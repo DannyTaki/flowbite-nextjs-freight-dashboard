@@ -4,4 +4,4 @@ export default function Page() {
       <h1>Book</h1>
     </div>
   );
-}   
+}
