@@ -19,7 +19,7 @@ export default function SignUpPage() {
       </Link>
       <Card
         horizontal
-        imgSrc="/images/authentication/create-account.jpg"
+        // imgSrc="/images/authentication/create-account.jpg"
         imgAlt=""
         className="w-full md:max-w-[1024px]"
         theme={{
@@ -40,10 +40,10 @@ export default function SignUpPage() {
           <div className="flex flex-col gap-y-2">
             <Label>Enter a Shipstation Order Number</Label>
             <TextInput
-              id="email"
-              name="email"
+              id="order-number"
+              name="order-number"
               placeholder="Order Number"
-              type="email"
+              type="text"
             />
           </div>
           <div className="mb-7">
