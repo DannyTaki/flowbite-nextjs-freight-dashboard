@@ -1,7 +1,64 @@
-export default function Page() {
+import { Button, Card, Checkbox, Label, TextInput } from "flowbite-react";
+import Image from "next/image";
+import Link from "next/link";
+
+export default function SignUpPage() {
   return (
-    <div>
-      <h1>Book</h1>
+    <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
+      <Link
+        href="/"
+        className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
+      >
+        <Image
+          alt=""
+          src="/images/alliancechemical.svg"
+          width={150}
+          height={150}
+          className="mr-4 h-11"
+        />
+      </Link>
+      <Card
+        horizontal
+        imgSrc="/images/authentication/create-account.jpg"
+        imgAlt=""
+        className="w-full md:max-w-[1024px]"
+        theme={{
+          root: {
+            children: "my-auto w-full gap-0 space-y-8 p-6 sm:p-8 lg:p-16",
+          },
+          img: {
+            horizontal: {
+              on: "hidden rounded-l-lg md:w-96 md:p-0 lg:block",
+            },
+          },
+        }}
+      >
+        <h2 className="text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+          Book Freight
+        </h2>
+        <form className="mt-8 space-y-6">
+          <div className="flex flex-col gap-y-2">
+            <Label>Enter a Shipstation Order Number</Label>
+            <TextInput
+              id="email"
+              name="email"
+              placeholder="Order Number"
+              type="email"
+            />
+          </div>
+          <div className="mb-7">
+            <Button
+              size="lg"
+              color="blue"
+              type="submit"
+              theme={{ inner: { base: "px-5 py-3" } }}
+              className="w-full px-0 py-[1px] sm:w-auto"
+            >
+              Submit
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 }

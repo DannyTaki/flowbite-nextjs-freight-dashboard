@@ -6,22 +6,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentProps, FC, HTMLAttributeAnchorTarget } from "react";
 import { useEffect, useState } from "react";
+import { BsFillTrainFreightFrontFill } from "react-icons/bs";
 import {
   HiAdjustments,
   HiChartPie,
   HiClipboardList,
   HiCog,
   HiCollection,
-  HiDocumentReport,
-  HiInboxIn,
   HiLockClosed,
   HiSearch,
-  HiShoppingBag,
   HiSupport,
-  HiUsers,
-  HiViewGrid,
 } from "react-icons/hi";
-import { BsFillTrainFreightFrontFill }  from "react-icons/bs";
 import { twMerge } from "tailwind-merge";
 
 interface SidebarItem {
@@ -429,7 +424,11 @@ function LanguageDropdown() {
 const pages: SidebarItem[] = [
   { href: "/", icon: HiChartPie, label: "Dashboard" },
   // eslint-disable-next-line prettier/prettier
-  { href: "/book-freight", icon: BsFillTrainFreightFrontFill, label: "Book Freight" },
+  {
+    href: "/book-freight",
+    icon: BsFillTrainFreightFrontFill,
+    label: "Book Freight",
+  },
   // { href: "/mailing/inbox", icon: HiInboxIn, label: "Inbox", badge: "3" },
   // {
   //   icon: HiShoppingBag,
