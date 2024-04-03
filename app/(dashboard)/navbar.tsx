@@ -75,13 +75,13 @@ export function DashboardNavbar() {
               <Image
                 className="mr-3 h-8"
                 alt=""
-                src="/images/logo.svg"
-                width={32}
-                height={32}
+                src={computedMode === "light" ? "/images/alliancechemical.svg" : "/images/alliancechemical_dark.svg"}
+                width={200}
+                height={200}
               />
-              <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
-                Flowbite
-              </span>
+              {/* <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
+              
+              </span> */}
             </Navbar.Brand>
             <form className="hidden lg:block lg:pl-2">
               <Label htmlFor="search" className="sr-only">

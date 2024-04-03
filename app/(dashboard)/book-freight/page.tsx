@@ -1,8 +1,11 @@
-import { Button, Card, Checkbox, Label, TextInput } from "flowbite-react";
+'use client'
+
+import { Button, Card, Checkbox, Label, TextInput, useThemeMode } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function SignUpPage() {
+  const { computedMode } = useThemeMode();
   return (
     <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
       <Link
@@ -11,7 +14,7 @@ export default function SignUpPage() {
       >
         <Image
           alt=""
-          src="/images/alliancechemical.svg"
+          src={computedMode == "light" ? "/images/alliancechemical.svg" : "/images/alliancechemical_dark.svg"}
           width={150}
           height={150}
           className="mr-4 h-11"
