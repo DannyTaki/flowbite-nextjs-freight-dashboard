@@ -10,7 +10,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Next.js Tailwind CSS Dashboard - Flowbite",
+  title: "Alliance Chemical - FreightView - Book Freight",
   description:
     "Get started with a premium admin dashboard layout built with React, Tailwind CSS and Flowbite featuring 21 example pages including charts, kanban board, mailing system, and more.",
 };
