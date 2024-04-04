@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { Button, Card, Checkbox, Label, TextInput, useThemeMode } from "flowbite-react";
+import { Button, Card, Label, TextInput, useThemeMode } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,7 +14,11 @@ export default function SignUpPage() {
       >
         <Image
           alt=""
-          src={computedMode == "light" ? "/images/alliancechemical.svg" : "/images/alliancechemical_dark.svg"}
+          src={
+            computedMode == "light"
+              ? "/images/alliancechemical.svg"
+              : "/images/alliancechemical_dark.svg"
+          }
           width={150}
           height={150}
           className="mr-4 h-11"

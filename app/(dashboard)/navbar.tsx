@@ -75,7 +75,11 @@ export function DashboardNavbar() {
               <Image
                 className="mr-3 h-8"
                 alt=""
-                src={computedMode === "light" ? "/images/alliancechemical.svg" : "/images/alliancechemical_dark.svg"}
+                src={
+                  computedMode === "light"
+                    ? "/images/alliancechemical.svg"
+                    : "/images/alliancechemical_dark.svg"
+                }
                 width={200}
                 height={200}
               />
