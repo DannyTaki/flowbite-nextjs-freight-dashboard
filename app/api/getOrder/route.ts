@@ -14,6 +14,7 @@ const shipStation = new Shipstation({
   apiSecret: credentials.secret,
 });
 
+
 const getOrderList = async (
   client: Shipstation,
   opts: object,
@@ -46,7 +47,11 @@ export async function POST(request: Request) {
       if (typeof orderNumber === "string" && orderNumber.length === 0) {
         return new Response("Order number must not be empty, and must be a string", { status: 400 });
       }
-      const orders = await getOrderList(shipStation, orderNumber);
+      const opts = {
+        orderNumber: orderNumber,
+      };
+      
+      const orders = await getOrderList(shipStation, opts);
       return new Response(JSON.stringify({ orderNumber, orders }), { 
         status: 200, 
         headers: { 'Content-Type': 'application/json' } // Make sure to set Content-Type as application/json
