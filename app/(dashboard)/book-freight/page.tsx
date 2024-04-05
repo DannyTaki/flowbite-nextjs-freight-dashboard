@@ -10,25 +10,23 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   const orderNumber = formData.get("order-number");
   console.log("Order Number: " + orderNumber);
 
-
   const response = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + '/api/getOrder',
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/getOrder",
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderNumber }),
-    }
-  )
+    },
+  );
 
   if (response.ok) {
-    alert('Order Fetched Successfully!')
+    alert("Order Fetched Successfully!");
+  } else {
+    alert("Failed to fetch order");
   }
-  else {
-    alert('Failed to fetch order')
-  }
-}
+};
 
 export default function SignUpPage() {
   const { computedMode } = useThemeMode();

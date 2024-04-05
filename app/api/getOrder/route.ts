@@ -1,4 +1,3 @@
-import { get } from "http";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
 
@@ -13,7 +12,6 @@ const shipStation = new Shipstation({
   apiKey: credentials.key,
   apiSecret: credentials.secret,
 });
-
 
 const getOrderList = async (
   client: Shipstation,
@@ -35,33 +33,34 @@ const getOrderList = async (
 // }
 
 export async function POST(request: Request) {
- 
-  try { 
-        if (!request.body) {
-        return new Response("Request body is required", { status: 400 });
-      }
-      const { orderNumber } = await request.json();
-      if (orderNumber === null || orderNumber === undefined) {
-        return new Response("Order number is required", { status: 400 });
-      }
-      if (typeof orderNumber === "string" && orderNumber.length === 0) {
-        return new Response("Order number must not be empty, and must be a string", { status: 400 });
-      }
-      const opts = {
-        orderNumber: orderNumber,
-      };
-      
-      const orders = await getOrderList(shipStation, opts);
-      return new Response(JSON.stringify({ orderNumber, orders }), { 
-        status: 200, 
-        headers: { 'Content-Type': 'application/json' } // Make sure to set Content-Type as application/json
-      });
+  try {
+    if (!request.body) {
+      return new Response("Request body is required", { status: 400 });
+    }
+    const { orderNumber } = await request.json();
+    if (orderNumber === null || orderNumber === undefined) {
+      return new Response("Order number is required", { status: 400 });
+    }
+    if (typeof orderNumber === "string" && orderNumber.length === 0) {
+      return new Response(
+        "Order number must not be empty, and must be a string",
+        { status: 400 },
+      );
+    }
+    const opts = {
+      orderNumber: orderNumber,
+    };
+
+    const orders = await getOrderList(shipStation, opts);
+    return new Response(JSON.stringify({ orderNumber, orders }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }, // Make sure to set Content-Type as application/json
+    });
   } catch (error: unknown) {
     if (error instanceof Error) {
       return new Response(error.message, { status: 500 });
+    } else {
+      console.log("Error: " + error);
     }
-    else {
-      console.log("Error: " + error); 
-    }
-  } 
-} 
+  }
+}
