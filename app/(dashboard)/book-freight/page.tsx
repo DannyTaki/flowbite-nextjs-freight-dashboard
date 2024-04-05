@@ -4,6 +4,32 @@ import { Button, Card, Label, TextInput, useThemeMode } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const formData = new FormData(e.currentTarget);
+  const orderNumber = formData.get("order-number");
+  console.log("Order Number: " + orderNumber);
+
+
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + '/api/getOrder',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderNumber }),
+    }
+  )
+
+  if (response.ok) {
+    alert('Order Fetched Successfully!')
+  }
+  else {
+    alert('Failed to fetch order')
+  }
+}
+
 export default function SignUpPage() {
   const { computedMode } = useThemeMode();
   return (
@@ -43,7 +69,7 @@ export default function SignUpPage() {
         <h2 className="text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
           Book Freight
         </h2>
-        <form className="mt-8 space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-y-2">
             <Label>Enter a Shipstation Order Number</Label>
             <TextInput
