@@ -3,33 +3,42 @@
 import { Button, Card, Label, TextInput, useThemeMode } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
+import React, {useState} from 'react';
+import { IOrderPaginationResult, IOrder } from "shipstation-node/typings/models"; 
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const formData = new FormData(e.currentTarget);
-  const orderNumber = formData.get("order-number");
-  console.log("Order Number: " + orderNumber);
-
-  const response = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + "/api/getOrder",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderNumber }),
-    },
-  );
-
-  if (response.ok) {
-    alert("Order Fetched Successfully!");
-  } else {
-    alert("Failed to fetch order");
-  }
-};
 
 export default function SignUpPage() {
   const { computedMode } = useThemeMode();
+  const [orderData, setOrderData] = useState<IOrderPaginationResult | null>(null);
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const orderNumber = formData.get("order-number");
+    console.log("Order Number: " + orderNumber);
+  
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_BASE_URL + "/api/getOrder",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderNumber }),
+      },
+    );
+  
+    if (response.ok) {
+      const data: IOrderPaginationResult = await response.json();
+      setOrderData(data);
+      console.log(data);
+    } else {
+      alert("Failed to fetch order");
+    }
+  };
+
+
   return (
     <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
       <Link
@@ -89,6 +98,17 @@ export default function SignUpPage() {
             </Button>
           </div>
         </form>
+        {orderData && orderData.orders.length > 0 && (
+          <div className="order-details mt-4 p-4 border border-gray-200 rounded shadow-lg">
+            <h3 className="text-lg font-semibold">Order Details:</h3>
+            <p>Order ID: {orderData.orders[0].orderId.toString()}</p>
+            <p>Order Number: {orderData.orders[0].orderNumber}</p>
+            <p>Order Date: {orderData.orders[0].orderDate}</p>
+            <p>Total Paid: ${orderData.orders[0].amountPaid.toString()}</p>
+            <p>Order Status: {orderData.orders[0].orderStatus}</p>
+            <p>Shipping to: {orderData.orders[0].shipTo.name}, {orderData.orders[0].shipTo.city}, {orderData.orders[0].shipTo.state}</p>
+          </div>
+        )}
       </Card>
     </div>
   );
