@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 import { customTheme } from "./theme";
+import { ReactQueryProvider } from "./react-query-provider";
 
 import "./globals.css";
 
@@ -27,7 +28,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <ThemeModeScript />
       </head>
       <body className={twMerge("bg-gray-50 dark:bg-gray-900", inter.className)}>
+        <ReactQueryProvider>
         <Flowbite theme={{ theme: customTheme }}>{children}</Flowbite>
+        </ReactQueryProvider>
       </body>
     </html>
   );
