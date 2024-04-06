@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
-import useSWR from "swr";
+
 
 export default function SignUpPage() {
   const { computedMode } = useThemeMode();
@@ -13,10 +13,6 @@ export default function SignUpPage() {
     null,
   );
   const [orderNumber, setOrderNumber] = useState(""); // This will trigger the useEffect when changed
-  const [isLoading, setLoading] = useState(false); // Track loading state
-
-  const fetcher = (url: string) =>
-    fetch(process.env.NEXT_PUBLIC_BASE_URL + url).then((res) => res.json());
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
