@@ -2,6 +2,9 @@
 
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
+import { z } from "zod";
+
+const FormData = z.object({ "order-number": z.string() });
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,

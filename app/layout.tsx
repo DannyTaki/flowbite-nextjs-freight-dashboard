@@ -1,12 +1,12 @@
-import { Flowbite, ThemeModeScript } from "flowbite-react";
+import { Flowbite, ThemeModeScript, Toast } from "flowbite-react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import type { PropsWithChildren } from "react";
+import { use, type PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 import { customTheme } from "./theme";
-
-
+import { ToastContext, useToastContext } from "flowbite-react/lib/esm/components/Toast/ToastContext";
 import "./globals.css";
+
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   description:
     "Get started with a premium admin dashboard layout built with React, Tailwind CSS and Flowbite featuring 21 example pages including charts, kanban board, mailing system, and more.",
 };
+
+
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
@@ -28,7 +30,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <ThemeModeScript />
       </head>
       <body className={twMerge("bg-gray-50 dark:bg-gray-900", inter.className)}>
-        <Flowbite theme={{ theme: customTheme }}>{children}</Flowbite>
+        
+        <Flowbite theme={{ theme: customTheme }}><ToastContext.Provider value={  }>{children}</ToastContext.Provider></Flowbite>
       </body>
     </html>
   );
