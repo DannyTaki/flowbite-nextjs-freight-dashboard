@@ -16,17 +16,18 @@ const shipStation = new Shipstation({
   apiSecret: credentials.secret,
 });
 
-
-export async function getOrder(formData: FormData): Promise<IOrderPaginationResult | null> {
-    try {
-        const rawFormData = {
-            orderNumber: formData.get("order-number"),
-        };
-        const orderList = await shipStation.orders.getAll(rawFormData);
-        console.log("Order List: " + JSON.stringify(orderList));
-        return orderList;
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-};
+export async function getOrder(
+  formData: FormData,
+): Promise<IOrderPaginationResult | null> {
+  try {
+    const rawFormData = {
+      orderNumber: formData.get("order-number"),
+    };
+    const orderList = await shipStation.orders.getAll(rawFormData);
+    console.log("Order List: " + JSON.stringify(orderList));
+    return orderList;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}

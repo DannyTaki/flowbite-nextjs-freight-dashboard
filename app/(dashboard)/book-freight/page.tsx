@@ -1,31 +1,28 @@
 "use client";
 
-import { Button, Card, Label, TextInput, useThemeMode, Toast } from "flowbite-react";
-import { HiX } from "react-icons/hi";
+import { Button, Card, Label, TextInput, useThemeMode } from "flowbite-react";
+import { useToastContext } from "flowbite-react/lib/esm/components/Toast/ToastContext";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useContext } from "react";
-import { getOrder } from "@/app/actions/action";
-import { useFormStatus } from 'react-dom';
+import { useFormStatus } from "react-dom";
 import { z } from "zod";
-import { useToastContext, ToastContext } from "flowbite-react/lib/esm/components/Toast/ToastContext";
-
 
 const optsSchema = z.object({
-  orderNumber: z.string().trim().min(1, {
-    message: "Order number must be at least 1 character long",
-  }).max(25, {
-    message: "Order number must be at most 25 characters long",
-  }),
+  orderNumber: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "Order number must be at least 1 character long",
+    })
+    .max(25, {
+      message: "Order number must be at most 25 characters long",
+    }),
 });
 
 export default function SignUpPage() {
   const { computedMode } = useThemeMode();
   const { pending } = useFormStatus();
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
   const toastContext = useToastContext();
-
 
   const clientAction = async (formData: FormData) => {
     //construct new options object
@@ -40,28 +37,26 @@ export default function SignUpPage() {
       let errorMessage = "";
       // result.error.flatten();
       result.error.issues.forEach((issue) => {
-        errorMessage = issue.message + '. ';
+        errorMessage = issue.message + ". ";
       });
-      setToastMessage(errorMessage);
-      setShowToast(true);
+      toastContext.setIsClosed(false);
       return;
     }
 
     // await getOrder();
-  }
+  };
 
   return (
-    
-    <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">   
-    {showToast && (
+    <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
+      {/* {showToast && (
         <Toast>
-        <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
-          <HiX className="h-5 w-5" />
-        </div>
-        <div className="ml-3 text-sm font-normal">{toastMessage}</div>
-        <Toast.Toggle onClick={() => setShowToast(false)} />
-      </Toast>
-    )}
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
+            <HiX className="h-5 w-5" />
+          </div>
+          <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+          <Toast.Toggle onClick={() => setShowToast(false)} />
+        </Toast>
+      )} */}
       <Link
         href="/"
         className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
