@@ -25,6 +25,7 @@ export default function BookFreight()
   const [icon, setIcon] = useState<ReactElement | null>(null);
   const [toastStyle, setToastStyle] = useState<string | null>(null);
   const [chevronRight, setChevronRight] = useState<boolean| null>(true);
+  const [disableFreightBtn, setDisableFreightBtn] = useState<boolean | undefined>(true);
 
   function handleChevronClick() {
     setChevronRight(prev => !prev);
@@ -35,6 +36,7 @@ export default function BookFreight()
   {
     setOrderData(null);
     setShowToast(false);
+    setDisableFreightBtn(true);
 
     const opts = {
       orderNumber: formData.get("order-number"),
@@ -65,6 +67,7 @@ export default function BookFreight()
         setToastMessage("Order data loaded successfully!");
         setToastStyle("bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200");
         setIcon(<HiCheck className="h-5 w-5" />);
+        setDisableFreightBtn(false);
       } else {
         setShowToast(true);
         setToastMessage("No orders found with that order number");
@@ -118,7 +121,7 @@ export default function BookFreight()
                 <Button type="submit" size="lg" color="blue" disabled={pending}>
                   Submit
                 </Button>
-                <Button type="submit" size="lg" color="success" disabled={true} >
+                <Button type="submit" size="lg" color="success" disabled={disableFreightBtn} >
                   Book Freight
                 </Button>
                 </div>
