@@ -1,12 +1,11 @@
 import { Flowbite, ThemeModeScript } from "flowbite-react";
-import { ToastContext } from "flowbite-react/lib/esm/components/Toast/ToastContext";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { type PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 import "./globals.css";
 import { customTheme } from "./theme";
-import { toastTheme } from "flowbite-react/lib/esm/components/Toast";
+
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -29,17 +28,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <ThemeModeScript />
       </head>
       <body className={twMerge("bg-gray-50 dark:bg-gray-900", inter.className)}>
-        <ToastContext.Provider
-          value={{
-            isClosed: true,
-            setIsClosed: () => {},
-            setIsRemoved: () => {},
-            theme: toastTheme,
-            isRemoved: true,
-          }}
-        >
           <Flowbite theme={{ theme: customTheme }}>{children}</Flowbite>
-        </ToastContext.Provider>
       </body>
     </html>
   );

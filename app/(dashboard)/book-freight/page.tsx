@@ -1,11 +1,12 @@
 "use client";
 
-import { Button, Card, Label, TextInput, useThemeMode } from "flowbite-react";
-import { useToastContext } from "flowbite-react/lib/esm/components/Toast/ToastContext";
+import { Button, Card, Label, TextInput, useThemeMode, Toast } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { z } from "zod";
+import { useState } from "react"; 
+import { HiX } from "react-icons/hi";
 
 const optsSchema = z.object({
   orderNumber: z
@@ -22,7 +23,9 @@ const optsSchema = z.object({
 export default function SignUpPage() {
   const { computedMode } = useThemeMode();
   const { pending } = useFormStatus();
-  const toastContext = useToastContext();
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
 
   const clientAction = async (formData: FormData) => {
     //construct new options object
@@ -39,7 +42,8 @@ export default function SignUpPage() {
       result.error.issues.forEach((issue) => {
         errorMessage = issue.message + ". ";
       });
-      toastContext.setIsClosed(false);
+      setShowToast(true); 
+      setToastMessage(errorMessage);
       return;
     }
 
@@ -47,16 +51,17 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
-      {/* {showToast && (
-        <Toast>
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
-            <HiX className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">{toastMessage}</div>
-          <Toast.Toggle onClick={() => setShowToast(false)} />
-        </Toast>
-      )} */}
+    <>
+    {showToast && (
+      <Toast className="fixed top-30 right-5 mt-6">
+        <div  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
+          <HiX className="h-5 w-5" />
+        </div>
+        <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+        <Toast.Toggle onClick={() => setShowToast(false)} />
+      </Toast>
+    )}
+    <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen"> 
       <Link
         href="/"
         className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
@@ -92,5 +97,7 @@ export default function SignUpPage() {
         </form>
       </Card>
     </div>
+    
+    </>
   );
 }
