@@ -20,13 +20,14 @@ export default function BookFreight()
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [orderData, setOrderData] = useState<IOrderPaginationResult | null>(null);
-  const [icon, setIcon] = useState(<HiX className="h-5 w-5" />);
+  const [icon, setIcon] = useState<ReactElement | null>(null);
   const [toastStyle, setToastStyle] = useState<string | null>(null);
 
 
   const clientAction = async (formData: FormData) => 
   {
-    //construct new options object
+    setOrderData(null);
+    setShowToast(false);
 
     const opts = {
       orderNumber: formData.get("order-number"),
@@ -110,6 +111,33 @@ export default function BookFreight()
                   Submit
                 </Button>
               </form>
+              
+            </Card>
+            <Card className="w-full md:max-w-[1024px] mt-10">
+              <div className="order-details">
+              {orderData ? (
+                <div>
+                  <ul>
+                  <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">Shipment Details</h3>
+                    {orderData.orders.map(order => (
+                      <div className="grid grid-col-2">
+                        <ul key={order.orderId}>
+                          <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white ">Order Number: {order.orderNumber}</li>
+                          <li>Ship To Address</li>
+                          <li>{order.shipTo.name}</li>
+                          {order.shipTo.company && <li>Company: {order.shipTo.company}</li>}
+                          <li>{order.shipTo.street1}, {order.shipTo.street2}, {order.shipTo.street3}</li>                        
+                          <li>City: {order.shipTo.city}, {order.shipTo.state}, {order.shipTo.postalCode} </li>                                  
+                        </ul>
+                        <img className="col-start-2" src={order.items[0].imageUrl} width="150" height="150" />  
+                      </div>
+                    ))}
+                    </ul>
+                </div>
+              ) : (
+                <p>No order details available.</p>
+              )}
+            </div>
             </Card>
           </div> 
         </>
