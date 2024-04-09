@@ -6,10 +6,12 @@ import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { set, z } from "zod";
 import { useState, ReactElement } from "react"; 
-import { HiX, HiExclamation, HiCheck } from "react-icons/hi";
+import { HiX, HiExclamation, HiCheck, HiChevronDown, HiChevronRight } from "react-icons/hi";
 import { getOrder } from "@/app/actions/action";
 import { optsSchema } from "@/types/optsSchema";
 import { IOrder, type IOrderPaginationResult } from "shipstation-node/typings/models";
+import titleize from 'titleize';
+
 
 
 
@@ -22,6 +24,11 @@ export default function BookFreight()
   const [orderData, setOrderData] = useState<IOrderPaginationResult | null>(null);
   const [icon, setIcon] = useState<ReactElement | null>(null);
   const [toastStyle, setToastStyle] = useState<string | null>(null);
+  const [chevronRight, setChevronRight] = useState<boolean| null>(true);
+
+  function handleChevronClick() {
+    setChevronRight(prev => !prev);
+  }
 
 
   const clientAction = async (formData: FormData) => 
@@ -107,9 +114,14 @@ export default function BookFreight()
                   type="text"
                   required
                 />
+                <div className="flex flex-row gap gap-3">
                 <Button type="submit" size="lg" color="blue" disabled={pending}>
                   Submit
                 </Button>
+                <Button type="submit" size="lg" color="green" disabled={pending}>
+                  Book Freight
+                </Button>
+                </div>
               </form>
               
             </Card>
@@ -118,16 +130,23 @@ export default function BookFreight()
               {orderData ? (
                 <div>
                   <ul>
-                  <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">Shipment Details</h3>
-                    {orderData.orders.map(order => (
+                    <div className="flex flex-row">
+                      <button onClick={handleChevronClick} className="focus:outline-none">
+                        {chevronRight ? <HiChevronRight className="h-7 w-7 dark:text-white" /> : <HiChevronDown className="h-7 w-7 dark:text-white" />}
+                      </button>
+                      <button onClick={handleChevronClick} className="focus:outline-none">
+                      <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">Shipment Details</h3>
+                      </button>
+                    </div>
+                    {!chevronRight && orderData.orders.map(order => (
                       <div className="grid grid-col-2">
-                        <ul key={order.orderId}>
+                        <ul key={order.orderId} className="flex flex-col gap-1">
                           <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white ">Order Number: {order.orderNumber}</li>
-                          <li>Ship To Address</li>
-                          <li>{order.shipTo.name}</li>
-                          {order.shipTo.company && <li>Company: {order.shipTo.company}</li>}
-                          <li>{order.shipTo.street1}, {order.shipTo.street2}, {order.shipTo.street3}</li>                        
-                          <li>City: {order.shipTo.city}, {order.shipTo.state}, {order.shipTo.postalCode} </li>                                  
+                          <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white">Ship To Address</li>
+                          <li className="text-sm text-gray-900 lg:text-base dark:text-white">{order.shipTo.name}</li>
+                          {order.shipTo.company && <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{order.shipTo.company}</li>}
+                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{titleize(order.shipTo.street1)} {order.shipTo.street2 ? titleize(order.shipTo.street2) : ""} {order.shipTo.street3 ? titleize(order.shipTo.street3) : ""}</li>                        
+                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{titleize(order.shipTo.city)}, {order.shipTo.state}, {titleize(order.shipTo.postalCode)} </li>                                  
                         </ul>
                         <img className="col-start-2" src={order.items[0].imageUrl} width="150" height="150" />  
                       </div>
