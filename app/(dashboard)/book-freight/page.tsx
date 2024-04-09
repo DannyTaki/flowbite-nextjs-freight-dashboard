@@ -4,12 +4,11 @@ import { Button, Card, Label, TextInput, useThemeMode, Toast } from "flowbite-re
 import Image from "next/image";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
-import { set, z } from "zod";
 import { useState, ReactElement } from "react"; 
-import { HiX, HiExclamation, HiCheck, HiChevronDown, HiChevronRight } from "react-icons/hi";
+import { HiX, HiExclamation, HiCheck, HiChevronDown, HiChevronRight, HiPhone, HiMail } from "react-icons/hi";
 import { getOrder } from "@/app/actions/action";
 import { optsSchema } from "@/types/optsSchema";
-import { IOrder, type IOrderPaginationResult } from "shipstation-node/typings/models";
+import { type IOrderPaginationResult } from "shipstation-node/typings/models";
 import titleize from 'titleize';
 
 
@@ -26,9 +25,16 @@ export default function BookFreight()
   const [toastStyle, setToastStyle] = useState<string | null>(null);
   const [chevronRight, setChevronRight] = useState<boolean| null>(true);
   const [disableFreightBtn, setDisableFreightBtn] = useState<boolean | undefined>(true);
+  const [chevronItemRight, setChevronItemRight] = useState<boolean | null>(true);
 
-  function handleChevronClick() {
-    setChevronRight(prev => !prev);
+  function handleChevronClick(section: string) {
+    if (section === 'shipment') {
+      setChevronRight(prev => !prev);
+    }
+    if (section === 'item') {
+      setChevronItemRight(prev => !prev);
+    }
+    
   }
 
 
@@ -134,22 +140,30 @@ export default function BookFreight()
                 <div>
                   <ul>
                     <div className="flex flex-row">
-                      <button onClick={handleChevronClick} className="focus:outline-none">
+                      <button onClick={() => handleChevronClick('shipment')} className="focus:outline-none">
                         {chevronRight ? <HiChevronRight className="h-7 w-7 dark:text-white" /> : <HiChevronDown className="h-7 w-7 dark:text-white" />}
                       </button>
-                      <button onClick={handleChevronClick} className="focus:outline-none">
+                      <button onClick={() => handleChevronClick('shipment')} className="focus:outline-none">
                       <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">Shipment Details</h3>
                       </button>
                     </div>
                     {!chevronRight && orderData.orders.map(order => (
                       <div className="grid grid-col-2">
                         <ul key={order.orderId} className="flex flex-col gap-1">
-                          <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white ">Order Number: {order.orderNumber}</li>
+                          <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white mt-3">Order Number: {order.orderNumber}</li>
                           <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white">Ship To Address</li>
                           <li className="text-sm text-gray-900 lg:text-base dark:text-white">{order.shipTo.name}</li>
                           {order.shipTo.company && <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{order.shipTo.company}</li>}
                           <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{titleize(order.shipTo.street1)} {order.shipTo.street2 ? titleize(order.shipTo.street2) : ""} {order.shipTo.street3 ? titleize(order.shipTo.street3) : ""}</li>                        
-                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{titleize(order.shipTo.city)}, {order.shipTo.state}, {titleize(order.shipTo.postalCode)} </li>                                  
+                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{titleize(order.shipTo.city)}, {order.shipTo.state}, {titleize(order.shipTo.postalCode)}</li> 
+                          <div className="flex flex-row">
+                          <HiPhone className="h-5 w-5 dark:text-white mr-2" />
+                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{order.shipTo.phone}</li>    
+                          </div>  
+                          <div className="flex flex-row">
+                          <HiMail className="h-5 w-5 dark:text-white mr-2" />
+                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{order.customerEmail}</li>    
+                          </div>                      
                         </ul>
                         <img className="col-start-2" src={order.items[0].imageUrl} width="150" height="150" />  
                       </div>
@@ -161,6 +175,30 @@ export default function BookFreight()
               )}
             </div>
             </Card>
+          {orderData ? ( 
+            <Card className="w-full md:max-w-[1024px] mt-10"> 
+            <div className="item-details">
+              <div className="flex flex-row">
+                  <button onClick={() => handleChevronClick('item')} className="focus:outline-none">
+                    {chevronItemRight ? <HiChevronRight className="h-7 w-7 dark:text-white" /> : <HiChevronDown className="h-7 w-7 dark:text-white" />}
+                  </button>
+                  <button onClick={() => handleChevronClick('item')} className="focus:outline-none">
+                    <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">Item Details</h3>
+                  </button>
+              </div>
+              {!chevronItemRight && orderData.orders.map(order => (
+                <ul className="grid grid-cols-5 mt-4 bg-gradient-to-r from-green-400 to-blue-500 text-center ">
+                  <li>Item Name</li>
+                  <li>Image</li>
+                  <li>Unit Cost</li>
+                  <li>Quantity</li>
+                  <li>Total</li>
+                </ul>
+              ))}
+            </div>
+
+            </Card>
+          ) : ("")}
           </div> 
         </>
       );
