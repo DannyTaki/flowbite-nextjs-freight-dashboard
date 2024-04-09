@@ -2,9 +2,13 @@
 
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
-import { z } from "zod";
+import { optsSchema } from "@/types/optsSchema";
 
-const FormData = z.object({ "order-number": z.string() });
+interface ErrorResult { 
+  error: {
+    message: string;
+  };
+}
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,
@@ -17,13 +21,28 @@ const shipStation = new Shipstation({
 });
 
 export async function getOrder(
-  formData: FormData,
-): Promise<IOrderPaginationResult | null> {
+  opts: unknown
+): Promise<IOrderPaginationResult | null | ErrorResult> {
   try {
-    const rawFormData = {
-      orderNumber: formData.get("order-number"),
-    };
-    const orderList = await shipStation.orders.getAll(rawFormData);
+
+
+    // Server-side Validation
+    const result = optsSchema.safeParse(opts);
+    if (!result.success) {
+      let errorMessage = "";
+      // result.error.flatten();
+      result.error.issues.forEach((issue) => {
+        errorMessage = issue.message + ". ";
+      });
+      return {
+        error: {
+          message: errorMessage,
+        },
+      }
+    }
+
+
+    const orderList = await shipStation.orders.getAll(result.data);
     console.log("Order List: " + JSON.stringify(orderList));
     return orderList;
   } catch (err) {

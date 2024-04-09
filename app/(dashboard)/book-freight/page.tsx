@@ -4,27 +4,21 @@ import { Button, Card, Label, TextInput, useThemeMode, Toast } from "flowbite-re
 import Image from "next/image";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
-import { z } from "zod";
-import { useState } from "react"; 
-import { HiX } from "react-icons/hi";
+import { set, z } from "zod";
+import { useState, ReactElement } from "react"; 
+import { HiX, HiExclamation } from "react-icons/hi";
+import { getOrder } from "@/app/actions/action";
+import { optsSchema } from "@/types/optsSchema";
 
-const optsSchema = z.object({
-  orderNumber: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "Order number must be at least 1 character long",
-    })
-    .max(25, {
-      message: "Order number must be at most 25 characters long",
-    }),
-});
 
-export default function SignUpPage() {
+
+export default function BookFreight() {
   const { computedMode } = useThemeMode();
   const { pending } = useFormStatus();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [orderData, setOrderData] = useState(undefined);
+  const [icon, setIcon] = useState(<HiX className="h-5 w-5" />);
 
 
   const clientAction = async (formData: FormData) => {
@@ -38,7 +32,6 @@ export default function SignUpPage() {
     const result = optsSchema.safeParse(opts);
     if (!result.success) {
       let errorMessage = "";
-      // result.error.flatten();
       result.error.issues.forEach((issue) => {
         errorMessage = issue.message + ". ";
       });
@@ -47,7 +40,17 @@ export default function SignUpPage() {
       return;
     }
 
-    // await getOrder();
+    const response = await getOrder(opts);
+    if(response !== null && 'error' in response) {
+      setShowToast(true);
+      setToastMessage(response.error.message);
+    } else {
+      if (response == null || response.orders.length === 0) {
+        setShowToast(true);
+        setToastMessage("No orders found with that order number");
+        setIcon(<HiExclamation className="h-5 w-5" />);
+      }
+    }
   };
 
   return (
@@ -55,7 +58,7 @@ export default function SignUpPage() {
     {showToast && (
       <Toast className="fixed top-30 right-5 mt-6">
         <div  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
-          <HiX className="h-5 w-5" />
+          {icon}
         </div>
         <div className="ml-3 text-sm font-normal">{toastMessage}</div>
         <Toast.Toggle onClick={() => setShowToast(false)} />
