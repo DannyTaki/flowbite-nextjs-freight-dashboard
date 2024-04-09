@@ -118,7 +118,7 @@ export default function BookFreight()
                 <Button type="submit" size="lg" color="blue" disabled={pending}>
                   Submit
                 </Button>
-                <Button type="submit" size="lg" color="green" disabled={pending}>
+                <Button type="submit" size="lg" color="success" disabled={true} >
                   Book Freight
                 </Button>
                 </div>
