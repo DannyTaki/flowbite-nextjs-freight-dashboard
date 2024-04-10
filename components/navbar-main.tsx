@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function NavbarMain() {
   return (
-    <nav className="fixed z-50 w-full border-b border-gray-200 bg-white sm:py-2 dark:border-gray-700 dark:bg-gray-800">
+    <nav className="fixed z-50 w-full border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:py-2">
       <div className="px-4 py-3 lg:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start">
@@ -69,7 +69,7 @@ export function NavbarMain() {
               className="mr-3 inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
             >
               <svg
-                className="-ml-1 mr-2 h-5 w-5"
+                className="-ml-1 mr-2 size-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -87,13 +87,13 @@ export function NavbarMain() {
             <button
               data-collapse-toggle="mobile-menu"
               type="button"
-              className="ml-3 inline-flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-300 sm:hidden dark:hover:bg-gray-700 dark:hover:text-white"
+              className="ml-3 inline-flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:hover:bg-gray-700 dark:hover:text-white sm:hidden"
               aria-controls="mobile-menu-2"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
               <svg
-                className="h-6 w-6"
+                className="size-6"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -105,7 +105,7 @@ export function NavbarMain() {
                 />
               </svg>
               <svg
-                className="hidden h-6 w-6"
+                className="hidden size-6"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +160,7 @@ export function NavbarMain() {
               className="inline-flex w-full items-center px-3 py-2 text-base font-normal text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
             >
               <svg
-                className="mr-2 h-5 w-5"
+                className="mr-2 size-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

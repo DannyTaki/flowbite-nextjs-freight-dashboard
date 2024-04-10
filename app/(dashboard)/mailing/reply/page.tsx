@@ -77,7 +77,7 @@ const MailingReplyPage: NextPage = function () {
 
 const Menu: FC = function () {
   return (
-    <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 sm:flex dark:border-gray-700 dark:bg-gray-800">
+    <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
       <div className="flex items-center divide-x divide-gray-100 dark:divide-gray-700">
         <div className="pr-3">
           <Link
@@ -85,7 +85,7 @@ const Menu: FC = function () {
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Return</span>
-            <HiArrowNarrowLeft className="h-6 w-6" />
+            <HiArrowNarrowLeft className="size-6" />
           </Link>
         </div>
         <div className="flex space-x-2 pl-0 sm:px-2">
@@ -94,49 +94,49 @@ const Menu: FC = function () {
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Save</span>
-            <HiClock className="h-6 w-6" />
+            <HiClock className="size-6" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Purge</span>
-            <HiExclamationCircle className="h-6 w-6" />
+            <HiExclamationCircle className="size-6" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Move</span>
-            <HiArchive className="h-6 w-6" />
+            <HiArchive className="size-6" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Tag</span>
-            <HiOutlineTag className="h-6 w-6" />
+            <HiOutlineTag className="size-6" />
           </Link>
         </div>
         <div className="pl-3 text-sm font-medium text-gray-500 dark:text-gray-400">
           Today, 08:34 AM
         </div>
       </div>
-      <div className="hidden space-x-2 divide-x divide-gray-100 pl-0 sm:flex sm:px-2 dark:divide-gray-700">
+      <div className="hidden space-x-2 divide-x divide-gray-100 pl-0 dark:divide-gray-700 sm:flex sm:px-2">
         <div className="flex gap-1 pr-2">
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Reply</span>
-            <HiOutlineReply className="h-6 w-6" />
+            <HiOutlineReply className="size-6" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Delete</span>
-            <HiTrash className="h-6 w-6" />
+            <HiTrash className="size-6" />
           </Link>
         </div>
         <div className="flex gap-1 pl-2">
@@ -145,14 +145,14 @@ const Menu: FC = function () {
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Previous</span>
-            <HiChevronLeft className="h-7 w-7" />
+            <HiChevronLeft className="size-7" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Next</span>
-            <HiChevronRight className="h-7 w-7" />
+            <HiChevronRight className="size-7" />
           </Link>
         </div>
       </div>
@@ -162,7 +162,7 @@ const Menu: FC = function () {
 
 const SendForm: FC = function () {
   return (
-    <div className="bottom-0 right-0 w-full border-t border-gray-200 bg-white p-4 lg:fixed lg:pl-64 dark:border-gray-700 dark:bg-gray-800">
+    <div className="bottom-0 right-0 w-full border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 lg:fixed lg:pl-64">
       <form className="mb-3 lg:pl-4">
         <div className="mb-4">
           <Label htmlFor="reply-to" className="sr-only">
@@ -186,7 +186,7 @@ const SendForm: FC = function () {
           />
         </div>
       </form>
-      <div className="items-center sm:flex sm:divide-x sm:divide-gray-100 lg:pl-4 dark:divide-gray-700">
+      <div className="items-center dark:divide-gray-700 sm:flex sm:divide-x sm:divide-gray-100 lg:pl-4">
         <div className="mb-3 space-y-3 sm:mb-0 sm:flex sm:space-x-3 sm:space-y-0">
           <Button color="primary" href="/mailing/reply">
             <div className="flex items-center gap-x-2">
@@ -201,28 +201,28 @@ const SendForm: FC = function () {
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Add emoji</span>
-            <HiFaceSmile className="h-6 w-6" />
+            <HiFaceSmile className="size-6" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Attach</span>
-            <HiPaperClip className="h-6 w-6" />
+            <HiPaperClip className="size-6" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Screenshot</span>
-            <HiOutlinePhotograph className="h-6 w-6" />
+            <HiOutlinePhotograph className="size-6" />
           </Link>
           <Link
             href="#"
             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
           >
             <span className="sr-only">Print</span>
-            <HiPrinter className="h-6 w-6" />
+            <HiPrinter className="size-6" />
           </Link>
         </div>
       </div>

@@ -34,7 +34,7 @@ const ECommerceProductsPageContent: FC<ECommerceProductsPageData> = function ({
 }) {
   return (
     <>
-      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 sm:flex dark:border-gray-700 dark:bg-gray-800">
+      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
         <div className="mb-1 w-full">
           <div className="mb-4">
             <Breadcrumb className="mb-5">
@@ -49,13 +49,13 @@ const ECommerceProductsPageContent: FC<ECommerceProductsPageData> = function ({
               </Breadcrumb.Item>
               <Breadcrumb.Item>Products</Breadcrumb.Item>
             </Breadcrumb>
-            <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
               All products
             </h1>
           </div>
           <div className="block items-center sm:flex">
             <SearchForProducts />
-            <div className="hidden space-x-1 border-l border-gray-100 pl-2 md:flex dark:border-gray-700">
+            <div className="hidden space-x-1 border-l border-gray-100 pl-2 dark:border-gray-700 md:flex">
               <Link
                 href="#"
                 className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -181,7 +181,7 @@ const AddProductModal: FC = function () {
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className="flex h-32 w-full cursor-pointer flex-col rounded border-2 border-dashed border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700">
                 <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                  <HiOutlineUpload className="h-10 w-10 text-gray-400" />
+                  <HiOutlineUpload className="size-10 text-gray-400" />
                   <p className="py-1 text-sm text-gray-600 dark:text-gray-500">
                     Upload a file or drag and drop
                   </p>
@@ -210,7 +210,7 @@ const EditProductModal: FC = function () {
   return (
     <>
       <Button size="sm" color="blue" onClick={() => setOpen(!isOpen)}>
-        <HiPencilAlt className="mr-2 h-5 w-5" />
+        <HiPencilAlt className="mr-2 size-5" />
         Edit item
       </Button>
       <Modal onClose={() => setOpen(false)} show={isOpen}>
@@ -260,7 +260,7 @@ const EditProductModal: FC = function () {
             <div className="my-4 flex space-x-5">
               <div>
                 <Image
-                  className="h-24 w-24 min-w-24"
+                  className="size-24 min-w-24"
                   alt="Apple iMac 1"
                   height={96}
                   src="/images/products/apple-imac-1.png"
@@ -273,7 +273,7 @@ const EditProductModal: FC = function () {
               </div>
               <div>
                 <Image
-                  className="h-24 w-24 min-w-24"
+                  className="size-24 min-w-24"
                   alt="Apple iMac 2"
                   height={96}
                   src="/images/products/apple-imac-2.png"
@@ -286,7 +286,7 @@ const EditProductModal: FC = function () {
               </div>
               <div>
                 <Image
-                  className="h-24 w-24 min-w-24"
+                  className="size-24 min-w-24"
                   alt="Apple iMac 3"
                   height={96}
                   src="/images/products/apple-imac-3.png"
@@ -302,7 +302,7 @@ const EditProductModal: FC = function () {
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className="flex h-32 w-full cursor-pointer flex-col rounded border-2 border-dashed border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700">
                 <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                  <HiOutlineUpload className="h-10 w-10 text-gray-400" />
+                  <HiOutlineUpload className="size-10 text-gray-400" />
                   <p className="py-1 text-sm text-gray-600 dark:text-gray-500">
                     Upload a file or drag and drop
                   </p>
@@ -336,7 +336,7 @@ const DeleteProductModal: FC = function () {
         className="!bg-red-700"
         onClick={() => setOpen(!isOpen)}
       >
-        <HiTrash className="mr-2 h-5 w-5" />
+        <HiTrash className="mr-2 size-5" />
         Delete item
       </Button>
       <Modal onClose={() => setOpen(false)} show={isOpen} size="md">
@@ -345,7 +345,7 @@ const DeleteProductModal: FC = function () {
         </Modal.Header>
         <Modal.Body className="px-6 pb-6 pt-0">
           <div className="flex flex-col items-center gap-y-6 text-center">
-            <HiOutlineExclamationCircle className="mx-auto h-20 w-20 text-red-600" />
+            <HiOutlineExclamationCircle className="mx-auto size-20 text-red-600" />
             <p className="text-xl font-normal text-gray-500 dark:text-gray-400">
               Are you sure you want to delete this product?
             </p>
@@ -442,19 +442,19 @@ const ProductsTable: FC<ECommerceProductsPageData> = function ({ products }) {
 
 function TableNavigation() {
   return (
-    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 sm:flex sm:justify-between dark:border-gray-700 dark:bg-gray-800">
+    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex sm:justify-between">
       <div className="mb-4 flex items-center sm:mb-0">
         <a
           href="#"
           className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white"
         >
-          <HiChevronLeft className="h-7 w-7" />
+          <HiChevronLeft className="size-7" />
         </a>
         <a
           href="#"
           className="mr-2 inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white"
         >
-          <HiChevronRight className="h-7 w-7" />
+          <HiChevronRight className="size-7" />
         </a>
         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
           Showing{" "}
@@ -469,12 +469,12 @@ function TableNavigation() {
       </div>
       <div className="flex items-center space-x-3">
         <Button color="blue" size="sm" href="#">
-          <HiChevronLeft className="-ml-1 mr-1 h-5 w-5" />
+          <HiChevronLeft className="-ml-1 mr-1 size-5" />
           Previous
         </Button>
         <Button color="blue" size="sm" href="#">
           Next
-          <HiChevronRight className="-mr-1 ml-1 h-5 w-5" />
+          <HiChevronRight className="-mr-1 ml-1 size-5" />
         </Button>
       </div>
     </div>

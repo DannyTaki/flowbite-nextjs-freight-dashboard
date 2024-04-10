@@ -32,10 +32,10 @@ const DashboardPageContent: FC<DashboardPageData> = function ({ dashboard }) {
 
 const SalesThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="mb-4 flex items-center justify-between">
         <div className="shrink-0">
-          <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white">
+          <span className="text-2xl font-bold leading-none text-gray-900 dark:text-white sm:text-3xl">
             {formatToUSD(dashboard.salesThisWeek.sales)}
           </span>
           <h3 className="text-base font-normal text-gray-600 dark:text-gray-400">
@@ -45,7 +45,7 @@ const SalesThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         <div className="flex flex-1 items-center justify-end text-base font-bold text-green-500 dark:text-green-400">
           {dashboard.salesThisWeek.percentage * 100}%
           <svg
-            className="h-5 w-5"
+            className="size-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -59,16 +59,16 @@ const SalesThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         </div>
       </div>
       <SalesApexChart dashboard={dashboard} />
-      <div className="mt-5 flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-6 dark:border-gray-700">
+      <div className="mt-5 flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
         <DateRangeDropdown />
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Sales Report
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -213,10 +213,10 @@ const SalesApexChart: FC<DashboardPageData> = function ({ dashboard }) {
 
 const NewProductsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="flex items-center">
         <div className="shrink-0">
-          <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white">
+          <span className="text-2xl font-bold leading-none text-gray-900 dark:text-white sm:text-3xl">
             {formatNumber(dashboard.newProductsThisWeek.products)}
           </span>
           <h3 className="text-base font-normal text-gray-600 dark:text-gray-400">
@@ -226,7 +226,7 @@ const NewProductsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         <div className="ml-5 flex w-0 flex-1 items-center justify-end text-base font-bold text-green-500 dark:text-green-400">
           {dashboard.newProductsThisWeek.percentage * 100}%
           <svg
-            className="h-5 w-5"
+            className="size-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -240,16 +240,16 @@ const NewProductsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         </div>
       </div>
       <NewProductsApexChart dashboard={dashboard} />
-      <div className="flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-6 dark:border-gray-700">
+      <div className="flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
         <DateRangeDropdown />
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Products Report
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -343,10 +343,10 @@ const NewProductsApexChart: FC<DashboardPageData> = function ({ dashboard }) {
 
 const VisitorsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="flex items-center">
         <div className="shrink-0">
-          <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white">
+          <span className="text-2xl font-bold leading-none text-gray-900 dark:text-white sm:text-3xl">
             {formatNumber(dashboard.visitorsThisWeek.visitors)}
           </span>
           <h3 className="text-base font-normal text-gray-600 dark:text-gray-400">
@@ -356,7 +356,7 @@ const VisitorsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         <div className="ml-5 flex w-0 flex-1 items-center justify-end text-base font-bold text-green-500 dark:text-green-400">
           {dashboard.visitorsThisWeek.percentage * 100}%
           <svg
-            className="h-5 w-5"
+            className="size-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -370,16 +370,16 @@ const VisitorsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         </div>
       </div>
       <VisitorsApexChart dashboard={dashboard} />
-      <div className="mt-3.5 flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-6 dark:border-gray-700">
+      <div className="mt-3.5 flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
         <DateRangeDropdown />
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Visits Report
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -451,10 +451,10 @@ const VisitorsApexChart: FC<DashboardPageData> = function ({ dashboard }) {
 
 const UserSignupsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="flex items-center">
         <div className="shrink-0">
-          <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white">
+          <span className="text-2xl font-bold leading-none text-gray-900 dark:text-white sm:text-3xl">
             {formatNumber(dashboard.userSignupsThisWeek.signups)}
           </span>
           <h3 className="text-base font-normal text-gray-600 dark:text-gray-400">
@@ -464,7 +464,7 @@ const UserSignupsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         <div className="ml-5 flex w-0 flex-1 items-center justify-end text-base font-bold text-red-500 dark:text-red-400">
           {dashboard.userSignupsThisWeek.percentage * 100}%
           <svg
-            className="h-5 w-5"
+            className="size-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -478,16 +478,16 @@ const UserSignupsThisWeek: FC<DashboardPageData> = function ({ dashboard }) {
         </div>
       </div>
       <UserSignupsApexChart dashboard={dashboard} />
-      <div className="flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-6 dark:border-gray-700">
+      <div className="flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
         <DateRangeDropdown />
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Users Report
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -609,7 +609,7 @@ const UserSignupsApexChart: FC<DashboardPageData> = function ({ dashboard }) {
 
 const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
   return (
-    <div className="mb-4 rounded-lg bg-white p-4 shadow sm:p-6 xl:mb-0 xl:p-8 2xl:col-span-2 dark:bg-gray-800">
+    <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:mb-0 xl:p-8 2xl:col-span-2">
       <div className="mb-4">
         <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
           Sessions by country
@@ -623,7 +623,7 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
         <li className="w-full items-center sm:flex">
           <div className="mb-3 flex items-center sm:mb-0">
             <svg
-              className="h-4 w-4"
+              className="size-4"
               viewBox="0 0 26 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -716,7 +716,7 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
                 </linearGradient>
               </defs>
             </svg>
-            <span className="mx-5 ml-3 w-32 text-base font-medium text-gray-900 sm:flex-none dark:text-white">
+            <span className="mx-5 ml-3 w-32 text-base font-medium text-gray-900 dark:text-white sm:flex-none">
               United States
             </span>
           </div>
@@ -732,7 +732,7 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
         <li className="w-full items-center sm:flex">
           <div className="mb-3 flex items-center sm:mb-0">
             <svg
-              className="h-4 w-4"
+              className="size-4"
               viewBox="0 0 26 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -805,7 +805,7 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
         <li className="w-full items-center sm:flex">
           <div className="mb-3 flex items-center sm:mb-0">
             <svg
-              className="h-4 w-4"
+              className="size-4"
               viewBox="0 0 26 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -872,7 +872,7 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
         <li className="w-full items-center sm:flex">
           <div className="mb-3 flex items-center sm:mb-0">
             <svg
-              className="h-4 w-4"
+              className="size-4"
               viewBox="0 0 26 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -939,7 +939,7 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
         <li className="w-full items-center sm:flex">
           <div className="mb-3 flex items-center sm:mb-0">
             <svg
-              className="h-4 w-4"
+              className="size-4"
               viewBox="0 0 26 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -1071,7 +1071,7 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
         <li className="w-full items-center sm:flex">
           <div className="mb-3 flex items-center sm:mb-0">
             <svg
-              className="h-4 w-4"
+              className="size-4"
               viewBox="0 0 26 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -1148,16 +1148,16 @@ const SessionsByCountry: FC<DashboardPageData> = function ({ dashboard }) {
           </div>
         </li>
       </ul>
-      <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-6 dark:border-gray-700">
+      <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
         <DateRangeDropdown />
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Location Overview
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1221,7 +1221,7 @@ const SessionsByCountryMap: FC<DashboardPageData> = function ({ dashboard }) {
 
 const LatestCustomers: FC<DashboardPageData> = function ({ dashboard }) {
   return (
-    <div className="mb-4 h-full rounded-lg bg-white p-4 shadow sm:p-6 dark:bg-gray-800">
+    <div className="mb-4 h-full rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-xl font-bold leading-none text-gray-900 dark:text-white">
           Latest Customers
@@ -1263,16 +1263,16 @@ const LatestCustomers: FC<DashboardPageData> = function ({ dashboard }) {
           ))}
         </ul>
       </div>
-      <div className="flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-6 dark:border-gray-700">
+      <div className="flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
         <DateRangeDropdown />
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Sales Report
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1294,7 +1294,7 @@ const LatestCustomers: FC<DashboardPageData> = function ({ dashboard }) {
 
 const AcquisitionOverview: FC<DashboardPageData> = function ({ dashboard }) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <h3 className="text-xl font-bold leading-none text-gray-900 dark:text-white">
         Acquisition Overview
       </h3>
@@ -1354,16 +1354,16 @@ const AcquisitionOverview: FC<DashboardPageData> = function ({ dashboard }) {
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-6 dark:border-gray-700">
+      <div className="flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
         <DateRangeDropdown />
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Acquisition Report
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1465,7 +1465,7 @@ const Transactions: FC<DashboardPageData> = function ({ dashboard }) {
   }
 
   return (
-    <div className="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
@@ -1540,11 +1540,11 @@ const Transactions: FC<DashboardPageData> = function ({ dashboard }) {
         <div className="shrink-0">
           <Link
             href="#"
-            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 sm:text-sm dark:text-primary-500 dark:hover:bg-gray-700"
+            className="inline-flex items-center rounded-lg p-2 text-xs font-medium uppercase text-primary-700 hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700 sm:text-sm"
           >
             Transactions Report
             <svg
-              className="ml-1 h-4 w-4 sm:h-5 sm:w-5"
+              className="ml-1 size-4 sm:size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

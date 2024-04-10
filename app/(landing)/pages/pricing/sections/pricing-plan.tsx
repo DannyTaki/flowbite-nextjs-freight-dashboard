@@ -56,10 +56,10 @@ export function PricingPlan() {
 
   return (
     <>
-      <h1 className="mb-3 text-3xl font-bold text-gray-900 sm:text-5xl sm:leading-none sm:tracking-tight dark:text-white">
+      <h1 className="mb-3 text-3xl font-bold text-gray-900 dark:text-white sm:text-5xl sm:leading-none sm:tracking-tight">
         Our pricing plan made simple
       </h1>
-      <p className="mb-6 text-lg font-normal text-gray-500 sm:text-xl dark:text-gray-400">
+      <p className="mb-6 text-lg font-normal text-gray-500 dark:text-gray-400 sm:text-xl">
         All types of businesses need access to development resources, so we give
         you the option to decide how much you need to use.
       </p>
@@ -163,7 +163,7 @@ function PricingCard({
   href,
 }: PricingCardProps) {
   return (
-    <div className="flex flex-col rounded-lg bg-white p-6 shadow xl:p-8 dark:bg-gray-800">
+    <div className="flex flex-col rounded-lg bg-white p-6 shadow dark:bg-gray-800 xl:p-8">
       <div className="flex-1">
         <h3 className="mb-4 text-2xl font-semibold text-gray-500 dark:text-gray-400">
           {title}
@@ -219,7 +219,7 @@ function PricingCardBenefit({
     >
       <Icon
         className={twMerge(
-          "h-5 w-5 shrink-0 text-green-400",
+          "size-5 shrink-0 text-green-400",
           disabled && "text-gray-400 dark:text-gray-500",
         )}
       />

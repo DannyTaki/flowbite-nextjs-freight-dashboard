@@ -32,7 +32,7 @@ import type { UsersListPageData } from "./page";
 const UsersListPageContent: FC<UsersListPageData> = function ({ usersList }) {
   return (
     <>
-      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 sm:flex dark:border-gray-700 dark:bg-gray-800">
+      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
         <div className="mb-1 w-full">
           <div className="mb-4">
             <Breadcrumb className="mb-5">
@@ -45,12 +45,12 @@ const UsersListPageContent: FC<UsersListPageData> = function ({ usersList }) {
               <Breadcrumb.Item href="/users/list">Users</Breadcrumb.Item>
               <Breadcrumb.Item>List</Breadcrumb.Item>
             </Breadcrumb>
-            <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
               All users
             </h1>
           </div>
           <div className="sm:flex">
-            <div className="mb-3 hidden items-center sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100 dark:divide-gray-700">
+            <div className="mb-3 hidden items-center dark:divide-gray-700 sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
               <form className="lg:pr-3">
                 <Label htmlFor="users-search" className="sr-only">
                   Search
@@ -264,7 +264,7 @@ const AllUsersTable: FC<UsersListPageData> = function ({ usersList }) {
               <div className="flex items-center">
                 <div
                   className={twMerge(
-                    "mr-2 h-2.5 w-2.5 rounded-full",
+                    "mr-2 size-2.5 rounded-full",
                     user.status === "Active" ? "bg-green-400" : "bg-red-500",
                   )}
                 />
@@ -296,7 +296,7 @@ const EditUserModal: FC = function () {
         onClick={() => setOpen(true)}
       >
         <div className="flex items-center gap-x-2">
-          <HiPencilAlt className="h-5 w-5" />
+          <HiPencilAlt className="size-5" />
           Edit user
         </div>
       </Button>
@@ -408,7 +408,7 @@ const DeleteUserModal: FC = function () {
         onClick={() => setOpen(true)}
       >
         <div className="flex items-center gap-x-2">
-          <HiTrash className="h-5 w-5" />
+          <HiTrash className="size-5" />
           Delete user
         </div>
       </Button>
@@ -418,7 +418,7 @@ const DeleteUserModal: FC = function () {
         </Modal.Header>
         <Modal.Body className="px-6 pb-6 pt-0">
           <div className="flex flex-col items-center gap-y-6 text-center">
-            <HiOutlineExclamationCircle className="mx-auto h-20 w-20 text-red-600" />
+            <HiOutlineExclamationCircle className="mx-auto size-20 text-red-600" />
             <p className="text-xl font-normal text-gray-500 dark:text-gray-400">
               Are you sure you want to delete this user?
             </p>
@@ -459,21 +459,21 @@ const Pagination: FC<UsersListPageData> = function ({ usersList }) {
   };
 
   return (
-    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 sm:flex sm:justify-between dark:border-gray-700 dark:bg-gray-800">
+    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex sm:justify-between">
       <div className="mb-4 flex items-center sm:mb-0">
         <button
           onClick={previousPage}
           className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
         >
           <span className="sr-only">Previous page</span>
-          <HiChevronLeft className="h-7 w-7" />
+          <HiChevronLeft className="size-7" />
         </button>
         <button
           onClick={nextPage}
           className="mr-2 inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
         >
           <span className="sr-only">Next page</span>
-          <HiChevronRight className="h-7 w-7" />
+          <HiChevronRight className="size-7" />
         </button>
         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
           Showing&nbsp;
@@ -492,7 +492,7 @@ const Pagination: FC<UsersListPageData> = function ({ usersList }) {
           href="#"
           className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
         >
-          <HiChevronLeft className="-ml-1 mr-1 h-5 w-5" />
+          <HiChevronLeft className="-ml-1 mr-1 size-5" />
           Previous
         </Link>
         <Link
@@ -500,7 +500,7 @@ const Pagination: FC<UsersListPageData> = function ({ usersList }) {
           className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
         >
           Next
-          <HiChevronRight className="-mr-1 ml-1 h-5 w-5" />
+          <HiChevronRight className="-mr-1 ml-1 size-5" />
         </Link>
       </div>
     </div>

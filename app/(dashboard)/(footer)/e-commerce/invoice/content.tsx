@@ -33,11 +33,11 @@ const ECommerceInvoicePageContent: FC<ECommerceInvoicePageData> = function ({
             </Breadcrumb.Item>
             <Breadcrumb.Item>Invoice</Breadcrumb.Item>
           </Breadcrumb>
-          <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
             Invoice
           </h1>
         </div>
-        <div className="col-span-12 mx-4 mb-4 rounded-lg bg-white p-4 shadow sm:p-6 md:mx-6 lg:my-6 xl:col-span-10 xl:col-start-2 xl:p-8 2xl:col-span-8 2xl:col-start-3 dark:bg-gray-800">
+        <div className="col-span-12 mx-4 mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 md:mx-6 lg:my-6 xl:col-span-10 xl:col-start-2 xl:p-8 2xl:col-span-8 2xl:col-start-3">
           <Invoice invoice={invoice} />
         </div>
       </div>
@@ -47,8 +47,8 @@ const ECommerceInvoicePageContent: FC<ECommerceInvoicePageData> = function ({
 
 const Menu: FC = function () {
   return (
-    <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 sm:flex dark:border-gray-700 dark:bg-gray-800">
-      <div className="mb-3 flex items-center sm:mb-0 sm:divide-x sm:divide-gray-100 dark:divide-gray-700">
+    <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
+      <div className="mb-3 flex items-center dark:divide-gray-700 sm:mb-0 sm:divide-x sm:divide-gray-100">
         <form className="flex-auto lg:pr-3" action="#" method="GET">
           <Label htmlFor="invoice-search" className="sr-only">
             Search
@@ -83,7 +83,7 @@ const Menu: FC = function () {
         <div>
           <Link
             href="#"
-            className="inline-flex w-full items-center justify-center gap-x-2 rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            className="inline-flex w-full items-center justify-center gap-x-2 rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 sm:w-auto"
           >
             <HiDownload className="text-2xl" />
             Download Invoice
@@ -92,7 +92,7 @@ const Menu: FC = function () {
         <div>
           <Link
             href="#"
-            className="inline-flex w-full items-center justify-center gap-x-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            className="inline-flex w-full items-center justify-center gap-x-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:w-auto"
           >
             <HiPrinter className="text-2xl" />
             Print
@@ -107,7 +107,7 @@ const Invoice: FC<ECommerceInvoicePageData> = function ({ invoice }) {
   return (
     <div className="space-y-6 overflow-hidden p-4 md:p-8">
       <div className="sm:flex">
-        <div className="mb-5 text-2xl font-bold sm:mb-0 sm:text-3xl dark:text-white">
+        <div className="mb-5 text-2xl font-bold dark:text-white sm:mb-0 sm:text-3xl">
           Invoice #{invoice.id}
         </div>
         <div className="space-y-3 text-left sm:ml-auto sm:text-right">
@@ -116,7 +116,7 @@ const Invoice: FC<ECommerceInvoicePageData> = function ({ invoice }) {
             height={40}
             src={invoice.issuer.logo}
             width={40}
-            className="h-10 w-10 sm:ml-auto"
+            className="size-10 sm:ml-auto"
           />
           <div className="space-y-1">
             <div className="text-lg font-semibold text-gray-900 dark:text-white">

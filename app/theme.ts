@@ -82,7 +82,7 @@ export const customTheme: CustomFlowbiteTheme = {
     colors: {
       gray: twMerge(
         theme.textarea.colors.gray,
-        "text-base focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:focus:border-blue-500 dark:focus:ring-blue-500",
+        "text-base focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-sm",
       ),
     },
   },

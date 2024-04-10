@@ -48,7 +48,7 @@ export function DashboardNavbar() {
   return (
     <Navbar
       fluid
-      className="fixed top-0 z-30 w-full border-b border-gray-200 bg-white p-0 sm:p-0 dark:border-gray-700 dark:bg-gray-800"
+      className="fixed top-0 z-30 w-full border-b border-gray-200 bg-white p-0 dark:border-gray-700 dark:bg-gray-800 sm:p-0"
     >
       <div className="w-full p-3 pr-4">
         <div className="flex items-center justify-between">
@@ -61,14 +61,14 @@ export function DashboardNavbar() {
               {/* mobile */}
               <div className="lg:hidden">
                 {sidebar.mobile.isOpen ? (
-                  <HiX className="h-6 w-6" />
+                  <HiX className="size-6" />
                 ) : (
-                  <HiMenuAlt1 className="h-6 w-6" />
+                  <HiMenuAlt1 className="size-6" />
                 )}
               </div>
               {/* desktop */}
               <div className="hidden lg:block">
-                <HiMenuAlt1 className="h-6 w-6" />
+                <HiMenuAlt1 className="size-6" />
               </div>
             </button>
             <Navbar.Brand as={Link} href="/" className="mr-14">
@@ -104,9 +104,9 @@ export function DashboardNavbar() {
           </div>
           <div className="flex items-center lg:gap-3">
             <div className="flex items-center">
-              <button className="cursor-pointer rounded p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:ring-2 focus:ring-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:bg-gray-700 dark:focus:ring-gray-700">
+              <button className="cursor-pointer rounded p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:ring-2 focus:ring-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:bg-gray-700 dark:focus:ring-gray-700 lg:hidden">
                 <span className="sr-only">Search</span>
-                <HiSearch className="h-6 w-6" />
+                <HiSearch className="size-6" />
               </button>
               <NotificationBellDropdown />
               <AppDrawerDropdown />
@@ -139,12 +139,12 @@ function NotificationBellDropdown() {
       label={
         <span className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
           <span className="sr-only">Notifications</span>
-          <HiBell className="h-6 w-6" />
+          <HiBell className="size-6" />
         </span>
       }
       theme={{ content: "py-0" }}
     >
-      <div className="max-w-[24rem]">
+      <div className="max-w-96">
         <div className="block rounded-t-xl bg-gray-50 px-4 py-2 text-center text-base font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
           Notifications
         </div>
@@ -161,9 +161,9 @@ function NotificationBellDropdown() {
                 width={44}
                 className="rounded-full"
               />
-              <div className="absolute -mt-5 ml-6 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-primary-700 dark:border-gray-700">
+              <div className="absolute -mt-5 ml-6 flex size-5 items-center justify-center rounded-full border border-white bg-primary-700 dark:border-gray-700">
                 <svg
-                  className="h-3 w-3 text-white"
+                  className="size-3 text-white"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -198,9 +198,9 @@ function NotificationBellDropdown() {
                 width={44}
                 className="rounded-full"
               />
-              <div className="absolute -mt-5 ml-6 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-gray-900 dark:border-gray-700">
+              <div className="absolute -mt-5 ml-6 flex size-5 items-center justify-center rounded-full border border-white bg-gray-900 dark:border-gray-700">
                 <svg
-                  className="h-3 w-3 text-white"
+                  className="size-3 text-white"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -237,9 +237,9 @@ function NotificationBellDropdown() {
                 width={44}
                 className="rounded-full"
               />
-              <div className="absolute -mt-5 ml-6 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-red-600 dark:border-gray-700">
+              <div className="absolute -mt-5 ml-6 flex size-5 items-center justify-center rounded-full border border-white bg-red-600 dark:border-gray-700">
                 <svg
-                  className="h-3 w-3 text-white"
+                  className="size-3 text-white"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -280,9 +280,9 @@ function NotificationBellDropdown() {
                 width={44}
                 className="rounded-full"
               />
-              <div className="absolute -mt-5 ml-6 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-green-400 dark:border-gray-700">
+              <div className="absolute -mt-5 ml-6 flex size-5 items-center justify-center rounded-full border border-white bg-green-400 dark:border-gray-700">
                 <svg
-                  className="h-3 w-3 text-white"
+                  className="size-3 text-white"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -323,9 +323,9 @@ function NotificationBellDropdown() {
                 width={44}
                 className="rounded-full"
               />
-              <div className="absolute -mt-5 ml-6 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-purple-500 dark:border-gray-700">
+              <div className="absolute -mt-5 ml-6 flex size-5 items-center justify-center rounded-full border border-white bg-purple-500 dark:border-gray-700">
                 <svg
-                  className="h-3 w-3 text-white"
+                  className="size-3 text-white"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -353,7 +353,7 @@ function NotificationBellDropdown() {
           className="block rounded-b-xl border-t border-gray-200 bg-gray-50 py-2 text-center text-base font-normal text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:underline"
         >
           <div className="inline-flex items-center gap-x-2">
-            <HiEye className="h-5 w-5" />
+            <HiEye className="size-5" />
             <span>View all</span>
           </div>
         </Link>
@@ -371,7 +371,7 @@ function AppDrawerDropdown() {
       label={
         <span className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
           <span className="sr-only">Apps</span>
-          <HiViewGrid className="h-6 w-6" />
+          <HiViewGrid className="size-6" />
         </span>
       }
       theme={{ content: "py-0" }}
@@ -384,7 +384,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiShoppingBag className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiShoppingBag className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Sales
           </div>
@@ -393,7 +393,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiUsers className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiUsers className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Users
           </div>
@@ -402,7 +402,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiInbox className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiInbox className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Inbox
           </div>
@@ -411,7 +411,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiUserCircle className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiUserCircle className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Profile
           </div>
@@ -420,7 +420,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiCog className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiCog className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Settings
           </div>
@@ -429,7 +429,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiArchive className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiArchive className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Products
           </div>
@@ -438,7 +438,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiCurrencyDollar className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiCurrencyDollar className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Pricing
           </div>
@@ -447,7 +447,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiOutlineTicket className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiOutlineTicket className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Billing
           </div>
@@ -456,7 +456,7 @@ function AppDrawerDropdown() {
           href="#"
           className="block rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <HiLogout className="mx-auto mb-1 h-7 w-7 text-gray-500 dark:text-gray-400" />
+          <HiLogout className="mx-auto mb-1 size-7 text-gray-500 dark:text-gray-400" />
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             Logout
           </div>

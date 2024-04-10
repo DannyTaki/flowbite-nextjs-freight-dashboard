@@ -26,7 +26,6 @@ import {
 } from "react-icons/hi";
 import { type IOrderPaginationResult } from "shipstation-node/typings/models";
 import titleize from "titleize";
-import imagePlacholder from '@/public/images/image.png';
 
 export default function BookFreight() {
   const { computedMode } = useThemeMode();
@@ -76,7 +75,7 @@ export default function BookFreight() {
       setToastStyle(
         "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200",
       );
-      setIcon(<HiX className="h-5 w-5" />);
+      setIcon(<HiX className="size-5" />);
       return;
     }
 
@@ -84,7 +83,7 @@ export default function BookFreight() {
     if (response !== null && "error" in response) {
       setShowToast(true);
       setToastMessage(response.error.message);
-      setIcon(<HiX className="h-5 w-5" />);
+      setIcon(<HiX className="size-5" />);
     } else if (response && response.orders && response.orders.length > 0) {
       setOrderData(response);
       setShowToast(true);
@@ -92,7 +91,7 @@ export default function BookFreight() {
       setToastStyle(
         "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200",
       );
-      setIcon(<HiCheck className="h-5 w-5" />);
+      setIcon(<HiCheck className="size-5" />);
       setDisableFreightBtn(false);
     } else {
       setShowToast(true);
@@ -100,7 +99,7 @@ export default function BookFreight() {
       setToastStyle(
         "bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200",
       );
-      setIcon(<HiExclamation className="h-5 w-5" />);
+      setIcon(<HiExclamation className="size-5" />);
     }
   };
 
@@ -109,7 +108,7 @@ export default function BookFreight() {
       {showToast && (
         <Toast className="fixed right-5 top-28 mt-6">
           <div
-            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${toastStyle}`}
+            className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${toastStyle}`}
           >
             {icon}
           </div>
@@ -120,7 +119,7 @@ export default function BookFreight() {
       <div className="flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
         <Link
           href="/"
-          className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
+          className="mb-8 flex items-center justify-center text-2xl font-semibold dark:text-white lg:mb-10"
         >
           <Image
             alt=""
@@ -134,8 +133,8 @@ export default function BookFreight() {
             className="mr-4 h-11"
           />
         </Link>
-        <Card horizontal className="w-full md:max-w-[1024px]">
-          <h2 className="text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+        <Card horizontal className="w-full md:max-w-screen-lg">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
             Book Freight
           </h2>
           <form className="mt-8 space-y-6" action={clientAction}>
@@ -164,7 +163,7 @@ export default function BookFreight() {
             </div>
           </form>
         </Card>
-        <Card className="mt-10 w-full md:max-w-[1024px]">
+        <Card className="mt-10 w-full md:max-w-screen-lg">
           {orderData ? (
             <ul>
               <div className="flex flex-row">
@@ -173,16 +172,16 @@ export default function BookFreight() {
                   className="focus:outline-none"
                 >
                   {chevronRight ? (
-                    <HiChevronRight className="h-7 w-7 dark:text-white" />
+                    <HiChevronRight className="size-7 dark:text-white" />
                   ) : (
-                    <HiChevronDown className="h-7 w-7 dark:text-white" />
+                    <HiChevronDown className="size-7 dark:text-white" />
                   )}
                 </button>
                 <button
                   onClick={() => handleChevronClick("shipment")}
                   className="focus:outline-none"
                 >
-                  <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white lg:text-2xl">
                     Shipment Details
                   </h3>
                 </button>
@@ -191,21 +190,21 @@ export default function BookFreight() {
                 orderData.orders.map((order) => (
                   <div key={order.orderId} className="grid grid-cols-2">
                     <ul className="flex flex-col gap-1">
-                      <li className="mt-3 text-sm font-bold text-gray-900 lg:text-base dark:text-white">
+                      <li className="mt-3 text-sm font-bold text-gray-900 dark:text-white lg:text-base">
                         Order Number: {order.orderNumber}
                       </li>
-                      <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white">
+                      <li className="text-sm font-bold text-gray-900 dark:text-white lg:text-base">
                         Ship To Address
                       </li>
-                      <li className="text-sm text-gray-900 lg:text-base dark:text-white">
+                      <li className="text-sm text-gray-900 dark:text-white lg:text-base">
                         {order.shipTo.name}
                       </li>
                       {order.shipTo.company && (
-                        <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                        <li className="text-sm  text-gray-900 dark:text-white lg:text-base">
                           {order.shipTo.company}
                         </li>
                       )}
-                      <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                      <li className="text-sm  text-gray-900 dark:text-white lg:text-base">
                         {titleize(order.shipTo.street1)}{" "}
                         {order.shipTo.street2
                           ? titleize(order.shipTo.street2)
@@ -214,29 +213,29 @@ export default function BookFreight() {
                           ? titleize(order.shipTo.street3)
                           : ""}
                       </li>
-                      <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                      <li className="text-sm  text-gray-900 dark:text-white lg:text-base">
                         {titleize(order.shipTo.city)}, {order.shipTo.state},{" "}
                         {titleize(order.shipTo.postalCode)}
                       </li>
                       <div className="flex flex-row">
-                        <HiPhone className="mr-2 h-5 w-5 dark:text-white" />
-                        <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                        <HiPhone className="mr-2 size-5 dark:text-white" />
+                        <li className="text-sm  text-gray-900 dark:text-white lg:text-base">
                           {order.shipTo.phone}
                         </li>
                       </div>
                       <div className="flex flex-row">
-                        <HiMail className="mr-2 h-5 w-5 dark:text-white" />
-                        <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                        <HiMail className="mr-2 size-5 dark:text-white" />
+                        <li className="text-sm  text-gray-900 dark:text-white lg:text-base">
                           {order.customerEmail}
                         </li>
                       </div>
                     </ul>
-                    <Image
+                    <img
                       className="col-start-2"
-                      src={order.items[0]?.imageUrl || imagePlacholder}
+                      src={order.items[0]?.imageUrl || ""}
                       width="150"
                       height="150"
-                      alt="Order Item Image"
+                      alt="Order Item"
                     />
                   </div>
                 ))}
@@ -246,40 +245,60 @@ export default function BookFreight() {
           )}
         </Card>
         {orderData ? (
-          <Card className="mt-10 w-full md:max-w-[1024px]">
+          <Card className="mt-10 w-full md:max-w-screen-lg">
             <div className="flex flex-row">
               <button
                 onClick={() => handleChevronClick("item")}
                 className="focus:outline-none"
               >
                 {chevronItemRight ? (
-                  <HiChevronRight className="h-7 w-7 dark:text-white" />
+                  <HiChevronRight className="size-7 dark:text-white" />
                 ) : (
-                  <HiChevronDown className="h-7 w-7 dark:text-white" />
+                  <HiChevronDown className="size-7 dark:text-white" />
                 )}
               </button>
               <button
                 onClick={() => handleChevronClick("item")}
                 className="focus:outline-none"
               >
-                <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white lg:text-2xl">
                   Item Details
                 </h3>
               </button>
             </div>
-            {!chevronItemRight &&
-              orderData.orders.map((order) => (
-                <ul
-                  key={order.orderId}
-                  className="mt-4 grid grid-cols-5 bg-gradient-to-r from-green-400 to-blue-500 text-center "
-                >
-                  <li>Item Name</li>
-                  <li>Image</li>
-                  <li>Unit Cost</li>
-                  <li>Quantity</li>
-                  <li>Total</li>
+            {!chevronItemRight && (
+              <>
+                <ul className="mt-4 grid grid-cols-5 bg-gradient-to-r from-green-400 to-blue-500 text-center ">
+                  <li className="font-bold">Item Name</li>
+                  <li className="font-bold">Image</li>
+                  <li className="font-bold">Unit Cost</li>
+                  <li className="font-bold">Quantity</li>
+                  <li className="font-bold">Total</li>
                 </ul>
-              ))}
+                {orderData.orders.map((order) =>
+                  order.items.map((item, index) => (
+                    <ul
+                      key={index}
+                      className="grid grid-cols-5 items-center border-b bg-white text-center"
+                    >
+                      <li className="py-2">{item.name}</li>
+                      <li>
+                        <img
+                          src={item.imageUrl || ""}
+                          className="mx-auto size-10"
+                          alt="Order Item"
+                        />
+                      </li>
+                      <li>${item.unitPrice?.toFixed(2)}</li>
+                      <li>{item.quantity}</li>
+                      <li>
+                        ${((item.unitPrice || 0) * item.quantity).toFixed(2)}
+                      </li>
+                    </ul>
+                  )),
+                )}
+              </>
+            )}
           </Card>
         ) : (
           ""

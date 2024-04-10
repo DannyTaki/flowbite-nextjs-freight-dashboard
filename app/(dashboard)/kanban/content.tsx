@@ -97,7 +97,7 @@ const KanbanPageContent: FC<KanbanPageData> = function ({ kanbanBoards }) {
                             ))}
                           </div>
                           <div className="flex items-center justify-center rounded-lg bg-purple-100 px-3 text-sm font-medium text-purple-800 dark:bg-purple-200">
-                            <HiClock className="mr-1 h-4 w-4" /> 7 days left
+                            <HiClock className="mr-1 size-4" /> 7 days left
                           </div>
                         </div>
                       </div>
@@ -124,7 +124,7 @@ export const EditCardModal: FC = function () {
         className="rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
       >
         <span className="sr-only">Edit card</span>
-        <HiPencilAlt className="h-5 w-5" />
+        <HiPencilAlt className="size-5" />
       </button>
       <Modal onClose={() => setOpen(false)} show={isOpen}>
         <Modal.Header>Edit task</Modal.Header>
@@ -175,7 +175,7 @@ export const EditCardModal: FC = function () {
                     height={28}
                     src="/images/users/roberta-casas.png"
                     width={28}
-                    className="h-7 w-7 rounded-full border-2 border-white dark:border-gray-800"
+                    className="size-7 rounded-full border-2 border-white dark:border-gray-800"
                   />
                 </Link>
                 <div
@@ -211,7 +211,7 @@ export const EditCardModal: FC = function () {
                 className="ml-5 font-bold dark:bg-gray-600 [&>*]:px-2.5 [&>*]:py-1"
               >
                 <div className="flex items-center gap-x-2 text-xs">
-                  <HiPlusSm className="h-4 w-4" />
+                  <HiPlusSm className="size-4" />
                   Join
                 </div>
               </Button>
@@ -220,14 +220,14 @@ export const EditCardModal: FC = function () {
                 className="ml-3 font-bold dark:bg-gray-600 [&>*]:px-2.5 [&>*]:py-1"
               >
                 <div className="flex items-center gap-x-2 text-xs">
-                  <HiPaperClip className="h-4 w-4" />
+                  <HiPaperClip className="size-4" />
                   Attachment
                 </div>
               </Button>
             </div>
           </div>
           <div className="mb-2 inline-flex items-center text-center text-lg font-semibold text-gray-900 dark:text-white">
-            <HiDocumentText className="mr-1 h-5 w-5" />
+            <HiDocumentText className="mr-1 size-5" />
             Description
           </div>
           <div className="mb-4 space-y-2 text-base text-gray-500 dark:text-gray-400">
@@ -264,7 +264,7 @@ export const EditCardModal: FC = function () {
                 type="button"
                 className="inline-flex items-center rounded-lg bg-primary-700 px-3 py-1.5 text-center text-xs font-semibold text-white hover:bg-primary-800"
               >
-                <HiPaperClip className="mr-1 h-4 w-4" />
+                <HiPaperClip className="mr-1 size-4" />
                 Post comment
               </button>
               <div className="flex space-x-1 pl-0 sm:pl-2">
@@ -272,14 +272,14 @@ export const EditCardModal: FC = function () {
                   href="#"
                   className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
-                  <HiPaperClip className="h-6 w-6" />
+                  <HiPaperClip className="size-6" />
                 </Link>
                 <Link
                   href="#"
                   className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
                   <svg
-                    className="h-6 w-6"
+                    className="size-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -319,7 +319,7 @@ export const EditCardModal: FC = function () {
                 href="#"
                 className="rounded-lg p-1 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
               >
-                <HiDotsHorizontal className="h-4 w-4" />
+                <HiDotsHorizontal className="size-4" />
               </Link>
             </div>
             <ul className="list-outside list-disc pl-6 text-xs text-gray-500 dark:text-gray-400">
@@ -337,31 +337,31 @@ export const EditCardModal: FC = function () {
           <div className="grid w-full grid-cols-2 items-center gap-3 sm:grid-cols-5">
             <Button color="blue" onClick={() => setOpen(false)}>
               <div className="flex items-center gap-x-2">
-                <HiClipboardList className="h-5 w-5" />
+                <HiClipboardList className="size-5" />
                 Save
               </div>
             </Button>
             <Button color="gray" onClick={() => setOpen(false)}>
               <div className="flex items-center gap-x-2">
-                <PiCaretUpDownBold className="h-5 w-5" />
+                <PiCaretUpDownBold className="size-5" />
                 Move
               </div>
             </Button>
             <Button color="gray" onClick={() => setOpen(false)}>
               <div className="flex items-center gap-x-2">
-                <HiClipboardCopy className="h-5 w-5" />
+                <HiClipboardCopy className="size-5" />
                 Copy
               </div>
             </Button>
             <Button color="gray" onClick={() => setOpen(false)}>
               <div className="flex items-center gap-x-2">
-                <HiArchive className="h-5 w-5" />
+                <HiArchive className="size-5" />
                 Archive
               </div>
             </Button>
             <Button color="gray" onClick={() => setOpen(false)}>
               <div className="flex items-center gap-x-2">
-                <HiEye className="h-5 w-5" />
+                <HiEye className="size-5" />
                 Watch
               </div>
             </Button>
@@ -382,7 +382,7 @@ const AddAnotherCardModal: FC = function () {
         className="flex w-full items-center justify-center whitespace-nowrap rounded-lg border-2 border-dashed border-gray-200 px-5 py-2 font-semibold text-gray-500 hover:border-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:border-gray-800 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-white"
       >
         <svg
-          className="h-6 w-6"
+          className="size-6"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -421,7 +421,7 @@ const AddAnotherCardModal: FC = function () {
               <label className="flex h-32 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-gray-500 hover:border-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white">
                 <div className="flex items-center justify-center space-x-2">
                   <svg
-                    className="h-8 w-8"
+                    className="size-8"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

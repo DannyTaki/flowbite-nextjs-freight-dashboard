@@ -8,7 +8,7 @@ export default function ProfileLockPage() {
     <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
       <Link
         href="/"
-        className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
+        className="mb-8 flex items-center justify-center text-2xl font-semibold dark:text-white lg:mb-10"
       >
         <Image
           alt=""
@@ -22,7 +22,7 @@ export default function ProfileLockPage() {
         </span>
       </Link>
       <Card
-        className="w-full sm:max-w-screen-sm md:max-w-[640px] md:flex-row"
+        className="w-full sm:max-w-screen-sm md:max-w-screen-sm md:flex-row"
         theme={{ root: { children: "w-full p-6 sm:p-8 md:p-16" } }}
       >
         <div className="flex space-x-4">
@@ -31,9 +31,9 @@ export default function ProfileLockPage() {
             width={32}
             height={32}
             src="/images/users/bonnie-green.png"
-            className="h-8 w-8 rounded-full"
+            className="size-8 rounded-full"
           />
-          <h2 className="mb-3 text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+          <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
             Bonnie Green
           </h2>
         </div>
@@ -68,7 +68,7 @@ export default function ProfileLockPage() {
               color="blue"
               type="submit"
               theme={{ inner: { base: "flex items-center px-5 py-3" } }}
-              className="w-full px-0 py-[1px] sm:w-auto"
+              className="w-full px-0 py-px sm:w-auto"
             >
               <HiLockOpen className="mr-2 text-xl" />
               Unlock

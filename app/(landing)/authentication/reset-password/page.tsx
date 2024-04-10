@@ -7,7 +7,7 @@ export default function ResetPasswordPage() {
     <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
       <Link
         href="/"
-        className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
+        className="mb-8 flex items-center justify-center text-2xl font-semibold dark:text-white lg:mb-10"
       >
         <Image
           alt=""
@@ -24,7 +24,7 @@ export default function ResetPasswordPage() {
         horizontal
         imgAlt=""
         imgSrc="/images/authentication/reset-password.jpg"
-        className="w-full md:max-w-[1024px]"
+        className="w-full md:max-w-screen-lg"
         theme={{
           root: {
             children: "my-auto w-full gap-0 space-y-8 p-6 sm:p-8 lg:p-16",
@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
           },
         }}
       >
-        <h2 className="text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
           Reset your password
         </h2>
         <form className="mt-8 space-y-6">
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
               color="blue"
               type="submit"
               theme={{ inner: { base: "px-5 py-3" } }}
-              className="w-full px-0 py-[1px] sm:w-auto"
+              className="w-full px-0 py-px sm:w-auto"
             >
               Reset password
             </Button>

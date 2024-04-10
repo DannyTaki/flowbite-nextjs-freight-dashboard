@@ -23,7 +23,7 @@ const UserProfilePageDataContent: FC<UserProfilePageData> = function ({
           <Breadcrumb.Item href="/users/list">Users</Breadcrumb.Item>
           <Breadcrumb.Item>Profile</Breadcrumb.Item>
         </Breadcrumb>
-        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
           Profile
         </h1>
       </div>
@@ -42,7 +42,7 @@ const UserProfilePageDataContent: FC<UserProfilePageData> = function ({
 
 const ProfileIntro: FC<UserProfilePageData> = function ({ userProfile }) {
   return (
-    <div className="mb-4 rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="sm:flex sm:space-x-4 xl:block xl:space-x-0">
         <Image
           alt=""
@@ -55,11 +55,11 @@ const ProfileIntro: FC<UserProfilePageData> = function ({ userProfile }) {
           <h2 className="text-xl font-bold dark:text-white">Jese Leos</h2>
           <ul className="mt-2 space-y-1">
             <li className="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
-              <HiBriefcase className="mr-2 h-4 w-4 text-gray-900 dark:text-gray-100" />
+              <HiBriefcase className="mr-2 size-4 text-gray-900 dark:text-gray-100" />
               {userProfile.position}
             </li>
             <li className="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
-              <HiLocationMarker className="mr-2 h-4 w-4 text-gray-900 dark:text-gray-100" />
+              <HiLocationMarker className="mr-2 size-4 text-gray-900 dark:text-gray-100" />
               {userProfile.location}
             </li>
           </ul>
@@ -102,7 +102,7 @@ const ProfileIntro: FC<UserProfilePageData> = function ({ userProfile }) {
 
 const Skills: FC<UserProfilePageData> = function ({ userProfile }) {
   return (
-    <div className="mb-4 rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="flow-root">
         <h3 className="text-xl font-bold dark:text-white">Skills</h3>
         <ul className="mt-4 flex flex-wrap gap-2">
@@ -125,7 +125,7 @@ const Skills: FC<UserProfilePageData> = function ({ userProfile }) {
 
 const Hobbies: FC<UserProfilePageData> = function ({ userProfile }) {
   return (
-    <div className="mb-4 rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="flow-root">
         <h3 className="text-xl font-bold dark:text-white">Hobbies</h3>
         <ul className="mt-4 flex flex-wrap gap-2">
@@ -148,7 +148,7 @@ const Hobbies: FC<UserProfilePageData> = function ({ userProfile }) {
 
 const GeneralInformation: FC<UserProfilePageData> = function ({ userProfile }) {
   return (
-    <div className="mb-4 rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <h3 className="mb-4 text-xl font-bold dark:text-white">
         General information
       </h3>
@@ -251,7 +251,7 @@ const SkillProficiencyProgressBars: FC<UserProfilePageData> = function ({
   userProfile,
 }) {
   return (
-    <div className="mb-4 rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 dark:bg-gray-800">
+    <div className="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800 sm:p-6 xl:p-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-x-16 lg:gap-x-8 2xl:gap-x-24">
         {userProfile.skillProficiencies.map(({ skill, proficiency }) => (
           <div key={skill}>

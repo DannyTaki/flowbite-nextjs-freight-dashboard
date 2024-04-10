@@ -75,7 +75,7 @@ function DesktopSidebar() {
       aria-label="Sidebar with multi-level dropdown example"
       collapsed={isCollapsed}
       className={twMerge(
-        "fixed inset-y-0 left-0 z-20 flex h-full shrink-0 flex-col border-r border-gray-200 pt-16 duration-75 lg:flex dark:border-gray-700",
+        "fixed inset-y-0 left-0 z-20 flex h-full shrink-0 flex-col border-r border-gray-200 pt-16 duration-75 dark:border-gray-700 lg:flex",
         isCollapsed && "hidden w-16",
       )}
       id="sidebar"
@@ -112,7 +112,7 @@ function MobileSidebar() {
       <Sidebar
         aria-label="Sidebar with multi-level dropdown example"
         className={twMerge(
-          "fixed inset-y-0 left-0 z-20 hidden h-full shrink-0 flex-col border-r border-gray-200 pt-16 lg:flex dark:border-gray-700",
+          "fixed inset-y-0 left-0 z-20 hidden h-full shrink-0 flex-col border-r border-gray-200 pt-16 dark:border-gray-700 lg:flex",
           isOpen && "flex",
         )}
         id="sidebar"
@@ -147,7 +147,7 @@ function MobileSidebar() {
       <div
         onClick={close}
         aria-hidden="true"
-        className="fixed inset-0 z-10 h-full w-full bg-gray-900/50 pt-16 dark:bg-gray-900/90"
+        className="fixed inset-0 z-10 size-full bg-gray-900/50 pt-16 dark:bg-gray-900/90"
       />
     </>
   );
@@ -214,7 +214,7 @@ function BottomMenu({ isCollapsed }: { isCollapsed: boolean }) {
     >
       <button className="inline-flex cursor-pointer justify-center rounded p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white">
         <span className="sr-only">Tweaks</span>
-        <HiAdjustments className="h-6 w-6" />
+        <HiAdjustments className="size-6" />
       </button>
       <Tooltip content="Settings page">
         <Link
@@ -222,7 +222,7 @@ function BottomMenu({ isCollapsed }: { isCollapsed: boolean }) {
           className="inline-flex cursor-pointer justify-center rounded p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white"
         >
           <span className="sr-only">Settings page</span>
-          <HiCog className="h-6 w-6" />
+          <HiCog className="size-6" />
         </Link>
       </Tooltip>
       <div>
@@ -244,7 +244,7 @@ function LanguageDropdown() {
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
             viewBox="0 0 3900 3900"
-            className="h-5 w-5 rounded-full"
+            className="size-5 rounded-full"
           >
             <path fill="#b22234" d="M0 0h7410v3900H0z" />
             <path
@@ -288,7 +288,7 @@ function LanguageDropdown() {
           >
             <div className="inline-flex items-center">
               <svg
-                className="mr-2 h-4 w-4 rounded-full"
+                className="mr-2 size-4 rounded-full"
                 xmlns="http://www.w3.org/2000/svg"
                 id="flag-icon-css-us"
                 viewBox="0 0 512 512"
@@ -329,7 +329,7 @@ function LanguageDropdown() {
           >
             <div className="inline-flex items-center">
               <svg
-                className="mr-2 h-4 w-4 rounded-full"
+                className="mr-2 size-4 rounded-full"
                 xmlns="http://www.w3.org/2000/svg"
                 id="flag-icon-css-de"
                 viewBox="0 0 512 512"
@@ -349,7 +349,7 @@ function LanguageDropdown() {
           >
             <div className="inline-flex items-center">
               <svg
-                className="mr-2 h-4 w-4 rounded-full"
+                className="mr-2 size-4 rounded-full"
                 xmlns="http://www.w3.org/2000/svg"
                 id="flag-icon-css-it"
                 viewBox="0 0 512 512"
@@ -371,7 +371,7 @@ function LanguageDropdown() {
           >
             <div className="inline-flex items-center">
               <svg
-                className="mr-2 h-4 w-4 rounded-full"
+                className="mr-2 size-4 rounded-full"
                 xmlns="http://www.w3.org/2000/svg"
                 xmlnsXlink="http://www.w3.org/1999/xlink"
                 id="flag-icon-css-cn"

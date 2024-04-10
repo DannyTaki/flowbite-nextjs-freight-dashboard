@@ -44,11 +44,11 @@ const UserProfile: FC<Pick<UserFeedPageData, "userProfile">> = function ({
           </h2>
           <ul className="mt-2 space-y-1">
             <li className="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
-              <HiBriefcase className="mr-2 h-4 w-4 text-gray-900 dark:text-white" />
+              <HiBriefcase className="mr-2 size-4 text-gray-900 dark:text-white" />
               {userProfile.position}
             </li>
             <li className="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
-              <HiLocationMarker className="mr-2 h-4 w-4 text-gray-900 dark:text-white" />
+              <HiLocationMarker className="mr-2 size-4 text-gray-900 dark:text-white" />
               {userProfile.location}
             </li>
           </ul>
@@ -147,7 +147,7 @@ const UserFeed: FC<UserFeedPageData> = function ({ userFeed, userProfile }) {
                 href="#"
                 className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
               >
-                <MdComment className="mr-1 h-4 w-4" />
+                <MdComment className="mr-1 size-4" />
                 {userFeedEntry.numComments > 0
                   ? `${userFeedEntry.numComments} Comments`
                   : "No comments"}
@@ -156,7 +156,7 @@ const UserFeed: FC<UserFeedPageData> = function ({ userFeed, userProfile }) {
                 href="#"
                 className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
               >
-                <HiHeart className="mr-1 h-4 w-4" />
+                <HiHeart className="mr-1 size-4" />
                 {userFeedEntry.numLikes} Likes
               </Link>
             </div>
@@ -214,7 +214,7 @@ const UserFeed: FC<UserFeedPageData> = function ({ userFeed, userProfile }) {
                 key={institution}
                 className="flex items-center space-x-4 py-4 first-of-type:pt-0"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-900 text-sm font-bold uppercase text-white dark:bg-gray-600">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gray-900 text-sm font-bold uppercase text-white dark:bg-gray-600">
                   {institution.split(" ").map((word) => word.charAt(0))}
                 </div>
                 <div>

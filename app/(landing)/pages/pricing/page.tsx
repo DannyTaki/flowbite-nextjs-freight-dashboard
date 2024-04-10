@@ -6,7 +6,7 @@ export default function PricingPage() {
   return (
     <>
       <NavbarMain />
-      <div className="container mx-auto px-4 pt-32 lg:px-0 dark:bg-gray-900">
+      <div className="container mx-auto px-4 pt-32 dark:bg-gray-900 lg:px-0">
         <PricingPlan />
         <Benefits />
         <FAQ />

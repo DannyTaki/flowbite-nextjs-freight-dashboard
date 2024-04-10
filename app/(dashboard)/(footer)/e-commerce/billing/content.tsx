@@ -23,7 +23,7 @@ const ECommerceBillingPageContent: FC<ECommerceBillingPageData> = function ({
 }) {
   return (
     <>
-      <div className="mb-4 grid grid-cols-1 gap-y-6 px-4 pt-6 xl:grid-cols-2 xl:gap-4 dark:border-gray-700 dark:bg-gray-900">
+      <div className="mb-4 grid grid-cols-1 gap-y-6 px-4 pt-6 dark:border-gray-700 dark:bg-gray-900 xl:grid-cols-2 xl:gap-4">
         <div className="col-span-full xl:mb-2">
           <Breadcrumb className="mb-5">
             <Breadcrumb.Item href="#">
@@ -37,7 +37,7 @@ const ECommerceBillingPageContent: FC<ECommerceBillingPageData> = function ({
             </Breadcrumb.Item>
             <Breadcrumb.Item>Billing</Breadcrumb.Item>
           </Breadcrumb>
-          <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
             Billing
           </h1>
         </div>
@@ -82,16 +82,16 @@ const IntroCard: FC<Pick<ECommerceBillingPageData, "nextPayment">> = function ({
         <div>
           <Link
             href="#"
-            className="inline-flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            className="inline-flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 sm:w-auto"
           >
-            <HiDocumentText className="-ml-1 mr-2 h-5 w-5" />
+            <HiDocumentText className="-ml-1 mr-2 size-5" />
             Change Plan
           </Link>
         </div>
         <div>
           <Link
             href="#"
-            className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+            className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 sm:w-auto"
           >
             Cancel Subscription
           </Link>
