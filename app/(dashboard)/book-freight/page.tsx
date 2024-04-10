@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactElement } from "react";
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import {
   HiCheck,
   HiChevronDown,
@@ -25,6 +26,7 @@ import {
 } from "react-icons/hi";
 import { type IOrderPaginationResult } from "shipstation-node/typings/models";
 import titleize from "titleize";
+import imagePlacholder from '@/public/images/image.png';
 
 export default function BookFreight() {
   const { computedMode } = useThemeMode();
@@ -115,7 +117,7 @@ export default function BookFreight() {
           <Toast.Toggle onClick={() => setShowToast(false)} />
         </Toast>
       )}
-      <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
+      <div className="flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
         <Link
           href="/"
           className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
@@ -231,9 +233,7 @@ export default function BookFreight() {
                     </ul>
                     <Image
                       className="col-start-2"
-                      src={
-                        order.items[0]?.imageUrl || "./public/images/image.png"
-                      }
+                      src={order.items[0]?.imageUrl || imagePlacholder}
                       width="150"
                       height="150"
                       alt="Order Item Image"
