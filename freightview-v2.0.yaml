@@ -1,0 +1,4113 @@
+---
+openapi: 3.0.1
+info:
+  version: 2.0.0
+  title: Freightview API v2.0
+  description: |
+    # Introduction
+
+    The Freightview API is designed using the principles of REST APIs. It features predictable URLs that are focused on resources and their actions. We also take advantage of HTTP's built-in features, such as HTTP verbs and HTTP authentication. All responses to the Freightview API are returned in JSON.
+
+    **You must have an active account and carriers added to your account in Freightview to use the API.**
+
+    ## Getting started
+
+    ### Freightview API v2.0 Endpoints
+
+    * **Production:** https://api.freightview.com/v2.0
+
+    * **Sandbox:** https://api.freightview.dev/v2.0
+
+    Access to the sandbox environment is granted automatically, and will be available 24 hours after your Freightview account is setup and carriers have been added. If you have issues accessing the Freightview sandbox environment, please contact the Freightview support team via chat, email (support@freightview.com) or phone (913.353.6188).
+
+    Read more about migrating to Freightview API v2.0 [here](#section/Migrating-from-v1.0-to-v2.0).
+
+    ## Technical details
+
+    ### Rate limiting
+
+    The Freightview API does have a limit of 120 requests per minute, per endpoint. When this limit is exceeded the API will return HTTP status 429. The response headers include custom headers showing the rate limit (`Ratelimit-Limit`), how many remaining requests can be made within the time period (`Ratelimit-Remaining`), and how many seconds are remaining until the limit is reset (`Ratelimit-Reset`).
+
+    Example of the `Ratelimit` headers:
+    ```yaml
+    Ratelimit-Limit: 20
+    Ratelimit-Remaining: 19
+    Ratelimit-Reset: 13
+    ```
+
+    ### Request headers
+
+    All requests made to the Freightview API should include an `Accept:application/json` header, to avoid an HTTP 406 Not Acceptable error. If a request includes a request body, the `Content-Type:application/json` header should also be included.
+
+  contact:
+    name: Freightview Support
+    email: support@freightview.com
+
+servers:
+- url: https://api.freightview.dev
+  description: Sandbox
+- url: https://api.freightview.com
+  description: Production
+components:
+  securitySchemes:
+    OAuth:
+      type: oauth2
+      description: |
+        This API uses OAuth 2 with the client credentials grant flow.
+
+        Use the `access_token` from the response body as the bearer token in the Authorization header for all requests made to the Freightview API v2.0 endpoints.
+      flows:
+        clientCredentials:
+          tokenUrl: /v2.0/auth/token
+  schemas:
+    UnauthorizedError:
+      type: object
+      properties:
+        name:
+          type: string
+          default: UNAUTHORIZED
+          minLength: 1
+          description: |
+            The name of the error.
+
+            - `TOKEN_EXPIRED` - The request authorization failed because the provided token has expired.
+            - `UNAUTHORIZED` - The request authorization failed because the provided token was invalid.
+        requestId:
+          type: string
+          description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+          minLength: 1
+        message:
+          type: string
+          description: The error message.
+          minLength: 1
+      required:
+      - name
+      - requestId
+      - message
+    BadRequestError:
+      type: object
+      properties:
+        name:
+          type: string
+          default: BAD_REQUEST
+          description: The name of the error.
+          minLength: 1
+        requestId:
+          type: string
+          description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+          minLength: 1
+        message:
+          type: string
+          description: The error message.
+          minLength: 1
+      required:
+      - name
+      - requestId
+      - message
+    ValidationError:
+      type: object
+      properties:
+        name:
+          type: string
+          description: |
+            The name of the error.
+
+            - `VALIDATION_ERROR` - The input data was not valid, in either content or format (e.g. improperly formatted JSON). The `message` field will describe the error, and if applicable, the objects in the `errors` array will have details on which fields and values were invalid.
+          minLength: 1
+        requestId:
+          type: string
+          description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+          minLength: 1
+        message:
+          type: string
+          description: The error message.
+          minLength: 1
+        errors:
+          type: array
+          description: The errors associated with the request.
+          items:
+            "$ref": "#/components/schemas/ValidationErrorEntry"
+      required:
+      - name
+      - requestId
+      - message
+    ValidationErrorEntry:
+      type: object
+      properties:
+        propertyName:
+          type: string
+          description: The path to the property with invalid data.
+          minLength: 1
+        message:
+          type: string
+          description: The error message regarding the property.
+          minLength: 1
+        allowedValues:
+          type: array
+          description: The allowed values for the property.
+          items:
+            type: string
+        providedValue:
+          description: The value provided for the property.
+          anyOf:
+          - type: number
+          - type: string
+          - type: boolean
+          - type: object
+          - type: array
+      required:
+      - propertyName
+      - message
+    TokenResponseDTO:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: The access token that should be used as the bearer token on all subsequent API calls.
+        expires_in:
+          type: number
+          description: The amount of time the token is valid. Will always be 86400 seconds (24 hours).
+        scope:
+          type: string
+          description: The access token scope.
+        token_type:
+          type: string
+          description: The type of token generated. Will always be **Bearer**.
+          enum:
+          - Bearer
+    GenerateTokenReqDTO:
+      type: object
+      properties:
+        client_id:
+          type: string
+          description: The client id to use when generating the access token.
+          minLength: 1
+        client_secret:
+          type: string
+          description: The client secret to use when generating the access token.
+          minLength: 1
+        grant_type:
+          type: string
+          description: The grant type to use when generating access token.
+          enum:
+          - client_credentials
+          minLength: 1
+      required:
+      - client_id
+      - client_secret
+      - grant_type
+    ExternalPagedShipmentsDTO:
+      type: object
+      properties:
+        shipments:
+          type: array
+          description: An array of shipments that matched the query parameters.
+          items:
+            "$ref": "#/components/schemas/ExternalShipmentDTO"
+        continuationToken:
+          type: string
+          description: |
+            - If search results (in the `data` array) exceed 20 shipments, then a `continuationToken` value will be returned.
+            - Pass the `continuationToken` as a query parameter to retrieve the next set of search results.
+            - If `continuationToken` is not present, then no further results are available.
+    ExternalShipmentDTO:
+      type: object
+      properties:
+        bookedDate:
+          type: string
+          format: date-time
+          description: Date / time when shipment was awarded to carrier.
+        createdDate:
+          type: string
+          format: date-time
+          description: Date / time when shipment was created.
+        shipmentId:
+          type: string
+          description: The unique identifier in Freightview for this shipment.
+        pickupDate:
+          type: string
+          format: date
+          description: The requested date for pickup of the shipment.
+        status:
+          type: string
+          description: |
+            - `pending` - Shipment has been created.
+            - `awarded` - Shipment has been awarded to a carrier.
+            - `confirmed` - Shipment has been confirmed by carrier.
+            - `picked-up` - Shipment has been picked up.
+            - `delivered` - Shipment has been delivered.
+            - `canceled` - Shipment has been canceled by the shipper.
+          enum:
+          - pending
+          - awarded
+          - confirmed
+          - picked-up
+          - delivered
+          - canceled
+        locations:
+          type: array
+          description: The shipment's locations, e.g. origin, destination and any stops in between.
+          items:
+            "$ref": "#/components/schemas/ExternalLocationDTO"
+        billTo:
+          "$ref": "#/components/schemas/ApiBillToDTO"
+        equipment:
+          "$ref": "#/components/schemas/ExternalEquipmentDTO"
+        customsBroker:
+          "$ref": "#/components/schemas/ApiCustomsBrokerDTO"
+        emergencyContact:
+          "$ref": "#/components/schemas/ApiEmergencyContactDTO"
+        isLiveLoad:
+          type: boolean
+          description: |
+            A flag to indicate whether the shipper considers the shipment a "live load".
+
+            - `true` - This is a "live load" that will be shipped.
+            - `false` - This shipment is "quote only".
+        isArchived:
+          type: boolean
+          description: A flag to indicate whether the shipment has been archived in Freightview.
+        items:
+          type: array
+          description: The items (handling units) being transported as part of the shipment.
+          items:
+            "$ref": "#/components/schemas/ExternalHandlingUnitDTO"
+        direction:
+          type: string
+          description: The direction of the the shipment (based on the locations setup for the account).
+          enum:
+          - inbound
+          - outbound
+          - third-party
+        refNums:
+          type: array
+          description: The reference numbers associated with the shipment.
+          items:
+            "$ref": "#/components/schemas/ReadOnlyRefNum"
+        selectedQuote:
+          "$ref": "#/components/schemas/ExternalQuoteDTO"
+        tracking:
+          "$ref": "#/components/schemas/LoadTrackDetailDTO"
+        documents:
+          type: array
+          description: The documents for the shipment.
+          items:
+            "$ref": "#/components/schemas/ExternalDocumentDTO"
+        pickup:
+          "$ref": "#/components/schemas/ExternalPickupDetailsDTO"
+        bol:
+          "$ref": "#/components/schemas/ExternalBOLDetailsDTO"
+        invoice:
+          "$ref": "#/components/schemas/ExternalInvoiceDTO"
+        quotedBy:
+          type: string
+          description: The name of the user who quoted the shipment.
+        bookedBy:
+          type: string
+          description: The name of the user who booked the shipment.
+        shipmentDetailsUrl:
+          type: string
+          description: A direct link to access the details for this shipment within Freightview.
+        shipmentQuotePageUrl:
+          type: string
+          description: A direct link to access all of the quotes for this shipment within Freightview.
+    ExternalLocationDTO:
+      type: object
+      properties:
+        company:
+          type: string
+          description: Company name for the location.
+        address:
+          type: string
+          description: Address for the location.
+        address2:
+          type: string
+          description: Address line 2 for the location.
+        city:
+          type: string
+          description: City for the location.
+        state:
+          type: string
+          description: Two character state / province abbreviation for the location.
+        postalCode:
+          type: string
+          description: |
+            Postal code of the location in US or Canadian format.
+
+            Valid formats (USA):
+              - `10111`
+              - `10111-1111`
+
+            Valid formats (Canada):
+              - `A9A9A9`
+              - `A9A 9A9`
+              - `A9A-9A9`
+          example: "10111"
+          pattern: "(^\\d{5}([ :-]?\\d{4})?)$|(^[A-z]\\d[A-z][ :-]?\\d[A-z]\\d$)"
+          minLength: 1
+        country:
+          type: string
+          description: Two character country code for the location.
+          enum:
+          - us
+          - ca
+          # - mx
+          example: us
+        stopDate:
+          type: string
+          format: date
+          example: '2021-03-01'
+          description: The date of the stop at the location.
+        stopDateType:
+          type: string
+          description: An indicator of whether the stop should be made on the stop date, or by the stop date.
+          enum:
+          - 'on'
+          - by
+          # - between
+        stopType:
+          type: string
+          description: An indicator of whether freight will be picked up, delivered, or both at this stop.
+          enum:
+          - pickup
+          - delivery
+          - both
+        sequence:
+          type: number
+          description: The sequence of the location within the shipment, starting at 0.
+        accessorials:
+          type: array
+          description: The accessorials associated with the location.
+          items:
+            "$ref": "#/components/schemas/LocationAccessorialDTO"
+        refNums:
+          type: array
+          description: Reference numbers for the location.
+          items:
+            "$ref": "#/components/schemas/LocationRefNum"
+        type:
+          type: string
+          description: An indicator of whether the location is the origin / destination of the shipment, or a stop in between.
+          enum:
+          - origin
+          - destination
+          - stop
+          minLength: 1
+        lat:
+          type: number
+          description: The latitude of the location.
+        lng:
+          type: number
+          description: The longitude of the location.
+        timezone:
+          type: string
+          description: The timezone of the location in [IANA timezone](https://www.iana.org/time-zones) format. e.g. `America/New_York`
+        opensAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The time the location will open in 24-hr format.
+          example: '15:30'
+        closesAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The time the location will close in 24-hr format.
+          example: '15:30'
+        contactName:
+          type: string
+          description: The name of a contact person at the location.
+        contactEmail:
+          type: string
+          description: The email address for the contact at the location.
+        contactPhone:
+          type: string
+          description: The phone number for the contact at the location.
+        contactPhoneExt:
+          type: string
+          description: The phone number extension for the contact at the location.
+        instructions:
+          type: string
+          description: The special instructions for the location.
+      required:
+      - postalCode
+      - sequence
+      - type
+    LocationAccessorialDTO:
+      type: object
+      properties:
+        key:
+          type: string
+          description: An accessorial associated with the location. Can be the type of location (e.g. `residential` and/or an activity to be performed at the location (e.g. `schedule`, `sort-and-segregate`).
+          enum:
+          - schedule
+          - driver-assist
+          - notify
+          - limited-access
+          - inside
+          - tradeshow
+          - residential
+          - sort-and-segregate
+          - construction-site
+          - farm
+          - military
+          - airport
+          - place-of-worship
+          - school
+          - mine
+          - pier
+          - liftgate
+        opensAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The start time of the appointment in 24-hr time. (Only for accessorial key of `schedule`).
+          example: '15:30'
+        closesAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The end time of the appointment in 24-hr time. (Only for accessorial key of `schedule`).
+          example: '15:30'
+    LocationRefNum:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of reference number.
+          enum:
+          # - load-num
+          - other
+          minLength: 1
+        value:
+          type: string
+          description: The value of the reference number.
+          minLength: 1
+      required:
+      - type
+      - value
+    ApiBillToDTO:
+      type: object
+      description: The bill-to information for the shipment.
+      properties:
+        company:
+          type: string
+          description: The company name for the billing party.
+          minLength: 1
+        address:
+          type: string
+          description: The address for the billing party.
+          minLength: 1
+        address2:
+          type: string
+          description: The address line 2 for the billing party.
+        city:
+          type: string
+          description: The city for the billing party.
+          minLength: 1
+        state:
+          type: string
+          description: The two character state / province abbreviation for the billing party.
+          minLength: 1
+        postalCode:
+          type: string
+          description: |
+            Postal code of for the billing party in US or Canadian format.
+
+            Valid formats (USA):
+              - `10111`
+              - `10111-1111`
+
+            Valid formats (Canada):
+              - `A9A9A9`
+              - `A9A 9A9`
+              - `A9A-9A9`
+          example: "10111"
+          pattern: "(^\\d{5}([ :-]?\\d{4})?)$|(^[A-z]\\d[A-z][ :-]?\\d[A-z]\\d$)"
+          minLength: 1
+        country:
+          type: string
+          description: The two character country code for the billing party.
+          enum:
+          - us
+          - ca
+          # - mx
+          example: us
+        contactName:
+          type: string
+          description: The contact name for the billing party.
+          minLength: 1
+        contactPhone:
+          type: string
+          description: The phone number for the billing party.
+          example: "(555) 555-5555"
+        contactPhoneExt:
+          type: string
+          description: The phone number extension for the billing party.
+        contactEmail:
+          type: string
+          format: email
+          description: The email address for the billing party.
+          minLength: 1
+      required:
+      - company
+      - address
+      - city
+      - state
+      - postalCode
+      - contactName
+      - contactEmail
+    ExternalEquipmentDTO:
+      type: object
+      description: The equipment for the shipment.
+      properties:
+        alternateTypes:
+          type: array
+          description: The alternate types of equipment that could be quoted by the carrier.
+          items:
+            type: string
+            enum:
+            - dry-van-53
+            - dry-van-48
+            - flatbed-53
+            - flatbed-48
+            - refrigerated-48
+            - refrigerated-53
+            - step-deck
+            - flatbed-lowboy
+            - air-freight
+            - box-truck-16
+            - box-truck-24
+            - bulk-aluminum
+            - bulk-auger-semi
+            - bulk-auger-straight-truck
+            - bulk-belt-trailer
+            - bulk-convertible-hopper
+            - bulk-end-dump
+            - bulk-hopper
+            - bulk-insulated
+            - bulk-lined
+            - bulk-one-tank
+            - bulk-pneumatic
+            - bulk-stainless
+            - bulk-three-hole
+            - bulk-four-hole
+            - bulk-two-hole
+            - bulk-walking-floor
+            - bulk-bag-combo
+            - conestoga
+            - consolidated
+            - crazy8-flatbed
+            - curtain-side-van
+            - drayage-20
+            - drayage-40
+            - drayage-45
+            - drayage-48
+            - drayage-53
+            - flatbed-48-double-drop
+            - flatbed-48-step
+            - flatbed-53-step
+            - flatbed-b-train
+            - flatbed-heavy-haul
+            - flatbed-removable-gooseneck(rgn)
+            - flatbed-self-unloader
+            - flatbed-with-piggyback
+            - flatbed-tri-axle
+            - intermodal-20
+            - intermodal-40
+            - intermodal-45
+            - intermodal-48
+            - intermodal-53
+            - logistics-van-53
+            - ltl
+            - padded-van
+            - partial-dry-van
+            - partial-flatbed
+            - partial-refrigerated
+            - power-only
+            - pup
+            - refrigerated-ltl
+            - sprinter-van
+            - straight-truck-20
+            - straight-truck-26
+            - tanker
+            - volume-ltl
+        type:
+          type: string
+          description: The type of equipment used for the transport of the shipment.
+          enum:
+          - dry-van-53
+          - dry-van-48
+          - flatbed-53
+          - flatbed-48
+          - refrigerated-48
+          - refrigerated-53
+          - step-deck
+          - flatbed-lowboy
+          - air-freight
+          - box-truck-16
+          - box-truck-24
+          - bulk-aluminum
+          - bulk-auger-semi
+          - bulk-auger-straight-truck
+          - bulk-belt-trailer
+          - bulk-convertible-hopper
+          - bulk-end-dump
+          - bulk-hopper
+          - bulk-insulated
+          - bulk-lined
+          - bulk-one-tank
+          - bulk-pneumatic
+          - bulk-stainless
+          - bulk-three-hole
+          - bulk-four-hole
+          - bulk-two-hole
+          - bulk-walking-floor
+          - bulk-bag-combo
+          - conestoga
+          - consolidated
+          - crazy8-flatbed
+          - curtain-side-van
+          - drayage-20
+          - drayage-40
+          - drayage-45
+          - drayage-48
+          - drayage-53
+          - flatbed-48-double-drop
+          - flatbed-48-step
+          - flatbed-53-step
+          - flatbed-b-train
+          - flatbed-heavy-haul
+          - flatbed-removable-gooseneck(rgn)
+          - flatbed-self-unloader
+          - flatbed-with-piggyback
+          - flatbed-tri-axle
+          - intermodal-20
+          - intermodal-40
+          - intermodal-45
+          - intermodal-48
+          - intermodal-53
+          - logistics-van-53
+          - ltl
+          - padded-van
+          - partial-dry-van
+          - partial-flatbed
+          - partial-refrigerated
+          - power-only
+          - pup
+          - refrigerated-ltl
+          - sprinter-van
+          - straight-truck-20
+          - straight-truck-26
+          - tanker
+          - volume-ltl
+          minLength: 1
+        accessorials:
+          type: array
+          description: |
+            The accessorials associated with the equipment.
+
+            - `chains` - Only applicable for flatbed equipment.
+            - `e-track` - Only applicable for dry van equipment.
+            - `food-grade` - Only applicable for dry van and refrigerated equipment.
+            - `load-bars` - Only applicable for dry van equipment.
+            - `tarps` - Only applicable for flatbed equipment.
+            - `temp` - Only applicable for refrigerated equipment.
+            - `straps` - Only applicable for dry van and flatbed equipment.
+            - `protect-from-freezing` Only applicable for LTL equipment.
+            - `liftgate` - Only applicable for dry van, straight truck, and box truck equipment.
+            - `team-driver` - Applicable for all equipment types.
+            - `tanker-endorsement` - Only applicable for dry van, flatbed, and refrigerated equipment.
+          items:
+            "$ref": "#/components/schemas/EquipmentAccessorialDTO"
+        description:
+          type: string
+          description: The description of the shipment.
+          minLength: 1
+        declaredValue:
+          type: number
+          description: The declared value of the shipment provided when quoting.
+          minimum: 1
+        declaredValueCurrency:
+          type: string
+          default: usd
+          description: The declared value currency.
+          enum:
+          - usd
+          # - cad
+          example: usd
+          minLength: 1
+        weight:
+          type: number
+          description: The weight of the shipment.
+          minimum: 1
+        weightUOM:
+          type: string
+          description: The unit of measure for the weight.
+          enum:
+          - lbs
+          # - kgs
+          minLength: 1
+        isHazardous:
+          type: boolean
+          description: A flag to indicate whether the shipment is hazardous.
+      required:
+      - type
+      - description
+      - weight
+      - weightUOM
+      - isHazardous
+    # EquipmentAccessorialDTO:
+    #   type: object
+    #   properties:
+    #     key:
+    #       type: string
+    #       enum:
+    #       - chains
+    #       - e-track
+    #       - food-grade
+    #       - load-bars
+    #       - tarps
+    #       - temp
+    #       - straps
+    #       - protect-from-freezing
+    #       - liftgate
+    #       - team-driver
+    #       minLength: 1
+    #     size:
+    #       type: number
+    #     count:
+    #       type: number
+    #     min:
+    #       type: number
+    #     max:
+    #       type: number
+    #     uom:
+    #       type: string
+    #       enum:
+    #       - f
+    #       - c
+    #   required:
+    #   - key
+    EquipmentAccessorialDTO:
+      type: object
+      discriminator:
+        propertyName: key
+        mapping:
+          chains: "#/components/schemas/EquipmentAccessorialCount"
+          e-track: "#/components/schemas/EquipmentAccessorialSimple"
+          food-grade: "#/components/schemas/EquipmentAccessorialSimple"
+          load-bars: "#/components/schemas/EquipmentAccessorialCount"
+          tarps: "#/components/schemas/EquipmentAccessorialTarps"
+          temp: "#/components/schemas/EquipmentAccessorialTemp"
+          straps: "#/components/schemas/EquipmentAccessorialCount"
+          protect-from-freezing: "#/components/schemas/EquipmentAccessorialSimple"
+          liftgate: "#/components/schemas/EquipmentAccessorialSimple"
+          team-driver: "#/components/schemas/EquipmentAccessorialSimple"
+          tanker-endorsement: "#/components/schemas/EquipmentAccessorialSimple"
+      properties:
+        key:
+          type: string
+          description: The identifier for the accessorial.
+          enum:
+          - chains
+          - e-track
+          - food-grade
+          - load-bars
+          - tarps
+          - temp
+          - straps
+          - protect-from-freezing
+          - liftgate
+          - team-driver
+          - tanker-endorsement
+          minLength: 1
+      required:
+      - key
+    EquipmentAccessorialCount:
+      allOf:
+        - $ref: '#/components/schemas/EquipmentAccessorialDTO'
+        - type: object
+          properties:
+            count:
+              type: number
+              description: A count of how many of the accessorial are needed.
+          required:
+          - count
+    EquipmentAccessorialTemp:
+      allOf:
+        - $ref: '#/components/schemas/EquipmentAccessorialDTO'
+        - type: object
+          properties:
+            min:
+              type: number
+              description: The minimum temperature for the equipment.
+            max:
+              type: number
+              description: The maximum temperature for the equipment.
+            uom:
+              type: string
+              description: The unit of measurement for the temperature.
+              enum:
+              - f
+              - c
+          required:
+          - min
+          - max
+          - uom
+    EquipmentAccessorialTarps:
+      allOf:
+        - $ref: '#/components/schemas/EquipmentAccessorialDTO'
+        - type: object
+          properties:
+            size:
+              type: number
+              description: The size of tarps needed (in feet).
+              enum:
+              - 4
+              - 6
+              - 8
+          required:
+          - size
+    EquipmentAccessorialSimple:
+      allOf:
+        - $ref: '#/components/schemas/EquipmentAccessorialDTO'
+    ApiCustomsBrokerDTO:
+      type: object
+      description: The customs broker for the shipment.
+      properties:
+        address:
+          type: string
+          description: The address of the customs broker.
+        address2:
+          type: string
+          description: The address line 2 of the customs broker.
+        city:
+          type: string
+          description: The city of the customs broker.
+        companyName:
+          type: string
+          description: The company name of the customs broker.
+          minLength: 1
+        country:
+          type: string
+          description: The two-digit country code for the customs broker.
+          enum:
+          - us
+          - ca
+          # - mx
+          example: us
+        email:
+          type: string
+          description: The email address of the customs broker.
+          format: email
+        phone:
+          type: string
+          description: The phone number of the customs broker.
+          example: "(555) 555-5555"
+          minLength: 1
+        phoneExt:
+          type: string
+          description: The phone number extension of the customs broker.
+        postalCode:
+          type: string
+          description: |
+            The postal code of the customs broker in US or Canadian format.
+
+            Valid formats (USA):
+              - `10111`
+              - `10111-1111`
+
+            Valid formats (Canada):
+              - `A9A9A9`
+              - `A9A 9A9`
+              - `A9A-9A9`
+          example: "10111"
+          pattern: "(^\\d{5}([ :-]?\\d{4})?)$|(^[A-z]\\d[A-z][ :-]?\\d[A-z]\\d$)"
+        state:
+          type: string
+          description: The two-digit state / province code for the customs broker.
+        value:
+          type: number
+          description: The declared value of the shipment for customs.
+      required:
+      - companyName
+      - phone
+    ApiEmergencyContactDTO:
+      type: object
+      description: The emergency contact information for the shipment _Required for hazardous material shipments._
+      properties:
+        name:
+          type: string
+          description: The emergency contact name.
+          minLength: 1
+        phone:
+          type: string
+          description: The emergency contact phone number.
+          example: "(555) 555-5555"
+          minLength: 1
+        phoneExt:
+          type: string
+          description: The emergency contact phone number extension.
+        contractNumber:
+          type: string
+          description: The contract number with the emergency contact.
+      required:
+      - name
+      - phone
+    ExternalHandlingUnitDTO:
+      type: object
+      properties:
+        itemId:
+          type: string
+          description: The identifier for the handling unit in Freightview.
+        customsValue:
+          type: number
+          description: The customs value of the handling unit.
+          minimum: 1
+        customsValueCurrency:
+          type: string
+          description: The currency code for the customs value.
+          enum:
+          - usd
+          # - cad
+          example: usd
+        declaredValue:
+          type: number
+          description: The declared value of the handling unit.
+          minimum: 1
+        declaredValueCurrency:
+          type: string
+          description: The currency code for the declared value.
+          enum:
+          - usd
+          # - cad
+          example: usd
+        dimensionsUOM:
+          type: string
+          description: The unit of measure for the handling unit dimensions (`length`, `width`, `height`).
+          enum:
+          - in
+          # - cm
+          # - ft
+        freightClass:
+          type: number
+          description: The freight class of the handling unit.
+          enum:
+          - 50
+          - 55
+          - 60
+          - 65
+          - 70
+          - 77.5
+          - 85
+          - 92.5
+          - 100
+          - 110
+          - 125
+          - 150
+          - 175
+          - 200
+          - 250
+          - 300
+          - 400
+          - 500
+
+        height:
+          type: number
+          description: The height of the handling unit.
+          minimum: 1
+        length:
+          type: number
+          description: The length of the handling unit.
+          minimum: 1
+        nmfcNumber:
+          type: number
+          description: The NMFC code for the handling unit.
+        nmfcSubNumber:
+          type: number
+          description: The NMFC sub-code for the handling unit.
+        quantity:
+          type: number
+          description: The quantity of handling units in this `items` object.
+          minimum: 1
+        refNums:
+          type: array
+          description: The reference numbers associated with the handling unit.
+          items:
+            "$ref": "#/components/schemas/ItemRefNum"
+        width:
+          type: number
+          description: The width of the handling unit.
+          minimum: 1
+        pickupLocationSequence:
+          type: number
+          description: The location `sequence` number where the handling unit will be picked up.
+          minimum: 0
+        dropLocationSequence:
+          type: number
+          description: The location `sequence` number where the handling unit will be dropped off.
+          minimum: 1
+        stackable:
+          type: boolean
+          description: A flag to indicate whether the handling unit can be stacked.
+        turnable:
+          type: boolean
+          description: A flag to indicate whether the handling unit can be turned (not in use).
+        weight:
+          type: number
+          description: The weight of the handling unit.
+          minimum: 1
+        weightUOM:
+          type: string
+          description: The unit of measure for the weight.
+          enum:
+          - lbs
+          # - kgs
+          minLength: 1
+        description:
+          type: string
+          description: A description of the handling unit contents.
+          minLength: 1
+        type:
+          type: string
+          description: The type of handling unit.
+          example: pallet
+          enum:
+          - bag
+          - bale
+          - barrel
+          - basket
+          - beam
+          - bin
+          - box
+          - bucket
+          - bulkhead
+          - bulkfloor
+          - bundle
+          - can
+          - carboy
+          - carpet
+          - carton
+          - case
+          - cask
+          - chest
+          - coil
+          - container
+          - crate
+          - cylinder
+          - drum
+          - firkin
+          - gallon
+          - gaylord
+          - hamper
+          - hogshead
+          - jar
+          - jerrican
+          - keg
+          - kit
+          - liter
+          - loose
+          - ounce
+          - package
+          - pail
+          - pallet
+          - piece
+          - platform
+          - rack
+          - reel
+          - roll
+          - skid
+          - slipsheet
+          - spool
+          - stack
+          - tank
+          - tote
+          - trunk
+          - tub
+          - tube
+          - unit
+          minLength: 1
+        contains:
+          type: array
+          description: The contents of the handling unit.
+          items:
+            "$ref": "#/components/schemas/ExternalItemDTO"
+        hazardous:
+          type: array
+          description: The hazardous material details.
+          items:
+            "$ref": "#/components/schemas/ExternalHazardousDetail"
+      required:
+      - quantity
+      - pickupLocationSequence
+      - dropLocationSequence
+      - weight
+      - weightUOM
+      - description
+      - type
+    ItemRefNum:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - other
+          minLength: 1
+        value:
+          type: string
+          minLength: 1
+      required:
+      - type
+      - value
+    ExternalItemDTO:
+      type: object
+      properties:
+        customsValue:
+          type: number
+          description: The customs value of the item.
+          minimum: 1
+          nullable: true
+        customsValueCurrency:
+          type: string
+          description: The currency code of the customs value.
+          enum:
+          - usd
+          # - cad
+          example: usd
+        declaredValue:
+          type: number
+          description: The declared value of the item.
+          minimum: 1
+          nullable: true
+        declaredValueCurrency:
+          type: string
+          description: The currency code for the declared value.
+          enum:
+          - usd
+          # - cad
+          example: usd
+        description:
+          type: string
+          description: A description of the item contents.
+          minLength: 1
+        dimensionsUOM:
+          type: string
+          description: The unit of measure for the item dimensions (`length`, `width`, `height`).
+          enum:
+          - in
+          # - cm
+          # - ft
+        freightClass:
+          type: number
+          description: The freight class of the item contents.
+          enum:
+          - 50
+          - 55
+          - 60
+          - 65
+          - 70
+          - 77.5
+          - 85
+          - 92.5
+          - 100
+          - 110
+          - 125
+          - 150
+          - 175
+          - 200
+          - 250
+          - 300
+          - 400
+          - 500
+        height:
+          type: number
+          description: The height of the item.
+          minimum: 1
+          nullable: true
+        length:
+          type: number
+          description: The length of the item.
+          minimum: 1
+          nullable: true
+        nmfcNumber:
+          type: number
+          description: The NMFC code for the item contents.
+        nmfcSubNumber:
+          type: number
+          description: The NMFC sub-code for the item contents.
+        quantity:
+          type: number
+          description: The quantity of item contents.
+        refNums:
+          type: array
+          description: The reference numbers associated with the item.
+          items:
+            "$ref": "#/components/schemas/ItemRefNum"
+        type:
+          type: string
+          description: The type of packaging for the item contents.
+          enum:
+          - bag
+          - bale
+          - barrel
+          - basket
+          - beam
+          - bin
+          - box
+          - bucket
+          - bulkhead
+          - bulkfloor
+          - bundle
+          - can
+          - carboy
+          - carpet
+          - carton
+          - case
+          - cask
+          - chest
+          - coil
+          - container
+          - crate
+          - cylinder
+          - drum
+          - firkin
+          - gallon
+          - gaylord
+          - hamper
+          - hogshead
+          - jar
+          - jerrican
+          - keg
+          - kit
+          - liter
+          - loose
+          - ounce
+          - package
+          - pail
+          - pallet
+          - piece
+          - platform
+          - rack
+          - reel
+          - roll
+          - skid
+          - slipsheet
+          - spool
+          - stack
+          - tank
+          - tote
+          - trunk
+          - tub
+          - tube
+          - unit
+          minLength: 1
+        weight:
+          type: number
+          description: The weight of the item contents.
+          minimum: 1
+        weightUOM:
+          type: string
+          description: The unit of measure for the weight of the item contents.
+          enum:
+          - lbs
+          # - kgs
+        width:
+          type: number
+          description: The width of the item.
+        hazardous:
+          type: array
+          description: The hazardous material details.
+          items:
+            "$ref": "#/components/schemas/ExternalHazardousDetail"
+      required:
+      - description
+      - type
+    ExternalHazardousDetail:
+      type: object
+      description: The details of the hazardous material.
+      properties:
+        hazmatId:
+          type: string
+          description: The UN/NA number for the hazardous material.
+          minLength: 1
+        permitNumber:
+          type: string
+          description: The US DOT special permit number provided to a shipper as authorization to transport the hazardous material.
+        primaryClass:
+          type: string
+          description: Primary hazard class of the hazardous material.
+          enum:
+          - 1.1A
+          - 1.1B
+          - 1.1C
+          - 1.1D
+          - 1.1E
+          - 1.1F
+          - 1.1G
+          - 1.1J
+          - 1.1L
+          - 1.2B
+          - 1.2C
+          - 1.2D
+          - 1.2E
+          - 1.2F
+          - 1.2G
+          - 1.2H
+          - 1.2J
+          - 1.2K
+          - 1.2L
+          - 1.3C
+          - 1.3F
+          - 1.3G
+          - 1.3H
+          - 1.3J
+          - 1.3K
+          - 1.3L
+          - 1.4B
+          - 1.4C
+          - 1.4D
+          - 1.4E
+          - 1.4F
+          - 1.4G
+          - 1.4S
+          - 1.5D
+          - 1.6N
+          - '2.1'
+          - '2.2'
+          - '2.3'
+          - '3'
+          - '4.1'
+          - '4.2'
+          - '4.3'
+          - '5.1'
+          - '5.2'
+          - '6.1'
+          - '6.2'
+          - '7'
+          - '8'
+          - '9'
+          - '9.2'
+          minLength: 1
+        secondaryClass:
+          type: string
+          description: Secondary hazard class of the hazardous material.
+          enum:
+          - ''
+          - '2.1'
+          - '2.2'
+          - '2.3'
+          - '3'
+          - '4.1'
+          - '4.2'
+          - '4.3'
+          - '5.1'
+          - '5.2'
+          - '6.1'
+          - '6.2'
+          - '7'
+          - '8'
+          - '9'
+          - '9.2'
+        tertiaryClass:
+          type: string
+          description: Tertiary hazard class of the hazardous material.
+          enum:
+          - ''
+          - '2.1'
+          - '2.2'
+          - '2.3'
+          - '3'
+          - '4.1'
+          - '4.2'
+          - '4.3'
+          - '5.1'
+          - '5.2'
+          - '6.1'
+          - '6.2'
+          - '7'
+          - '8'
+          - '9'
+          - '9.2'
+        packingGroup:
+          type: string
+          description: The packing group of the hazardous material.
+          enum:
+          - I
+          - II
+          - III
+      required:
+      - hazmatId
+      - primaryClass
+    RefNum:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of reference number.
+          enum:
+          - other
+          minLength: 1
+        value:
+          type: string
+          description: The value of the reference number.
+          minLength: 1
+      required:
+      - type
+      - value
+    ReadOnlyRefNum:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of reference number.
+          enum:
+          - load-num
+          - other
+        value:
+          type: string
+          description: The value of the reference number.
+          minLength: 1
+    ExternalQuoteDTO:
+      type: object
+      description: The details of the quote.
+      properties:
+        quoteId:
+          type: string
+          description: The unique identifier for the quote in Freightview.
+        carrierId:
+          type: string
+          description: The unique identifier for the carrier in Freightview.
+        createdDate:
+          type: string
+          description: The date/time the quote was added to the shipment.
+        assetCarrierName:
+          type: string
+          description: The name of the carrier transporting the shipment.
+        assetCarrierCode:
+          type: string
+          description: The 4-digit SCAC code for the carrier transporting the shipment.
+        providerName:
+          type: string
+          description: |
+            The name of the carrier providing the quote for the shipment.
+
+            If the quote is provided by a broker, then this is different than the `assetCarrierName`, which is the carrier actually providing transportation of the freight.
+        providerCode:
+          type: string
+          description: The 4-digit SCAC code for the carrier providing the quote for the shipment.
+        equipmentType:
+          type: string
+          description: The type of equipment the carrier will use to transport the shipment.
+          enum:
+          - dry-van-53
+          - dry-van-48
+          - flatbed-53
+          - flatbed-48
+          - refrigerated-48
+          - refrigerated-53
+          - step-deck
+          - flatbed-lowboy
+          - air-freight
+          - box-truck-16
+          - box-truck-24
+          - bulk-aluminum
+          - bulk-auger-semi
+          - bulk-auger-straight-truck
+          - bulk-belt-trailer
+          - bulk-convertible-hopper
+          - bulk-end-dump
+          - bulk-hopper
+          - bulk-insulated
+          - bulk-lined
+          - bulk-one-tank
+          - bulk-pneumatic
+          - bulk-stainless
+          - bulk-three-hole
+          - bulk-four-hole
+          - bulk-two-hole
+          - bulk-walking-floor
+          - bulk-bag-combo
+          - conestoga
+          - consolidated
+          - crazy8-flatbed
+          - curtain-side-van
+          - drayage-20
+          - drayage-40
+          - drayage-45
+          - drayage-48
+          - drayage-53
+          - flatbed-48-double-drop
+          - flatbed-48-step
+          - flatbed-53-step
+          - flatbed-b-train
+          - flatbed-heavy-haul
+          - flatbed-removable-gooseneck(rgn)
+          - flatbed-self-unloader
+          - flatbed-with-piggyback
+          - flatbed-tri-axle
+          - intermodal-20
+          - intermodal-40
+          - intermodal-45
+          - intermodal-48
+          - intermodal-53
+          - logistics-van-53
+          - ltl
+          - padded-van
+          - partial-dry-van
+          - partial-flatbed
+          - partial-refrigerated
+          - power-only
+          - pup
+          - refrigerated-ltl
+          - sprinter-van
+          - straight-truck-20
+          - straight-truck-26
+          - tanker
+          - volume-ltl
+        expirationDate:
+          type: string
+          description: The expiration date of the quote.
+          format: date
+          example: '2021-03-01'
+        quoteNum:
+          type: string
+          description: The quote number specified by the carrier providing the quote.
+        serviceId:
+          type: string
+          description: An identifier for the service.
+        serviceDescription:
+          type: string
+          description: A description of the service.
+        pricingMethod:
+          type: string
+          description: The method of the pricing used for the quote.
+          enum:
+          - contracted
+          - capacity
+        pricingType:
+          type: string
+          description: The type of pricing used for the quote.
+          enum:
+          - pallet
+          - dimensional
+          - spot
+          - tariff
+          - density
+        pricingDescription:
+          type: string
+          description: A description of the pricing used to calculate the quote.
+        amount:
+          type: number
+          description: The total amount of this quote. Includes linehaul, fuel, and all additional charges.
+          minimum: 1
+        currency:
+          type: string
+          description: The currency of the quote amount.
+          enum:
+          - usd
+          # - cad
+        refNums:
+          type: array
+          description: The reference numbers associated with the quote.
+          items:
+            "$ref": "#/components/schemas/QuoteRefNum"
+        status:
+          type: string
+          description: |
+            The status of the quote within Freightview.
+
+            - `active` - The quote is active in Freightview.
+            - `awarded` - The shipper has selected the quote and awarded the shipment to the carrier.
+            - `retracted` - The carrier has retracted the quote.
+            - `error` - There was an error retrieving the quote.
+          enum:
+          - active
+          - awarded
+          - retracted
+          - error
+        method:
+          type: string
+          description: The method by which the quote was added to the shipment.
+          enum:
+          - api
+          - upload
+          - email
+          - manual
+        source:
+          type: string
+          description: The source of the quote.
+          enum:
+          - shipper
+          - carrier
+        charges:
+          type: array
+          description: The breakdown of the various charges that make up the quote `amount`. _Not supported by all carriers._
+          items:
+            "$ref": "#/components/schemas/ExternalQuoteCharge"
+        transitDaysMin:
+          type: number
+          description: The minimum number of transit days for the transport of the shipment.
+        transitDaysMax:
+          type: number
+          description: The maximum number of transit days for the transport of the shipment.
+        interline:
+          type: boolean
+          description: A flag that indicates whether another carrier will be used to provide a portion of the transportation of the shipment.
+        mode:
+          type: string
+          description: The mode of transport used for the shipment.
+          enum:
+          - truckload
+          - parcel
+          - ltl
+          - intermodal
+          - consolidated
+          - air
+          - ocean
+          - bulk
+        paymentTerms:
+          type: string
+          description: The payment terms used for the quote.
+          enum:
+          - outbound-prepaid
+          - outbound-collect
+          - inbound-collect
+          - third-party-prepaid
+          - third-party-collect
+        errors:
+          type: array
+          description: The errors encountered when retrieving the quote.
+          items:
+            "$ref": "#/components/schemas/ExternalQuoteError"
+        shipmentBookPageUrl:
+          type: string
+          description: A direct link to book the shipment with this rate within Freightview.
+    QuoteRefNum:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of reference number.
+          enum:
+          - contract-num
+          - other
+        value:
+          type: string
+          description: The value of the reference number.
+    ExternalQuoteCharge:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the charge.
+          minLength: 1
+        amount:
+          type: number
+          description: The amount of the charge.
+        type:
+          type: string
+        code:
+          type: string
+          description: The carrier's code for the charge. (Not provided by all carriers).
+        currency:
+          type: string
+          description: The currency of the charge.
+          enum:
+          - usd
+          # - cad
+          minLength: 1
+      required:
+      - name
+      - amount
+      - currency
+    ExternalQuoteError:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+        message:
+          type: string
+          description: The error message.
+    TrackDetail:
+      type: object
+      properties:
+        deliveryDateActual:
+          type: string
+          format: date-time
+          description: The actual delivery date of the shipment.
+        deliveryDateEstimate:
+          type: string
+          format: date
+          example: '2021-03-01'
+          description: The estimated delivery date of the shipment.
+        lastUpdatedDate:
+          type: string
+          format: date-time
+          description: The date the tracking detail was last updated.
+        pickupDateActual:
+          type: string
+          format: date-time
+          description: The actual pickup date of the shipment.
+        status:
+          type: string
+          description: The tracking status of the shipment.
+          enum:
+          - pending
+          - in-transit
+          - delivered
+          - not-found
+          - error
+        trackingNumber:
+          type: string
+          description: The tracking number for the shipment.
+    ItemTrackDetail:
+      allOf:
+        - $ref: '#/components/schemas/TrackDetail'
+        - type: object
+          properties:
+            itemId:
+              type: string
+              description: The identifier of the item in Freightview to which this tracking detail belongs.
+            index:
+              type: number
+              description: The zero-based index of the individual item for the given group of items specified by the itemId.
+    LoadTrackDetailDTO:
+      allOf:
+        - $ref: '#/components/schemas/TrackDetail'
+        - type: object
+          properties:
+            items:
+              type: array
+              description: If the carrier provides item-level tracking, this will contain the tracking details for the individual items of this shipment.
+              items:
+                $ref: '#/components/schemas/ItemTrackDetail'
+    ExternalDocumentDTO:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: The name of the file.
+        mimeType:
+          type: string
+          description: The MIME type of the file.
+          enum:
+          - application/pdf
+          - application/zpl
+          - image/jpeg
+          - image/png
+        source:
+          type: string
+          description: The source of the document.
+          enum:
+          - carrier
+          - shipper
+          - system
+        type:
+          type: string
+          description: The type of the file.
+          enum:
+          - appointment-confirmation
+          - authorization-for-special-service
+          - bol
+          - commercial-invoice
+          - contact-time-critical
+          - corrected-bol
+          - customer-quote
+          - customs-document
+          - delivery-return-receipt
+          - dimension-certificate
+          - freight-forwarding-delivery-order
+          - inspection-certificate
+          - inspection-report
+          - invoice
+          - label
+          - label-combined
+          - letter-of-authority
+          - lumper-certificate
+          - mtr
+          - nmfc-certificate
+          - other
+          - packing-slip
+          - proof-of-delivery
+          - quote
+          - rate-confirmation
+          - rate-detail
+          - reconsignment-authorization
+          - refused-delivery-receipt
+          - signed-bol
+          - tally-record-signature
+          - weight-and-research-inspection
+          - weight-cert
+          - weights-and-corrections
+          - weights-and-research-photos
+        uploadDate:
+          type: string
+          format: date-time
+          description: The date the document was added to the shipment.
+        url:
+          type: string
+          description: The link to the document.
+    ExternalPickupDetailsDTO:
+      type: object
+      description: The details for the pickup of the shipment.
+      properties:
+        status:
+          type: string
+          description: The status of the pickup request.
+          enum:
+          - ok
+          - pending
+          - error
+          - not-requested
+          - requesting
+        confirmationNumber:
+          type: string
+          description: The pickup confirmation number provided by the carrier.
+        requestedDate:
+          type: string
+          format: date-time
+          description: The date/time the shipment was awarded to the carrier.
+        confirmedDate:
+          type: string
+          format: date-time
+          description: The date/time the pickup was confirmed by the carrier.
+    ExternalBOLDetailsDTO:
+      type: object
+      description: The details for the retrieval of the bill of lading of the shipment.
+      properties:
+        status:
+          type: string
+          description: The status of the bill of lading retrieval.
+          enum:
+          - ok
+          - pending
+          - error
+          - not-requested
+          - requesting
+        bolNumber:
+          "$ref": "#/components/schemas/BOLNumber"
+    ExternalInvoiceDTO:
+      type: object
+      description: An object with details of the invoice for the shipment. (This object won't have data until the invoice details are entered by a user via Freightview's Audit functionality).
+      properties:
+        createdDate:
+          type: string
+          format: date-time
+          description: Date/time the invoice details were added by user in Freightview.
+        invoiceAmount:
+          type: number
+          description: The amount that was invoiced by the carrier.
+        invoiceNumber:
+          type: string
+          description: The carrier invoice number.
+        invoiceDate:
+          type: string
+          format: date
+          description: Date the invoice was issued by the carrier.
+        acceptedDate:
+          type: string
+          format: date
+          description: Date the invoice was accepted by the shipper.
+        disputedAmount:
+          type: number
+          description: The amount of the discrepancy between the invoiced rate and the quoted rate in Freightview.
+        payments:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ExternalPaymentDTO"
+    ExternalPaymentDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: The amount of the payment.
+        remitted:
+          type: boolean
+          description: A flag to indicate to indicate that this amount has been marked to be paid and exported out of the Freightview Audit tool (e.g. to an accounting group for payment to be sent to the carrier).
+    NotFoundError:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the error.
+          minLength: 1
+        requestId:
+          type: string
+          description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+          minLength: 1
+        message:
+          type: string
+          description: The error message.
+          minLength: 1
+      required:
+      - name
+      - requestId
+      - message
+    InternalServerError:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the error.
+          minLength: 1
+        requestId:
+          type: string
+          description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+          minLength: 1
+        message:
+          type: string
+          description: The error message.
+          minLength: 1
+      required:
+      - name
+      - requestId
+      - message
+    GetQuotesDtoListExternal:
+      type: object
+      properties:
+        quotes:
+          type: array
+          description: The quotes for the shipment.
+          items:
+            "$ref": "#/components/schemas/ExternalQuoteDtoListExternal"
+        requestedFrom:
+          type: array
+          description: Details on the carriers from which quotes were requested.
+          items:
+            "$ref": "#/components/schemas/HydratedRecipientListExternal"
+    ExternalQuoteDtoListExternal:
+      type: object
+      properties:
+        quoteId:
+          type: string
+          description: The unique identifier for the quote in Freightview.
+        carrierId:
+          type: string
+          description: The unique identifier for the carrier in Freightview.
+        createdDate:
+          type: string
+          description: The date/time the quote was added to the shipment.
+        assetCarrierName:
+          type: string
+          description: The name of the carrier transporting the shipment.
+        assetCarrierCode:
+          type: string
+          description: The 4-digit SCAC code for the carrier transporting the shipment.
+        providerName:
+          type: string
+          description: |
+            The name of the carrier providing the quote for the shipment.
+
+            If the quote is provided by a broker, then this is different than the `assetCarrierName`, which is the carrier actually providing transportation of the freight.
+        providerCode:
+          type: string
+          description: The 4-digit SCAC code for the carrier providing the quote for the shipment.
+        equipmentType:
+          type: string
+          description: The type of equipment the carrier will use to transport the shipment.
+          enum:
+          - dry-van-53
+          - dry-van-48
+          - flatbed-53
+          - flatbed-48
+          - refrigerated-48
+          - refrigerated-53
+          - step-deck
+          - flatbed-lowboy
+          - air-freight
+          - box-truck-16
+          - box-truck-24
+          - bulk-aluminum
+          - bulk-auger-semi
+          - bulk-auger-straight-truck
+          - bulk-belt-trailer
+          - bulk-convertible-hopper
+          - bulk-end-dump
+          - bulk-hopper
+          - bulk-insulated
+          - bulk-lined
+          - bulk-one-tank
+          - bulk-pneumatic
+          - bulk-stainless
+          - bulk-three-hole
+          - bulk-four-hole
+          - bulk-two-hole
+          - bulk-walking-floor
+          - bulk-bag-combo
+          - conestoga
+          - consolidated
+          - crazy8-flatbed
+          - curtain-side-van
+          - drayage-20
+          - drayage-40
+          - drayage-45
+          - drayage-48
+          - drayage-53
+          - flatbed-48-double-drop
+          - flatbed-48-step
+          - flatbed-53-step
+          - flatbed-b-train
+          - flatbed-heavy-haul
+          - flatbed-removable-gooseneck(rgn)
+          - flatbed-self-unloader
+          - flatbed-with-piggyback
+          - flatbed-tri-axle
+          - intermodal-20
+          - intermodal-40
+          - intermodal-45
+          - intermodal-48
+          - intermodal-53
+          - logistics-van-53
+          - ltl
+          - padded-van
+          - partial-dry-van
+          - partial-flatbed
+          - partial-refrigerated
+          - power-only
+          - pup
+          - refrigerated-ltl
+          - sprinter-van
+          - straight-truck-20
+          - straight-truck-26
+          - tanker
+          - volume-ltl
+        expirationDate:
+          type: string
+          description: The expiration date of the quote.
+          format: date
+          example: '2021-03-01'
+        quoteNum:
+          type: string
+          description: The quote number specified by the carrier providing the quote.
+        serviceId:
+          type: string
+          description: An identifier for the service.
+        serviceDescription:
+          type: string
+          description: A description of the service.
+        pricingMethod:
+          type: string
+          description: The method of the pricing used for the quote.
+          enum:
+          - contracted
+          - capacity
+        pricingType:
+          type: string
+          description: The type of pricing used for the quote.
+          enum:
+          - pallet
+          - dimensional
+          - spot
+          - tariff
+          - density
+        pricingDescription:
+          type: string
+          description: A description of the pricing used to calculate the quote.
+        amount:
+          type: number
+          description: The total amount of this quote. Includes linehaul, fuel, and all additional charges.
+          minimum: 1
+        currency:
+          type: string
+          description: The currency of the quote amount.
+          enum:
+          - usd
+          # - cad
+        refNums:
+          type: array
+          description: The reference numbers associated with the quote.
+          items:
+            "$ref": "#/components/schemas/QuoteRefNum"
+        status:
+          type: string
+          description: |
+            The status of the quote within Freightview.
+
+            - `active` - The quote is active in Freightview.
+            - `awarded` - The shipper has selected the quote and awarded the shipment to the carrier.
+            - `retracted` - The carrier has retracted the quote.
+            - `error` - There was an error retrieving the quote.
+          enum:
+          - active
+          - awarded
+          - retracted
+          - error
+        method:
+          type: string
+          description: The method by which the quote was added to the shipment.
+          enum:
+          - api
+          - upload
+          - email
+          - manual
+        source:
+          type: string
+          description: The source of the quote.
+          enum:
+          - shipper
+          - carrier
+        charges:
+          type: array
+          description: The breakdown of the various charges that make up the quote `amount`. _Not supported by all carriers._
+          items:
+            "$ref": "#/components/schemas/ExternalQuoteCharge"
+        transitDaysMin:
+          type: number
+          description: The minimum number of transit days for the transport of the shipment.
+        transitDaysMax:
+          type: number
+          description: The maximum number of transit days for the transport of the shipment.
+        interline:
+          type: boolean
+          description: A flag that indicates whether another carrier will be used to provide a portion of the transportation of the shipment.
+        mode:
+          type: string
+          description: The mode of transport used for the shipment.
+          enum:
+          - truckload
+          - parcel
+          - ltl
+          - intermodal
+          - consolidated
+          - air
+          - ocean
+          - bulk
+        paymentTerms:
+          type: string
+          description: The payment terms used for the quote.
+          enum:
+          - outbound-prepaid
+          - outbound-collect
+          - inbound-collect
+          - third-party-prepaid
+          - third-party-collect
+        errors:
+          type: array
+          description: The errors encountered when retrieving the quote.
+          items:
+            "$ref": "#/components/schemas/ExternalQuoteError"
+        shipmentBookPageUrl:
+          type: string
+          description: A direct link to book the shipment with this rate within Freightview.
+    HydratedRecipientListExternal:
+      type: object
+      properties:
+        lastResponseDate:
+          type: string
+          description: The date when the carrier user last quoted or declined to quote.
+        hasResponded:
+          type: boolean
+          description: A flag to indicate whether the carrier user has responded to the quote request.
+        hasDeclined:
+          type: boolean
+          description: A flag to indicate whether the carrier user has declined to provide a quote for the shipment.
+        name:
+          type: string
+          description: The name of the carrier user from whom a quote was requested.
+        email:
+          type: string
+          description: The email address of the carrier user from whom a quote was requested.
+        carrierName:
+          type: string
+          description: The carrier name of the carrier user from whom a quote was requested.
+    ExternalTrackEventDTO:
+      type: object
+      properties:
+        createdDate:
+          type: string
+          description: The full timestamp of when the event was entered into the Freightview system.
+          format: date-time
+        eventDate:
+          type: string
+          description: The date at which the event occurred.
+          format: date
+        eventTime:
+          type: string
+          description: The time (in 24-hr format) the event ocurred in the current location timezone.
+          format: time
+        eventType:
+          type: string
+          description: The type of event. Defaults to `update` if more specific `eventType` is not available.
+          enum:
+          - pickup
+          - in-transit
+          - arrived
+          - departed
+          - delivered
+          - delayed
+          - out-for-delivery
+          - update
+          - stop-completed
+          - stop-incomplete
+        summary:
+          type: string
+          description: The carrier's event description.
+    ExternalAddQuoteResDTO:
+      type: object
+      properties:
+        quoteId:
+          type: string
+          description: The unique identifier for the quote in Freightview.
+    ExternalAddQuoteReqDTO:
+      type: object
+      properties:
+        quoteNum:
+          type: string
+          description: The quote number specified by the carrier providing the quote.
+        amount:
+          type: number
+          minimum: 1
+          description: The total amount of this quote.
+        currency:
+          type: string
+          enum:
+          - usd
+          # - cad
+          example: usd
+          description: The currency of the quote amount.
+          minLength: 1
+        carrierEmail:
+          type: string
+          format: email
+          minLength: 1
+          description: The carrier email address to which the quoted should be associated.
+          example: "user@example.com"
+        autoCreateCarrierName:
+          type: string
+          description: If a carrier is not found for the carrier email provided, create
+            a new carrier with the provided name.
+      required:
+      - amount
+      - currency
+      - carrierEmail
+    CreateShipmentRequest:
+      type: object
+      properties:
+        locations:
+          type: array
+          description: The shipment's locations, e.g. origin, destination and any stops in between.
+          items:
+            "$ref": "#/components/schemas/UnbookedLocationDTO"
+          minItems: 2
+        billTo:
+          "$ref": "#/components/schemas/ApiBillToDTO"
+        bolNumber:
+          "$ref": "#/components/schemas/BOLNumber"
+        equipment:
+          "$ref": "#/components/schemas/ExternalEquipmentDTO"
+        customsBroker:
+          "$ref": "#/components/schemas/ExternalCustomsBroker"
+        emergencyContact:
+          "$ref": "#/components/schemas/ApiEmergencyContactDTO"
+        items:
+          type: array
+          description: The items (handling units) being transported as part of the shipment.
+          items:
+            "$ref": "#/components/schemas/ExternalHandlingUnitDTO"
+        isLiveLoad:
+          type: boolean
+          description: |
+            A flag to indicate whether the shipper considers the shipment a "live load".
+
+            - `true` - This is a "live load" that will be shipped.
+            - `false` - This shipment is "quote only".
+        refNums:
+          type: array
+          description: The reference numbers associated with the shipment.
+          items:
+            "$ref": "#/components/schemas/RefNum"
+      required:
+      - locations
+      - equipment
+      - isLiveLoad
+    UnbookedLocationDTO:
+      type: object
+      properties:
+        company:
+          type: string
+          description: Company name for the location.
+        address:
+          type: string
+          description: Address for the location.
+        address2:
+          type: string
+          description: Address line 2 for the location.
+        postalCode:
+          type: string
+          description: |
+            Postal code of the location in US or Canadian format.
+
+            Valid formats (USA):
+              - `10111`
+              - `10111-1111`
+
+            Valid formats (Canada):
+              - `A9A9A9`
+              - `A9A 9A9`
+              - `A9A-9A9`
+          example: "10111"
+          pattern: "(^\\d{5}([ :-]?\\d{4})?)$|(^[A-z]\\d[A-z][ :-]?\\d[A-z]\\d$)"
+          minLength: 1
+        city:
+          type: string
+          description: City for the location.
+        state:
+          type: string
+          description: Two character state / province abbreviation for the location.
+        country:
+          type: string
+          description: Two character country code for the location.
+          enum:
+          - us
+          - ca
+          # - mx
+          example: us
+        stopDate:
+          type: string
+          description: |
+            The date of the stop at the location. Required for origin location (i.e. `sequence : 0``).
+          format: date
+          example: '2021-03-01'
+        stopDateType:
+          type: string
+          description: An indicator of whether the stop should be made on the stop date, or by the stop date.
+          default: on
+          enum:
+          - 'on'
+          - by
+          # - between
+        stopType:
+          type: string
+          description: An indicator of whether freight will be picked up, delivered, or both at this stop.
+          enum:
+          - pickup
+          - delivery
+          - both
+        sequence:
+          type: number
+          description: The sequence of the location within the shipment, starting at 0.
+        accessorials:
+          type: array
+          description: The accessorials associated with the location.
+          items:
+            "$ref": "#/components/schemas/LocationAccessorialDTO"
+        refNums:
+          type: array
+          description: Reference numbers for the location.
+          items:
+            "$ref": "#/components/schemas/LocationRefNum"
+        opensAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The time the location will open in 24-hr format.
+          default: '08:00'
+          example: '15:30'
+        closesAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The time the location will close in 24-hr format.
+          default: '17:00'
+          example: '15:30'
+        contactName:
+          type: string
+          description: The name of a contact person at the location.
+        contactEmail:
+          type: string
+          description: The email address for the contact at the location.
+        contactPhone:
+          type: string
+          description: The phone number for the contact at the location.
+        contactPhoneExt:
+          type: string
+          description: The phone number extension for the contact at the location.
+        instructions:
+          type: string
+          description: The special instructions for the location.
+      required:
+      - postalCode
+      - country
+      - stopType
+      - sequence
+    ExternalCustomsBroker:
+      type: object
+      description: The customs broker information for the shipment. _Required if the shipment crosses the US-Canada border._
+      properties:
+        address:
+          type: string
+          description: The address of the customs broker.
+        address2:
+          type: string
+          description: The address line 2 of the customs broker.
+        city:
+          type: string
+          description: The city of the customs broker.
+        companyName:
+          type: string
+          description: The company name of the customs broker.
+          minLength: 1
+        country:
+          type: string
+          description: The two-digit country code for the customs broker.
+          enum:
+          - us
+          # - ca
+          example: us
+        email:
+          type: string
+          description: The email address of the customs broker.
+          format: email
+        phone:
+          type: string
+          description: The phone number of the customs broker.
+          example: "(555) 555-5555"
+          minLength: 1
+        phoneExt:
+          type: string
+          description: The phone number extension of the customs broker.
+        postalCode:
+          type: string
+          description: |
+            The postal code of the customs broker in US or Canadian format.
+
+            Valid formats (USA):
+              - `10111`
+              - `10111-1111`
+
+            Valid formats (Canada):
+              - `A9A9A9`
+              - `A9A 9A9`
+              - `A9A-9A9`
+          example: "10111"
+          pattern: "(^\\d{5}([ :-]?\\d{4})?)$|(^[A-z]\\d[A-z][ :-]?\\d[A-z]\\d$)"
+        state:
+          type: string
+          description: The two-digit state / province code for the customs broker.
+      required:
+      - companyName
+      - phone
+    EditBookedShipmentDTO:
+      type: object
+      title: Awarded Shipment
+      properties:
+        locations:
+          type: array
+          description: The shipment's locations, e.g. origin, destination and any stops in between.
+          items:
+            "$ref": "#/components/schemas/BookedLocationDTO"
+          minItems: 2
+        billTo:
+          "$ref": "#/components/schemas/ApiBillToDTO"
+        bolNumber:
+          "$ref": "#/components/schemas/BOLNumber"
+        equipment:
+          "$ref": "#/components/schemas/ExternalEquipmentDTO"
+        customsBroker:
+          "$ref": "#/components/schemas/ExternalCustomsBroker"
+        emergencyContact:
+          "$ref": "#/components/schemas/ApiEmergencyContactDTO"
+        items:
+          type: array
+          description: The items (handling units) being transported as part of the shipment.
+          items:
+            "$ref": "#/components/schemas/ExternalHandlingUnitDTO"
+        isLiveLoad:
+          type: boolean
+          description: |
+            A flag to indicate whether the shipper considers the shipment a "live load".
+
+            - `true` - This is a "live load" that will be shipped.
+            - `false` - This shipment is "quote only".
+        refNums:
+          type: array
+          description: The reference numbers associated with the shipment.
+          items:
+            "$ref": "#/components/schemas/RefNum"
+      required:
+      - locations
+      - equipment
+      - isLiveLoad
+    BookedLocationDTO:
+      type: object
+      properties:
+        company:
+          type: string
+          description: Company name for the location.
+          minLength: 1
+        address:
+          type: string
+          description: Address for the location.
+          minLength: 1
+        address2:
+          type: string
+          description: Address line 2 for the location.
+        city:
+          type: string
+          description: City for the location.
+        state:
+          type: string
+          description: Two character state / province abbreviation for the location.
+        postalCode:
+          type: string
+          description: |
+            Postal code of the location in US or Canadian format.
+
+            Valid formats (USA):
+              - `10111`
+              - `10111-1111`
+
+            Valid formats (Canada):
+              - `A9A9A9`
+              - `A9A 9A9`
+              - `A9A-9A9`
+          example: "10111"
+          pattern: "(^\\d{5}([ :-]?\\d{4})?)$|(^[A-z]\\d[A-z][ :-]?\\d[A-z]\\d$)"
+          minLength: 1
+        country:
+          type: string
+          description: Two character country code for the location.
+          enum:
+          - us
+          - ca
+          # - mx
+          example: us
+          minLength: 1
+        stopDate:
+          type: string
+          description: The date of the stop at the location.
+          format: date
+          example: '2021-03-01'
+        stopDateType:
+          type: string
+          description: An indicator of whether the stop should be made on the stop date, or by the stop date.
+          enum:
+          - 'on'
+          - by
+          # - between
+        stopType:
+          type: string
+          description: An indicator of whether freight will be picked up, delivered, or both at this stop.
+          enum:
+          - pickup
+          - delivery
+          - both
+          minLength: 1
+        sequence:
+          type: number
+          description: The sequence of the location within the shipment, starting at 0.
+        accessorials:
+          type: array
+          description: The accessorials associated with the location.
+          items:
+            "$ref": "#/components/schemas/LocationAccessorialDTO"
+        refNums:
+          type: array
+          description: Reference numbers for the location.
+          items:
+            "$ref": "#/components/schemas/LocationRefNum"
+        opensAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The time the location will open in 24-hr format.
+          example: '15:30'
+          minLength: 1
+        closesAt:
+          type: string
+          pattern: "([01]?[0-9]|2[0-3]):[0-5][0-9]"
+          description: The time the location will close in 24-hr format.
+          example: '15:30'
+          minLength: 1
+        contactName:
+          type: string
+          description: The name of a contact person at the location.
+        contactEmail:
+          type: string
+          description: The email address for the contact at the location.
+        contactPhone:
+          type: string
+          description: The phone number for the contact at the location.
+        contactPhoneExt:
+          type: string
+          description: The phone number extension for the contact at the location.
+        instructions:
+          type: string
+          description: The special instructions for the location.
+      required:
+      - company
+      - address
+      - postalCode
+      - country
+      - stopType
+      - sequence
+      - opensAt
+      - closesAt
+    EditUnbookedShipmentDTO:
+      type: object
+      title: Un-awarded Shipment
+      properties:
+        locations:
+          type: array
+          description: The shipment's locations, e.g. origin, destination and any stops in between.
+          items:
+            "$ref": "#/components/schemas/UnbookedLocationDTO"
+          minItems: 2
+        billTo:
+          "$ref": "#/components/schemas/ApiBillToDTO"
+        bolNumber:
+          "$ref": "#/components/schemas/BOLNumber"
+        equipment:
+          "$ref": "#/components/schemas/ExternalEquipmentDTO"
+        customsBroker:
+          "$ref": "#/components/schemas/ExternalCustomsBroker"
+        emergencyContact:
+          "$ref": "#/components/schemas/ApiEmergencyContactDTO"
+        items:
+          type: array
+          description: The items (handling units) being transported as part of the shipment.
+          items:
+            "$ref": "#/components/schemas/ExternalHandlingUnitDTO"
+        isLiveLoad:
+          type: boolean
+          description: |
+            A flag to indicate whether the shipper considers the shipment a "live load".
+
+            - `true` - This is a "live load" that will be shipped.
+            - `false` - This shipment is "quote only".
+        refNums:
+          type: array
+          description: The reference numbers associated with the shipment.
+          items:
+            "$ref": "#/components/schemas/RefNum"
+      required:
+      - locations
+      - equipment
+      - isLiveLoad
+    ExternalAwardLoadDTO:
+      type: object
+      properties:
+        quoteId:
+          type: string
+          description: The unique identifier for the quote in Freightview.
+          minLength: 1
+        items:
+          type: array
+          description: The items (handling units) being transported as part of the shipment. _Required if `createBOL` is true._
+          items:
+            "$ref": "#/components/schemas/ExternalHandlingUnitDTO"
+        equipment:
+          "$ref": "#/components/schemas/ApiEquipmentDTO"
+        locations:
+          type: array
+          description: The shipment's locations, e.g. origin, destination and any stops in between.
+          items:
+            "$ref": "#/components/schemas/BookedLocationDTO"
+          minItems: 2
+        createBOL:
+          type: boolean
+          description: A flag to indicate whether a Bill of Lading should be created for the shipment.
+          default: true
+        schedulePickup:
+          type: boolean
+          description: A flag to indicate whether the shipment should be scheduled with the carrier for pickup.
+          default: true
+        customsBroker:
+          "$ref": "#/components/schemas/ExternalCustomsBroker"
+        emergencyContact:
+          "$ref": "#/components/schemas/ApiEmergencyContactDTO"
+        billTo:
+          "$ref": "#/components/schemas/ApiBillToDTO"
+        bolNumber:
+          "$ref": "#/components/schemas/BOLNumber"
+      required:
+      - quoteId
+      - locations
+    ApiEquipmentDTO:
+      type: object
+      description: The equipment for the shipment.
+      properties:
+        accessorials:
+          type: array
+          description: |
+            The accessorials associated with the equipment.
+
+            - `chains` - Only applicable for flatbed equipment.
+            - `e-track` - Only applicable for dry van equipment.
+            - `food-grade` - Only applicable for dry van and refrigerated equipment.
+            - `load-bars` - Only applicable for dry van equipment.
+            - `tarps` - Only applicable for flatbed equipment.
+            - `temp` - Only applicable for refrigerated equipment.
+            - `straps` - Only applicable for dry van and flatbed equipment.
+            - `protect-from-freezing` Only applicable for LTL equipment.
+            - `liftgate` - Only applicable for dry van, straight truck, and box truck equipment.
+            - `team-driver` - Applicable for all equipment types.
+            - `tanker-endorsement` - Only applicable for dry van, flatbed, and refrigerated equipment.
+          items:
+            "$ref": "#/components/schemas/ApiEquipmentAccessorialDTO"
+    ApiEquipmentAccessorialDTO:
+      type: object
+      discriminator:
+        propertyName: key
+        mapping:
+          chains: "#/components/schemas/ApiEquipmentAccessorialCount"
+          e-track: "#/components/schemas/ApiEquipmentAccessorialSimple"
+          food-grade: "#/components/schemas/ApiEquipmentAccessorialSimple"
+          load-bars: "#/components/schemas/ApiEquipmentAccessorialCount"
+          tarps: "#/components/schemas/ApiEquipmentAccessorialTarps"
+          temp: "#/components/schemas/ApiEquipmentAccessorialTemp"
+          straps: "#/components/schemas/ApiEquipmentAccessorialCount"
+          protect-from-freezing: "#/components/schemas/ApiEquipmentAccessorialSimple"
+          liftgate: "#/components/schemas/ApiEquipmentAccessorialSimple"
+          team-driver: "#/components/schemas/ApiEquipmentAccessorialSimple"
+          tanker-endorsement: "#/components/schemas/ApiEquipmentAccessorialSimple"
+      properties:
+        key:
+          type: string
+          description: The identifier for the accessorial.
+          enum:
+          - chains
+          - e-track
+          - food-grade
+          - load-bars
+          - tarps
+          - temp
+          - straps
+          - protect-from-freezing
+          - liftgate
+          - team-driver
+          - tanker-endorsement
+          minLength: 1
+      required:
+      - key
+    ApiEquipmentAccessorialCount:
+      allOf:
+        - $ref: '#/components/schemas/ApiEquipmentAccessorialDTO'
+        - type: object
+          properties:
+            count:
+              type: number
+              description: A count of how many of the accessorial are needed.
+          required:
+          - count
+    ApiEquipmentAccessorialTemp:
+      allOf:
+        - $ref: '#/components/schemas/ApiEquipmentAccessorialDTO'
+        - type: object
+          properties:
+            min:
+              type: number
+              description: The minimum temperature for the equipment.
+            max:
+              type: number
+              description: The maximum temperature for the equipment.
+            uom:
+              type: string
+              description: The unit of measurement for the temperature.
+              enum:
+              - f
+              - c
+          required:
+            - min
+            - max
+            - uom
+    ApiEquipmentAccessorialTarps:
+      allOf:
+        - $ref: '#/components/schemas/ApiEquipmentAccessorialDTO'
+        - type: object
+          properties:
+            size:
+              type: number
+              description: The size of tarps needed (in feet).
+              enum:
+              - 4
+              - 6
+              - 8
+          required:
+            - size
+    ApiEquipmentAccessorialSimple:
+      allOf:
+        - $ref: '#/components/schemas/ApiEquipmentAccessorialDTO'
+    ManualConfirmDTO:
+      type: object
+      properties:
+        pickupConfirmationNumber:
+          type: string
+          description: The confirmation number for the pickup (from the carrier).
+          minLength: 1
+      required:
+      - pickupConfirmationNumber
+    ExternalRetractDTO:
+      type: object
+      properties:
+        notifyCarrier:
+          type: boolean
+          description: A flag to indicate whether the carrier should be notified of the retraction.
+      required:
+      - notifyCarrier
+    ExternalRequestQuotesDTO:
+      type: object
+      properties:
+        emails:
+          type: array
+          description: The carrier email addresses from whom to request quotes.
+          items:
+            format: email
+            type: string
+        message:
+          type: string
+          description: A field to add an additional message to the request for quotes. This message will be appended to the shipment details which will be included automatically.
+          maxLength: 500
+      required:
+      - emails
+    BOLNumber:
+      type: string
+      description: The Bill of Lading number for the shipment. Auto-generated by Freightview upon awarding unless value provided by shipper.
+    LabelSize:
+      type: string
+      description: |
+        The size of labels you would like to generate for the shipment.
+
+        **N/A for parcel shipments**, which default to `4x6`.
+
+      default: 4x6
+      enum:
+        - 2.25x4
+        - 3x4
+        - 3x5
+        - 3.5x5
+        - 4x1
+        - 4x2
+        - 4x3.3
+        - 4x6
+        - 4x8
+        - 5.5x8.5
+        - 8.5x11
+paths:
+  "/v2.0/auth/token":
+    post:
+      operationId: authGetToken
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TokenResponseDTO"
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/BadRequestError"
+                - "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+      summary: Generate token
+      description: This endpoint can be used to generate a bearer token for use as the authentication for all other v2.0 endpoints.
+      parameters: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/GenerateTokenReqDTO"
+          application/x-www-form-urlencoded:
+            schema:
+              "$ref": "#/components/schemas/GenerateTokenReqDTO"
+      tags:
+      - Authentication
+  "/v2.0/shipments":
+    get:
+      operationId: shipmentsSearchShipments
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ExternalPagedShipmentsDTO"
+          description: Success
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+      summary: Search shipments
+      description: |
+        This endpoint can be used to retrieve shipments from Freightview, via a `search` query parameter and/or various filters available as query parameters (e.g. `status`).
+
+        **Query Parameters**
+
+        All query parameters that are arrays are serialized in form style (i.e. the query parameter is repeated for each value in the array).
+
+        For example, a search for shipments that are in `confirmed` or `delivered` `status`, should be sent like this: `https://{baseUrl}/shipments?status=confirmed&status=delivered`.
+      security:
+      - OAuth: []
+      parameters:
+      - in: query
+        required: false
+        name: continuationToken
+        description: |
+            - If search results exceed 20 shipments, then a `continuationToken` value will be returned in the response body.
+            - Pass the `continuationToken` returned in the response body as a query parameter to retrieve the next set of results.
+            - If `continuationToken` is not present, then no further results are available.
+        schema:
+          type: string
+      - in: query
+        required: false
+        name: search
+        schema:
+          type: string
+          description: |
+            Search Freightview for shipments with this value.
+
+            Examples of searches:
+            - PRO number - `123456789`
+            - Tracking number - `1Z999999999999999`
+            - Shipment reference number - `PO#123456`
+            - Bill of Lading number - `7654321`
+            - Location company name - `ACME Corporation`
+            - Location city name - `Chicago`
+            - Location postal code - `60601`
+      - in: query
+        required: false
+        name: auditStatus
+        description: |
+          Search shipments by their current audit status.
+
+            - `outstanding` - Invoice balance is fully outstanding
+            - `accepted` - Payment has been approved
+            - `disputed` - Invoiced amount is in dispute
+            - `archived` - Invoice has been remitted for payment
+
+          A shipment can have multiple audit statuses. For example, when partial payment for an invoice has been approved while still disputing the remaining balance.
+        schema:
+          type: string
+          enum:
+          - outstanding
+          - accepted
+          - disputed
+          - archived
+      - in: query
+        required: false
+        name: deliveryDateStart
+        description: Start of delivery date range (for searching shipments by delivery date range).
+        schema:
+          type: string
+          format: date
+          example: "2022-01-01"
+      - in: query
+        required: false
+        name: deliveryDateEnd
+        description: End of delivery date range (for searching shipments by delivery date range).
+        schema:
+          type: string
+          format: date
+          example: "2022-01-01"
+      - in: query
+        required: false
+        name: bookedDateStart
+        description: Start of booked date range (for searching shipments by booked date range).
+        schema:
+          type: string
+          format: date
+          example: "2022-01-01"
+      - in: query
+        required: false
+        name: bookedDateEnd
+        description: End of booked date range (for searching shipments by booked date range).
+        schema:
+          type: string
+          format: date
+          example: "2022-01-01"
+      - in: query
+        required: false
+        name: direction
+        description: The direction of the the shipment (based on the locations setup for the account).
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - inbound
+            - outbound
+            - third-party
+      - in: query
+        required: false
+        name: isArchived
+        description: A flag to indicate whether the shipment has been archived in Freightview.
+        schema:
+          type: boolean
+      - in: query
+        required: false
+        name: isFreightCollect
+        description: |
+          A flag to indicate whether the freight charges for the shipment are being paid by the party creating the shipment. Also known as "customer routed" freight.
+
+          - `true` - The freight charges for the shipment will **not** be paid by the party setting up the shipment.
+          - `false` - The freight charges for the shipment will be paid by the party setting up the shipment.
+        schema:
+          type: boolean
+      - in: query
+        required: false
+        name: isInterline
+        description: A flag that indicates whether another carrier will be used to provide a portion of the transport for the shipment.
+        schema:
+          type: boolean
+      - in: query
+        required: false
+        name: mode
+        description: The mode of transport used for the shipment.
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - truckload
+            - parcel
+            - ltl
+            - intermodal
+            - consolidated
+            - air
+            - ocean
+            - bulk
+      - in: query
+        required: false
+        name: pickupDateStart
+        description: Start of pickup date range (for searching shipments by pickup date range).
+        schema:
+          type: string
+          format: date
+          example: "2022-01-01"
+      - in: query
+        required: false
+        name: pickupDateEnd
+        description: End of pickup date range (for searching shipments by pickup date range).
+        schema:
+          type: string
+          format: date
+          example: "2022-01-01"
+      - in: query
+        required: false
+        name: pricingMethod
+        description: |
+          The method for the pricing.
+
+          - `contracted` - The pricing is based on customer's contract with the carrier.
+          - `capacity` - The pricing is based on the carrier's current capacity in a given lane. (e.g. a spot quote).
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - contracted
+            - capacity
+      - in: query
+        required: false
+        name: pricingType
+        description: |
+          The type of pricing.
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - pallet
+            - dimensional
+            - spot
+            - tariff
+            - density
+      - in: query
+        required: false
+        name: status
+        description: |
+          - `pending` - Shipment has been created.
+          - `awarded` - Shipment has been awarded to a carrier.
+          - `confirmed` - Shipment has been confirmed by carrier.
+          - `picked-up` - Shipment has been picked up.
+          - `delivered` - Shipment has been delivered.
+          - `canceled` - Shipment has been canceled by the shipper.
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - pending
+            - awarded
+            - confirmed
+            - picked-up
+            - delivered
+            - canceled
+          example: [pending,awarded]
+      - in: query
+        required: false
+        name: bolNumber
+        description: |
+          The Bill of Lading number for the shipment.
+        schema:
+          type: string
+        example: "7654321"
+      - in: query
+        required: false
+        name: referenceNumber
+        description: |
+          A reference number associated with the shipment.
+        schema:
+          type: string
+        example: "PO#123456"
+      - in: query
+        required: false
+        name: trackingNumber
+        description: |
+          The tracking or PRO number for the shipment.
+        schema:
+          type: string
+        example: "1Z999999999999999"
+      - in: query
+        required: false
+        name: pickupConfirmationNumber
+        description: |
+          The pickup confirmation number for the shipment.
+        schema:
+          type: string
+        example: "123456789"
+      tags:
+      - Shipments
+  "/v2.0/shipments/{shipmentId}":
+    get:
+      operationId: shipmentsGetShipmentById
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ExternalShipmentDTO"
+          description: Success
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Get shipment details
+      description: This endpoint provides detailed information for a given `shipmentId`.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: labelSize
+        schema:
+          $ref: '#/components/schemas/LabelSize'
+      - in: query
+        name: labelCount
+        schema:
+          type: integer
+          enum:
+              - 1
+              - 2
+              - 4
+          description: |
+            The number of labels (per shipping item e.g. pallet) you would like to have returned for the shipment. See [here](#section/Labels) for more details on labels.
+
+            **N/A for parcel shipments**        
+      tags:
+      - Shipments
+  "/v2.0/shipments/{shipmentId}/quotes":
+    get:
+      operationId: shipmentsGetQuotes
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/GetQuotesDtoListExternal"
+          description: Success
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Get shipment quotes
+      description: This endpoint provides all quotes available for a given `shipmentId`.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      tags:
+      - Shipments
+  "/v2.0/shipments/{shipmentId}/tracking":
+    get:
+      operationId: shipmentsGetTrackHistory
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ExternalTrackEventDTO"
+          description: Success
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Get shipment tracking history
+      description: This endpoint provides detailed tracking history for a given `shipmentId`.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      - in: query
+        required: false
+        name: itemId
+        description: The identifier of the item in Freightview you wish to track. Required if an index is specified.
+        schema:
+          type: string
+      - in: query
+        required: false
+        name: itemIndex
+        description: The zero-based index for a given itemId in Freightview you wish to track. For example, if you want to track the second entity of an item with a quantity of 2 in the group of items, specify the number 1.
+        schema:
+          type: string
+      tags:
+      - Shipments
+  "/v2.0/shipments/truckload/{shipmentId}/quote":
+    post:
+      operationId: truckloadAddQuote
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ExternalAddQuoteResDTO"
+          description: Created
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Add manual quote
+      description: |
+        This endpoint can be used to add a quote to a truckload shipment.
+
+        If the value provided for `carrierEmail` does not match any carrier email address associated with the Freightview account, and no `autoCreateCarrierName` value is provided with which to create a new carrier in Freightview for the carrier email address, an `HTTP 404 Not Found` error will be returned.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ExternalAddQuoteReqDTO"
+      tags:
+      - Truckload
+  "/v2.0/shipments/truckload":
+    post:
+      operationId: truckloadCreateShipment
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ExternalShipmentDTO"
+          description: Created
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+      summary: Create shipment
+      description: |
+        This endpoint can be used to create a truckload shipment.
+
+        - A successfully created shipment returns a `shipmentId` with a `status` of `pending`, and echoes the shipment data passed in.
+        - It also includes any additional default data from Freightview (e.g. a location's latitude, longitude, & timezone, and the default account bill-to information if none was specified in the create request).
+      security:
+      - OAuth: []
+      parameters: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreateShipmentRequest"
+            examples:
+              MinimumRequiredDryVan:
+                summary: Minimum to create dry van shipment
+                value:
+                  locations:
+                    - postalCode: "30303"
+                      country: us
+                      stopType: pickup
+                      sequence: 0
+                      stopDate: 2022-10-01
+                    - postalCode: "60601"
+                      country: us
+                      stopType: delivery
+                      sequence: 1
+                  equipment:
+                    type: dry-van-53
+                    description: Dry freight
+                    weight: 30000
+                    weightUOM: lbs
+                    isHazardous: false
+                  isLiveLoad: true
+              MinimumRequiredReefer:
+                summary: Minimum to create refrigerated shipment
+                value:
+                  locations:
+                    - postalCode: "30303"
+                      country: us
+                      stopType: pickup
+                      sequence: 0
+                      stopDate: 2022-10-01
+                    - postalCode: "60601"
+                      country: us
+                      stopType: delivery
+                      sequence: 1
+                  equipment:
+                    type: refrigerated-53
+                    accessorials:
+                      - key: temp
+                        min: -10
+                        max: 0
+                        uom: f
+                    description: Frozen freight
+                    weight: 30000
+                    weightUOM: lbs
+                    isHazardous: false
+                  isLiveLoad: true
+              MinimumMultiStop:
+                summary: Minimum to create multi-stop shipment
+                value:
+                  locations:
+                    - postalCode: "30303"
+                      country: us
+                      stopType: pickup
+                      sequence: 0
+                      stopDate: 2022-10-01
+                    - postalCode: "61616"
+                      country: us
+                      stopType: delivery
+                      sequence: 1
+                    - postalCode: "60601"
+                      country: us
+                      stopType: delivery
+                      sequence: 2
+                  equipment:
+                    type: dry-van-53
+                    description: test freight
+                    weight: 30000
+                    weightUOM: lbs
+                    isHazardous: false
+                  isLiveLoad: true
+      tags:
+      - Truckload
+  "/v2.0/shipments/truckload/{shipmentId}":
+    put:
+      operationId: truckloadEditShipment
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ExternalShipmentDTO"
+          description: Success
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Edit shipment
+      description: |
+        This endpoint can be used to edit a truckload shipment.
+
+        - The required fields in each object differ based on whether a shipment has been awarded or not.
+        - A successfully edited shipment echoes the shipment data passed in, as well as any additional default data from Freightview.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - "$ref": "#/components/schemas/EditBookedShipmentDTO"
+              - "$ref": "#/components/schemas/EditUnbookedShipmentDTO"
+      tags:
+      - Truckload
+    delete:
+      operationId: truckloadCancelShipment
+      responses:
+        '204':
+          description: No Content
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Cancel shipment
+      description: This endpoint can be used to cancel a truckload shipment.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      tags:
+      - Truckload
+  "/v2.0/shipments/truckload/{shipmentId}/award":
+    post:
+      operationId: truckloadAwardShipment
+      responses:
+        '204':
+          description: No Content
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+        '500':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/InternalServerError"
+          description: Internal Server Error
+      summary: Award shipment to carrier
+      description: |
+        This endpoint can be used to award a truckload shipment to a carrier.
+
+        - Add full address detail for each location.
+        - Add contact information for each location.
+        - Add location appointment times (if needed).
+        - If creating a bill of lading, include all handling unit information in the `items` array.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ExternalAwardLoadDTO"
+            examples:
+              AwardTruckload:
+                summary: Award truckload
+                value:
+                  quoteId: quoteId
+                  locations:
+                    - sequence: 0
+                      type: origin
+                      stopType: pickup
+                      company: ABC Plastics
+                      address: 1234 Main St.
+                      city: Atlanta
+                      state: GA
+                      postalCode: "30303"
+                      country: us
+                      opensAt: 08:00
+                      closesAt: 17:00
+                    - sequence: 1
+                      type: destination
+                      stopType: delivery
+                      company: XYZ Packaging
+                      address: 987 Walnut Ave
+                      city: Newark
+                      state: NJ
+                      postalCode: "07101"
+                      country: us
+                      opensAt: 09:00
+                      closesAt: 14:00
+                  items:
+                    - type: pallet
+                      quantity: 15
+                      description: Freight
+                      weight: 30000
+                      weightUOM: lbs
+                      pickupLocationSequence: 0
+                      dropLocationSequence: 1
+              AwardMultiStopTruckload:
+                summary: Award multi-stop truckload
+                value:
+                  quoteId: quoteId
+                  locations:
+                    - sequence: 0
+                      type: origin
+                      stopType: pickup
+                      company: LED Manufacturing
+                      address: 456 2nd St.
+                      city: Kansas City
+                      state: MO
+                      postalCode: "64105"
+                      country: us
+                      opensAt: 09:00
+                      closesAt: 17:00
+                    - sequence: 1
+                      type: stop
+                      stopType: delivery
+                      company: Acme Test Co.
+                      address: 1234 Main St.
+                      city: Atlanta
+                      state: GA
+                      postalCode: "30303"
+                      country: us
+                      opensAt: 08:00
+                      closesAt: 17:00
+                    - sequence: 2
+                      type: destination
+                      stopType: delivery
+                      company: NBT Chemical
+                      address: 987 Walnut Ave
+                      city: Newark
+                      state: NJ
+                      postalCode: "07101"
+                      country: us
+                      opensAt: 09:00
+                      closesAt: 14:00
+                  items:
+                    - type: pallet
+                      quantity: 10
+                      description: Some Freight
+                      weight: 15000
+                      weightUOM: lbs
+                      pickupLocationSequence: 0
+                      dropLocationSequence: 1
+                    - type: pallet
+                      quantity: 15
+                      description: More Freight
+                      weight: 15000
+                      weightUOM: lbs
+                      pickupLocationSequence: 0
+                      dropLocationSequence: 2
+      tags:
+      - Truckload
+  "/v2.0/shipments/truckload/{shipmentId}/confirm":
+    post:
+      operationId: truckloadConfirmShipment
+      responses:
+        '204':
+          description: No Content
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Manually confirm shipment
+      description: |
+        This endpoint can be used to manually confirm a truckload shipment.
+
+        - Only shipments in `awarded` status can be manually confirmed.
+        - Manual confirmation should only be done if the carrier has provided confirmation of the shipment separately to the shipper (and not through Freightview, which is the recommended workflow).
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ManualConfirmDTO"
+      tags:
+      - Truckload
+  "/v2.0/shipments/truckload/{shipmentId}/retract":
+    post:
+      operationId: truckloadRetractAwardedShipment
+      responses:
+        '204':
+          description: No Content
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Retract awarded shipment
+      description: |
+        This endpoint can be used to retract an awarded truckload shipment from a carrier. Only shipments that are in status `awarded` or `confirmed` can be retracted.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ExternalRetractDTO"
+      tags:
+      - Truckload
+  "/v2.0/shipments/truckload/quotes/{shipmentId}/request":
+    post:
+      operationId: truckloadRequestForQuotes
+      responses:
+        '204':
+          description: No Content
+          headers:
+            x-request-id:
+              description: The unique identifier for this request / response that should be referenced when requesting assistance from Freightview Support.
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UnauthorizedError"
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFoundError"
+          description: Not Found
+      summary: Request quotes for shipment
+      description: This endpoint can be used to request spot quotes from carriers for a truckload shipment.
+      security:
+      - OAuth: []
+      parameters:
+      - in: path
+        name: shipmentId
+        description: The unique identifier in Freightview for the shipment.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ExternalRequestQuotesDTO"
+      tags:
+      - Truckload
+tags:
+- name: Authentication
+  description: |
+    Freightview uses OAuth 2.0 as the authentication for v2.0. You must generate a token using your `client_id` and `client_secret`. These values are available in the "API Integration" section of your Freightview user settings (select the gear icon in the upper right of Freightview's user interface).
+
+    There is no need to generate a new token with each request, as the generated token is valid for 24hrs. We recommend caching the token to avoid unnecessary requests to the authentication endpoint.
+- name: Shipments
+  description: Search for shipments and retrieve detailed shipment information.
+- name: Truckload
+  description: The truckload endpoints of the Freightview API v2.0 allow customers to create and manage full truckload shipments throughout the entirety of the shipment lifecycle from their own system. See one example of a possible workflow using these endpoints [here](#section/Example-truckload-API-workflow).
+# - name: Reference
+- name: Guides
+  description: |
+    The following sections provide helpful information on using Freightview API v2.0
+
+    # Example truckload API workflow
+
+    This is an example truckload workflow using the Freightview v2.0 API endpoints throughout the entire shipment lifecycle. (Customers can use the APIs to achieve other specific workflows; this example is provided to aid understanding of the capabilities of the Freightview truckload APIs.)
+
+    1. Create shipment using the [create shipment](#tag/Truckload/operation/truckloadCreateShipment) endpoint.
+    2. Retrieve available quotes (if any) using the [get shipment quotes](#tag/Shipments/operation/shipmentsGetQuotes) endpoint. Examples of available rates at this stage in the workflow include:
+        - applicable contracted rates that have been added for your carriers to your account in Freightview
+        - rates returned automatically from truckload carrier APIs (e.g. C.H. Robinson)
+    3. If no rates are available, or you'd like to request spot quotes from additional carriers, use the [request quotes for shipment](#tag/Truckload/operation/truckloadRequestForQuotes) endpoint.
+    4. After a given amount of time, retrieve available quotes using the [get shipment quotes](#tag/Shipments/operation/shipmentsGetQuotes) endpoint.
+    5. Select a quote and award it to the carrier using the [award shipment to carrier](#tag/Truckload/operation/truckloadAwardShipment) endpoint.
+    6. Use the [get shipment details](#tag/Shipments/operation/shipmentsGetShipmentById) endpoint to check the shipment `status`:
+
+        - If the `status` has been updated to `confirmed`, the carrier has confirmed they will accept and transport the shipment.
+        - If the `status` returns to `pending`, the carrier has rejected the shipment. Use the [get shipment quotes](#tag/Shipments/operation/shipmentsGetQuotes) and [award shipment to carrier](#tag/Truckload/operation/truckloadAwardShipment) endpoints to select a quote from another carrier and award the shipment.
+    7. Once the shipment has been confirmed, you can use the [get shipment details](#tag/Shipments/operation/shipmentsGetShipmentById) endpoint to retrieve the bill of lading.
+    8. As the shipment is picked up and transported to its destination, you can use the [get shipment tracking history](#tag/Shipments/operation/shipmentsGetTrackHistory) endpoint to retrieve the shipment's tracking history.
+    9. Throughout the shipment lifecycle, if the shipment needs to be edited or canceled, you can use the [edit shipment](#tag/Truckload/operation/truckloadEditShipment) or [cancel shipment](#tag/Truckload/operation/truckloadCancelShipment) endpoints respectively.
+
+    # Migrating from v1.0 to v2.0
+
+    ### Why a version change?
+
+    The Freightview API has remained on v1.0 since it's creation, even as it has added support for additional modes (such as parcel). But with the addition of a full-featured full truckload tool to Freightview (and specifically support for multi-stop shipments), there were schema changes made that are not backwards compatible.
+
+    Thus, in order to maintain the functionality of v1.0, but also allow access to the new truckload functionality, the Freightview API is adding v2.0.
+
+    ### Who should migrate?
+
+    If you are using the rate and book endpoints for LTL and parcel, there are currently **no changes to these API workflows** and they will remain on API v1.0 for the foreseeable future.
+
+    If you are using either the LTL or parcel workflows and the full truckload workflow and are retrieving shipment information via the shipment search and shipment information API endpoints, you will want to begin migrating to v2.0.
+
+    If you are using the full truckload workflow and want to integrate its capabilities via API, then you will want to implement v2.0.
+
+    ### Functionality changes
+
+    The initial release of v2.0 added the ability to search & retrieve shipment data for all shipments in Freightview regardless of workflow (LTL, parcel, truckload).
+
+    The full release of v2.0 added all the capabilities of Freightview's Truckload tool to the Freightview APIs.
+
+    ### Authentication changes
+
+    The Freightview API v1.0 uses HTTP Basic authentication. The Freightview API v2.0 is upgrading to use OAuth to generate a Bearer token, which is then used to authenticate requests made to all other v2.0 endpoints.
+
+    ### Data changes
+
+    #### Shipment
+
+    - The `id` field is now `shipmentId`.
+    - The `files` array is now `documents` array.
+      - `subType` is now `source.`
+    - The `archived` flag is now `isArchived`.
+    - The `tracking.history` array is now returned by the separate [shipment tracking history endpoint](#tag/Shipments/operation/shipmentsGetTrackHistory).
+    - The `bolNum` is now in `bol.bolNumber`.
+    - The data in the `accessorials` array has been split, some of the accessorials are in `equipment.accessorials` and the others are in `location.accessorials`.
+
+    #### Location
+    - The `origin` object is now an object within the `locations` array, with `type : origin`.
+    - The `destination` object is now an object within the `locations` array, with `type : destination`.
+    - Location reference numbers are now an array of reference number objects on the `location` instead of a single field (e.g. `origin.referenceNumber`) on the location.
+    - Location `dockHoursOpen` is now `opensAt` and is now in 24-hr time.
+    - Location `dockHoursClose` is now `closesAt` and is now in 24-hr time.
+    - Location `shipType` is now returned as kebab-case values in the `key` field in the `accessorials` array.
+
+    #### Item
+    - The `pieces` field is now `quantity`.
+    - The `package` field is now `type`.
+    - The `nmfc` field is now split between two fields, `nmfcNumber` and `nmfcSubNumber`.
+    - The `hazard` object is now the `hazardous` object.
+      - The `hazardClass` field is now `primaryClass`.
+      - The `hazardSubClass1` field is now `secondaryClass`.
+      - The `hazardSubClass2` field is now `tertiaryClass`.
+      - The `specialPermit` field is now `permitNumber`.
+    - Instead of the `saidToContain` and `saidToContainPackagingType` fields, the `contains` array has objects that have a `quantity` and `type`.
+
+    #### Rate
+    - The `rate` object is now `selectedQuote`.
+    - `total` is now `amount`.
+    - `days` is now `transitDaysMin` and `transitDaysMax`.
+    - The combination of `serviceType` and `serviceOption` is replaced by `serviceId`.
+    - `carrier` is now `assetCarrierName`.
+    - `carrierCode` is now `assetCarrierCode`.
+    - `provider` is now `providerName` and is returned for all quotes, not just brokerage quotes.
+    - `providerCode` is now returned for all quotes, not just brokerage quotes.
+    - `time`, `rural`, and `daysPlus` fields are not returned.
+
+    #### Dispatch
+    - The `dispatch` object has been removed, and the information from its fields is reflected in various other objects, as detailed below.
+    - The `dispatch.carrierId` field is now `selectedQuote.carrierId`.
+    - The `dispatch.carrier` field is now `selectedQuote.providerName`.
+    - The `dispatch.carrierCode` field is now `selectedQuote.providerCode`.
+    - The `dispatch.schedulePickup` flag is not directly replicated, but the `pickup.status` field can be used to match to its values. If `pickup.status` is `not-requested`, this is equivalent to `schedulePickup: false`, any other value equates to `schedulePickup : true`.
+    - The `dispatch.bolStatus` field is now `bol.status`.
+    - The `dispatch.pickupNum` field is now `pickup.confirmationNumber`.
+    - The `dispatch.proNum` field is now `tracking.trackingNumber`.
+
+    <!--
+    # Truckload integration scenarios
+
+    Version 2.0 of the Freightview API allows integration of Freightview's full truckload capabilities into your own system.
+
+    There are a number of ways to integrate the truckload functionality, depending on desired workflow and amount of integration that is needed between systems. These are described below, from most integrated to least integrated.
+
+    ## Minimal integration -->
+
+    # Migrating from Enterprise TMS API to Freightview API
+
+    Enterprise TMS (ETMS) is a transportation management software solution provided by C.H. Robinson (Freightview's parent company) that is being sunset.
+
+    This guide is provided to aid developers who are upgrading their systems to connect to the Freightview APIs.
+
+    ### API type
+
+    The ETMS API uses the SOAP protocol with XML request / response bodies, whereas Freightview's API is structured using RESTful principles with JSON request / response bodies.
+
+    ### Authentication
+
+    - ETMS uses a username/password (`authentication ID` / `authentication key`) in each SOAP request.
+    - For Freightview API v1.0, HTTP Basic Authentication is used, with a user's Freightview API key as the Basic Auth `username` in each HTTP request header.
+    - For Freightview API v2.0, OAuth 2.0 is used to generate a bearer token, which is used for requests to all endpoints.
+
+    ### LTL shipment API comparison
+
+    | Action | ETMS API endpoint | Freightview API endpoint |
+    | --- | --- | --- |
+    | Rate LTL shipment | `PostEditLTLShipment` | POST `/v1.0/rates` |
+    | Edit LTL shipment | `PostEditLTLShipment` | (Send a new `/v1.0/rates` request with the modified shipment information. </br> FV will return a new shipment `id`) |
+    | Book LTL shipment | `OfferShipment` | POST `/v1.0/book` |
+    | Track LTL shipment | `GetShipmentStatus` | GET `/v2.0/shipments/{shipmentId}/tracking` |
+    | Cancel LTL shipment | `CancelShipment` | - |
+    | Retrieve documents for LTL shipment | n/a | GET `/v2.0/shipments/{shipmentId}` (`documents` array) |
+    | Search for LTL shipment | n/a | GET `/v2.0/shipments` |
+
+    ### TL shipment API comparison
+
+    | Action | ETMS API endpoint | Freightview API endpoint |
+    | --- | --- | --- |
+    | Create TL shipment | `PostEditShipment` | POST `/v2.0/shipments/truckload` |
+    | Request TL spot-quotes | n/a | POST `/v2.0/shipments/truckload/quotes/{shipmentId}/request`
+    | Get TL shipment quotes | `GetQuotes` | GET `/v2.0/shipments/{shipmentId}/quotes` |
+    | Edit TL shipment | `PostEditShipment` | PUT `/v2.0/shipments/truckload/{shipmentId}` |
+    | Award TL shipment | `OfferShipment` | POST `/v2.0/shipments/truckload/{shipmentId}/award` |
+    | Retract TL shipment | `DropCarrier` | POST /`v2.0/shipments/truckload/{shipmentId}/retract` |
+    | Track TL shipment | `GetShipmentStatus` | GET `/v2.0/shipments/{shipmentId}/tracking` |
+    | Cancel TL shipment | `CancelShipment` | DELETE `/v2.0/shipments/truckload/{shipmentId}` |
+    | Retrieve documents for TL shipment | n/a | GET `/v2.0/shipments/{shipmentId}` (`documents` array) |
+    | Search for TL shipment | n/a | GET `/v2.0/shipments` |
+
+    # Labels
+
+      On the [shipment details](#tag/Shipments/operation/shipmentsGetShipmentById) endpoint, the `labelSize` and `labelCount` query parameters can be used to indicate what size of labels and how many labels to return for the shipment. (These query parameters do not apply to parcel shipments, whose labels are 4x6 and are generated by the carrier).
+
+      ### Label Size
+      The labels Freightview generates fall into two categories, roll and sheet. Below are the `labelSize` values, divided by category.
+
+      #### Sheet
+
+      - `8.5x11` - full page label
+      - `5.5x8.5` - two labels per page
+      - `3.5x5` - four labels per page
+      - `4x3.3` - six labels per page
+      - `4x2` - ten labels per page
+
+
+      #### Roll
+
+      - `4x8`
+      - `4x6`
+      - `3x5`
+      - `3x4`
+      - `2.25x4`
+      - `4x1`
+
+      ### Label Count
+
+      The label count determines how many labels get generated per shipping item, e.g. pallet. The supported `labelCount` values are `1`, `2`, and `4`.

@@ -163,7 +163,7 @@ export default function BookFreight() {
             </div>
           </form>
         </Card>
-        <Card className="mt-10 w-full md:max-w-screen-lg">
+        <Card className="mt-10 w-full md:max-w-screen-lg overflow-y-scroll max-h-80">
           {orderData ? (
             <ul>
               <div className="flex flex-row">
@@ -245,7 +245,7 @@ export default function BookFreight() {
           )}
         </Card>
         {orderData ? (
-          <Card className="mt-10 w-full md:max-w-screen-lg">
+          <Card className="mt-10 w-full md:max-w-screen-lg overflow-y-scroll max-h-80">
             <div className="flex flex-row">
               <button
                 onClick={() => handleChevronClick("item")}
