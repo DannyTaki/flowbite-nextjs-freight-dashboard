@@ -1,45 +1,59 @@
 "use client";
 
-import { Button, Card, Label, TextInput, useThemeMode, Toast } from "flowbite-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useFormStatus } from "react-dom";
-import { useState, ReactElement } from "react"; 
-import { HiX, HiExclamation, HiCheck, HiChevronDown, HiChevronRight, HiPhone, HiMail } from "react-icons/hi";
 import { getOrder } from "@/app/actions/action";
 import { optsSchema } from "@/types/optsSchema";
+import {
+  Button,
+  Card,
+  Label,
+  TextInput,
+  Toast,
+  useThemeMode,
+} from "flowbite-react";
+import Image from "next/image";
+import Link from "next/link";
+import type { ReactElement } from "react";
+import { useState } from "react";
+import {
+  HiCheck,
+  HiChevronDown,
+  HiChevronRight,
+  HiExclamation,
+  HiMail,
+  HiPhone,
+  HiX,
+} from "react-icons/hi";
 import { type IOrderPaginationResult } from "shipstation-node/typings/models";
-import titleize from 'titleize';
+import titleize from "titleize";
 
-
-
-
-export default function BookFreight()
-{
+export default function BookFreight() {
   const { computedMode } = useThemeMode();
   const { pending } = useFormStatus();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [orderData, setOrderData] = useState<IOrderPaginationResult | null>(null);
+  const [orderData, setOrderData] = useState<IOrderPaginationResult | null>(
+    null,
+  );
   const [icon, setIcon] = useState<ReactElement | null>(null);
   const [toastStyle, setToastStyle] = useState<string | null>(null);
-  const [chevronRight, setChevronRight] = useState<boolean| null>(true);
-  const [disableFreightBtn, setDisableFreightBtn] = useState<boolean | undefined>(true);
-  const [chevronItemRight, setChevronItemRight] = useState<boolean | null>(true);
+  const [chevronRight, setChevronRight] = useState<boolean | null>(true);
+  const [disableFreightBtn, setDisableFreightBtn] = useState<
+    boolean | undefined
+  >(true);
+  const [chevronItemRight, setChevronItemRight] = useState<boolean | null>(
+    true,
+  );
 
   function handleChevronClick(section: string) {
-    if (section === 'shipment') {
-      setChevronRight(prev => !prev);
+    if (section === "shipment") {
+      setChevronRight((prev) => !prev);
     }
-    if (section === 'item') {
-      setChevronItemRight(prev => !prev);
+    if (section === "item") {
+      setChevronItemRight((prev) => !prev);
     }
-    
   }
 
-
-  const clientAction = async (formData: FormData) => 
-  {
+  const clientAction = async (formData: FormData) => {
     setOrderData(null);
     setShowToast(false);
     setDisableFreightBtn(true);
@@ -55,139 +69,210 @@ export default function BookFreight()
       result.error.issues.forEach((issue) => {
         errorMessage = issue.message + ". ";
       });
-      setShowToast(true); 
+      setShowToast(true);
       setToastMessage(errorMessage);
-      setToastStyle("bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200");
+      setToastStyle(
+        "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200",
+      );
       setIcon(<HiX className="h-5 w-5" />);
       return;
     }
 
     const response = await getOrder(opts);
-    if(response !== null && 'error' in response) {
+    if (response !== null && "error" in response) {
       setShowToast(true);
       setToastMessage(response.error.message);
       setIcon(<HiX className="h-5 w-5" />);
     } else if (response && response.orders && response.orders.length > 0) {
-        setOrderData(response);
-        setShowToast(true);
-        setToastMessage("Order data loaded successfully!");
-        setToastStyle("bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200");
-        setIcon(<HiCheck className="h-5 w-5" />);
-        setDisableFreightBtn(false);
-      } else {
-        setShowToast(true);
-        setToastMessage("No orders found with that order number");
-        setToastStyle("bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200");
-        setIcon(<HiExclamation className="h-5 w-5" />);
-      }
-  }  
+      setOrderData(response);
+      setShowToast(true);
+      setToastMessage("Order data loaded successfully!");
+      setToastStyle(
+        "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200",
+      );
+      setIcon(<HiCheck className="h-5 w-5" />);
+      setDisableFreightBtn(false);
+    } else {
+      setShowToast(true);
+      setToastMessage("No orders found with that order number");
+      setToastStyle(
+        "bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200",
+      );
+      setIcon(<HiExclamation className="h-5 w-5" />);
+    }
+  };
 
-      return (
-        <>
-          {showToast && (
-            <Toast className="fixed top-30 right-5 mt-6">
-              <div className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${toastStyle}`}>
-                {icon}
-              </div>
-              <div className="ml-3 text-sm font-normal">{toastMessage}</div>
-              <Toast.Toggle onClick={() => setShowToast(false)} />
-            </Toast>
-          )}
-          <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen"> 
-            <Link
-              href="/"
-              className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
-            >
-              <Image
-                alt=""
-                src={
-                  computedMode === "light"
-                    ? "/images/alliancechemical.svg"
-                    : "/images/alliancechemical_dark.svg"
-                }
-                width={150}
-                height={150}
-                className="mr-4 h-11"
-              />
-            </Link>
-            <Card horizontal className="w-full md:max-w-[1024px]">
-              <h2 className="text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+  return (
+    <>
+      {showToast && (
+        <Toast className="fixed right-5 top-28 mt-6">
+          <div
+            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${toastStyle}`}
+          >
+            {icon}
+          </div>
+          <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+          <Toast.Toggle onClick={() => setShowToast(false)} />
+        </Toast>
+      )}
+      <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
+        <Link
+          href="/"
+          className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
+        >
+          <Image
+            alt=""
+            src={
+              computedMode === "light"
+                ? "/images/alliancechemical.svg"
+                : "/images/alliancechemical_dark.svg"
+            }
+            width={150}
+            height={150}
+            className="mr-4 h-11"
+          />
+        </Link>
+        <Card horizontal className="w-full md:max-w-[1024px]">
+          <h2 className="text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+            Book Freight
+          </h2>
+          <form className="mt-8 space-y-6" action={clientAction}>
+            <Label htmlFor="order-number">
+              Enter a Shipstation Order Number
+            </Label>
+            <TextInput
+              id="order-number"
+              name="order-number"
+              placeholder="Order Number"
+              type="text"
+              required
+            />
+            <div className="flex flex-row gap-3">
+              <Button type="submit" size="lg" color="blue" disabled={pending}>
+                Submit
+              </Button>
+              <Button
+                type="submit"
+                size="lg"
+                color="success"
+                disabled={disableFreightBtn}
+              >
                 Book Freight
-              </h2>
-              <form className="mt-8 space-y-6" action={clientAction}>
-                <Label htmlFor="order-number">Enter a Shipstation Order Number</Label>
-                <TextInput
-                  id="order-number"
-                  name="order-number"
-                  placeholder="Order Number"
-                  type="text"
-                  required
-                />
-                <div className="flex flex-row gap gap-3">
-                <Button type="submit" size="lg" color="blue" disabled={pending}>
-                  Submit
-                </Button>
-                <Button type="submit" size="lg" color="success" disabled={disableFreightBtn} >
-                  Book Freight
-                </Button>
-                </div>
-              </form>
-              
-            </Card>
-            <Card className="w-full md:max-w-[1024px] mt-10">
-              <div className="order-details">
-              {orderData ? (
-                <div>
-                  <ul>
-                    <div className="flex flex-row">
-                      <button onClick={() => handleChevronClick('shipment')} className="focus:outline-none">
-                        {chevronRight ? <HiChevronRight className="h-7 w-7 dark:text-white" /> : <HiChevronDown className="h-7 w-7 dark:text-white" />}
-                      </button>
-                      <button onClick={() => handleChevronClick('shipment')} className="focus:outline-none">
-                      <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">Shipment Details</h3>
-                      </button>
-                    </div>
-                    {!chevronRight && orderData.orders.map(order => (
-                      <div className="grid grid-col-2">
-                        <ul key={order.orderId} className="flex flex-col gap-1">
-                          <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white mt-3">Order Number: {order.orderNumber}</li>
-                          <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white">Ship To Address</li>
-                          <li className="text-sm text-gray-900 lg:text-base dark:text-white">{order.shipTo.name}</li>
-                          {order.shipTo.company && <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{order.shipTo.company}</li>}
-                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{titleize(order.shipTo.street1)} {order.shipTo.street2 ? titleize(order.shipTo.street2) : ""} {order.shipTo.street3 ? titleize(order.shipTo.street3) : ""}</li>                        
-                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{titleize(order.shipTo.city)}, {order.shipTo.state}, {titleize(order.shipTo.postalCode)}</li> 
-                          <div className="flex flex-row">
-                          <HiPhone className="h-5 w-5 dark:text-white mr-2" />
-                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{order.shipTo.phone}</li>    
-                          </div>  
-                          <div className="flex flex-row">
-                          <HiMail className="h-5 w-5 dark:text-white mr-2" />
-                          <li className="text-sm  text-gray-900 lg:text-base dark:text-white">{order.customerEmail}</li>    
-                          </div>                      
-                        </ul>
-                        <img className="col-start-2" src={order.items[0].imageUrl} width="150" height="150" />  
-                      </div>
-                    ))}
-                    </ul>
-                </div>
-              ) : (
-                <p>No order details available.</p>
-              )}
+              </Button>
             </div>
-            </Card>
-          {orderData ? ( 
-            <Card className="w-full md:max-w-[1024px] mt-10"> 
-            <div className="item-details">
+          </form>
+        </Card>
+        <Card className="mt-10 w-full md:max-w-[1024px]">
+          {orderData ? (
+            <ul>
               <div className="flex flex-row">
-                  <button onClick={() => handleChevronClick('item')} className="focus:outline-none">
-                    {chevronItemRight ? <HiChevronRight className="h-7 w-7 dark:text-white" /> : <HiChevronDown className="h-7 w-7 dark:text-white" />}
-                  </button>
-                  <button onClick={() => handleChevronClick('item')} className="focus:outline-none">
-                    <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">Item Details</h3>
-                  </button>
+                <button
+                  onClick={() => handleChevronClick("shipment")}
+                  className="focus:outline-none"
+                >
+                  {chevronRight ? (
+                    <HiChevronRight className="h-7 w-7 dark:text-white" />
+                  ) : (
+                    <HiChevronDown className="h-7 w-7 dark:text-white" />
+                  )}
+                </button>
+                <button
+                  onClick={() => handleChevronClick("shipment")}
+                  className="focus:outline-none"
+                >
+                  <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
+                    Shipment Details
+                  </h3>
+                </button>
               </div>
-              {!chevronItemRight && orderData.orders.map(order => (
-                <ul className="grid grid-cols-5 mt-4 bg-gradient-to-r from-green-400 to-blue-500 text-center ">
+              {!chevronRight &&
+                orderData.orders.map((order) => (
+                  <div key={order.orderId} className="grid grid-cols-2">
+                    <ul className="flex flex-col gap-1">
+                      <li className="mt-3 text-sm font-bold text-gray-900 lg:text-base dark:text-white">
+                        Order Number: {order.orderNumber}
+                      </li>
+                      <li className="text-sm font-bold text-gray-900 lg:text-base dark:text-white">
+                        Ship To Address
+                      </li>
+                      <li className="text-sm text-gray-900 lg:text-base dark:text-white">
+                        {order.shipTo.name}
+                      </li>
+                      {order.shipTo.company && (
+                        <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                          {order.shipTo.company}
+                        </li>
+                      )}
+                      <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                        {titleize(order.shipTo.street1)}{" "}
+                        {order.shipTo.street2
+                          ? titleize(order.shipTo.street2)
+                          : ""}{" "}
+                        {order.shipTo.street3
+                          ? titleize(order.shipTo.street3)
+                          : ""}
+                      </li>
+                      <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                        {titleize(order.shipTo.city)}, {order.shipTo.state},{" "}
+                        {titleize(order.shipTo.postalCode)}
+                      </li>
+                      <div className="flex flex-row">
+                        <HiPhone className="mr-2 h-5 w-5 dark:text-white" />
+                        <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                          {order.shipTo.phone}
+                        </li>
+                      </div>
+                      <div className="flex flex-row">
+                        <HiMail className="mr-2 h-5 w-5 dark:text-white" />
+                        <li className="text-sm  text-gray-900 lg:text-base dark:text-white">
+                          {order.customerEmail}
+                        </li>
+                      </div>
+                    </ul>
+                    <Image
+                      className="col-start-2"
+                      src={
+                        order.items[0]?.imageUrl || "./public/images/image.png"
+                      }
+                      width="150"
+                      height="150"
+                      alt="Order Item Image"
+                    />
+                  </div>
+                ))}
+            </ul>
+          ) : (
+            <p>No order details available.</p>
+          )}
+        </Card>
+        {orderData ? (
+          <Card className="mt-10 w-full md:max-w-[1024px]">
+            <div className="flex flex-row">
+              <button
+                onClick={() => handleChevronClick("item")}
+                className="focus:outline-none"
+              >
+                {chevronItemRight ? (
+                  <HiChevronRight className="h-7 w-7 dark:text-white" />
+                ) : (
+                  <HiChevronDown className="h-7 w-7 dark:text-white" />
+                )}
+              </button>
+              <button
+                onClick={() => handleChevronClick("item")}
+                className="focus:outline-none"
+              >
+                <h3 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
+                  Item Details
+                </h3>
+              </button>
+            </div>
+            {!chevronItemRight &&
+              orderData.orders.map((order) => (
+                <ul
+                  key={order.orderId}
+                  className="mt-4 grid grid-cols-5 bg-gradient-to-r from-green-400 to-blue-500 text-center "
+                >
                   <li>Item Name</li>
                   <li>Image</li>
                   <li>Unit Cost</li>
@@ -195,12 +280,11 @@ export default function BookFreight()
                   <li>Total</li>
                 </ul>
               ))}
-            </div>
-
-            </Card>
-          ) : ("")}
-          </div> 
-        </>
-      );
-    }
-
+          </Card>
+        ) : (
+          ""
+        )}
+      </div>
+    </>
+  );
+}

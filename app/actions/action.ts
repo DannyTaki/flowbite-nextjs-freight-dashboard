@@ -1,10 +1,10 @@
 "use server";
 
+import { optsSchema } from "@/types/optsSchema";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
-import { optsSchema } from "@/types/optsSchema";
 
-interface ErrorResult { 
+interface ErrorResult {
   error: {
     message: string;
   };
@@ -21,11 +21,9 @@ const shipStation = new Shipstation({
 });
 
 export async function getOrder(
-  opts: unknown
+  opts: unknown,
 ): Promise<IOrderPaginationResult | null | ErrorResult> {
   try {
-
-
     // Server-side Validation
     const result = optsSchema.safeParse(opts);
     if (!result.success) {
@@ -38,9 +36,8 @@ export async function getOrder(
         error: {
           message: errorMessage,
         },
-      }
+      };
     }
-
 
     const orderList = await shipStation.orders.getAll(result.data);
     console.log("Order List: " + JSON.stringify(orderList));

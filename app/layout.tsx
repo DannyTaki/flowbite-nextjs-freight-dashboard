@@ -6,7 +6,6 @@ import { twMerge } from "tailwind-merge";
 import "./globals.css";
 import { customTheme } from "./theme";
 
-
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
@@ -16,7 +15,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
-
   return (
     <html lang="en">
       <head>
@@ -28,7 +26,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <ThemeModeScript />
       </head>
       <body className={twMerge("bg-gray-50 dark:bg-gray-900", inter.className)}>
-          <Flowbite theme={{ theme: customTheme }}>{children}</Flowbite>
+        <Flowbite theme={{ theme: customTheme }}>{children}</Flowbite>
       </body>
     </html>
   );
