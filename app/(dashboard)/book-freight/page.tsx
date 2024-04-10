@@ -26,6 +26,8 @@ import {
 } from "react-icons/hi";
 import { type IOrderPaginationResult } from "shipstation-node/typings/models";
 import titleize from "titleize";
+import darkLogo from "@/public/images/alliancechemical_dark.svg";
+import lightLogo from "@/public/images/alliancechemical.svg";
 
 export default function BookFreight() {
   const { computedMode } = useThemeMode();
@@ -53,6 +55,10 @@ export default function BookFreight() {
       setChevronItemRight((prev) => !prev);
     }
   }
+
+  const bookFreight = async (orderData: IOrderPaginationResult) => {
+
+  };
 
   const clientAction = async (formData: FormData) => {
     setOrderData(null);
@@ -125,8 +131,8 @@ export default function BookFreight() {
             alt=""
             src={
               computedMode === "light"
-                ? "/images/alliancechemical.svg"
-                : "/images/alliancechemical_dark.svg"
+                ? lightLogo
+                : darkLogo
             }
             width={150}
             height={150}
@@ -137,7 +143,7 @@ export default function BookFreight() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
             Book Freight
           </h2>
-          <form className="mt-8 space-y-6" action={clientAction}>
+          <form className="mt-8 space-y-6">
             <Label htmlFor="order-number">
               Enter a Shipstation Order Number
             </Label>
@@ -149,7 +155,7 @@ export default function BookFreight() {
               required
             />
             <div className="flex flex-row gap-3">
-              <Button type="submit" size="lg" color="blue" disabled={pending}>
+              <Button type="submit" size="lg" color="blue" disabled={pending} formAction={clientAction}>
                 Submit
               </Button>
               <Button
@@ -157,6 +163,7 @@ export default function BookFreight() {
                 size="lg"
                 color="success"
                 disabled={disableFreightBtn}
+                formAction={bookFreight}
               >
                 Book Freight
               </Button>
@@ -241,7 +248,7 @@ export default function BookFreight() {
                 ))}
             </ul>
           ) : (
-            <p>No order details available.</p>
+            <p className="text-sm  text-gray-900 dark:text-white lg:text-base">No order details available.</p>
           )}
         </Card>
         {orderData ? (

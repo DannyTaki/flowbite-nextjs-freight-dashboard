@@ -3,6 +3,10 @@
 import { optsSchema } from "@/types/optsSchema";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
+import type { paths, components } from "@/types/schema";
+import createClient from "openapi-fetch";
+
+const client = createClient<paths>({ baseUrl: process.env.SANDBOX_FREIGHTVIEW_BASE_URL});
 
 interface ErrorResult {
   error: {
@@ -46,4 +50,20 @@ export async function getOrder(
     console.error(err);
     return null;
   }
+}
+
+export async function bookFreight() { 
+  // Implement this function
+  generateToken();
+  return null;  
+}
+
+async function generateToken() { 
+
+  const {
+    data,
+    error,
+  } = await client.POST("/v2.0/auth/token", )
+  
+
 }

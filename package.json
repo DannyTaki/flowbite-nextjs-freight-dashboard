@@ -11,8 +11,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "flowbite-react": "^0.7.2",
+    "flowbite-react": "^0.8.0",
     "next": "^14.0.4",
+    "openapi-fetch": "^0.9.3",
     "react": "^18",
     "react-apexcharts": "^1.4.1",
     "react-dom": "^18",
