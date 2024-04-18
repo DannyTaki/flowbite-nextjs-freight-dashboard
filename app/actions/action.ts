@@ -140,13 +140,18 @@ export async function bookFreight(orderData: IOrderPaginationResult, liftgate: b
 async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boolean, limitedAccess: boolean) {
   const now = new Date();
   const todayDate  = date.format(now, 'YYYY-MM-DD');
-  for (const order of enrichedOrders) {  
-    const charges = [];
-    if (order.shipTo.residential) {
-      charges.push('residential');
-    } 
-    if (limitedAccess) {  
-      charges.push('limited acccess');
+  for (const order of enrichedOrders) { 
+    let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
+ 
+  
+    if (liftgate && !order.shipTo.resident) { 
+      destType = "business no dock";
+    } else if (order.shipTo.residential) {
+      destType = "residential";
+    } else if (limitedAccess) {
+      destType = "limited access";
+    } else {
+      destType = "business dock";
     }
   return await client.POST("/rates", {
     body: {
@@ -172,7 +177,7 @@ async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boole
       destState: order.shipTo.state,
       destPostalCode: order.shipTo.postalCode,
       destCountry: "USA",
-      destType: charges,
+      destType: destType,
 
 
 
