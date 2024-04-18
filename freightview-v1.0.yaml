@@ -1,0 +1,3262 @@
+openapi: 3.0.0
+info:
+  title: Freightview API
+  description: |
+    # Introduction
+
+    The Freightview API is designed using the principles of REST APIs. It features predictable URLs that are focused on resources and their actions. We also take advantage of HTTP's built-in features, such as HTTP verbs and HTTP authentication. All responses to the Freightview API are returned in JSON.
+
+    **You must have an active account and carriers added to your account in Freightview to use the API.**
+
+    ## Getting Started
+
+    **Versions**
+
+    The Freightview API has multiple versions, all of which are accessible at any time by using the defined base endpoint and version number. Version changes are made when backwards incompatible changes are made.
+
+    See [here](/v2) for v2.0 API documentation.
+
+    **v1.0 Endpoints**
+
+    * **Production:** https://www.freightview.com/api/v1.0
+
+    * **Sandbox:** https://www.freightview.dev/api/v1.0
+
+    Access to the sandbox environment is granted automatically, and will be available 24 hours after your Freightview account is setup and carriers have been added. If you have issues accessing the Freightview sandbox environment, please contact the Freightview support team via chat, email (support@freightview.com) or phone (913.353.6188).
+
+    A Freightview [blog post](https://blog.freightview.com/connecting-to-freightviews-api-with-postman) is available containing detailed instructions on testing the API with cURL or Postman.
+
+    ## Integration Scenarios
+
+    To help give an idea of what is possible using the Frieghtview API, here are some common integration scenarios that Freightview customers have used.
+
+    ### Full Integration
+
+    ![](../assets/img/api-flow-a.svg)
+
+    - Create & [rate](#tag/Rating) shipments via API
+    - Select rate & [book](#tag/Booking) shipments via API
+    - Retrieve [shipment information](#tag/Shipment) & documents via API
+
+    To select a rate and book the shipment from your own system, you can use the booking endpoint . See the booking endpoint [documentation](#tag/Booking) for more details.
+
+    ### Integrate Rating & Info (Book Now)
+
+    ![](../assets/img/api-flow-b.svg)
+
+    - Create & [rate](#tag/Rating) shipments via API
+    - Select rate & book shipments in Freightview
+    - Retrieve [shipment information](#tag/Shipment) & documents via API
+
+    To select a rate and book the shipment within Freightview, use the provided url found in the `bookUrl` property of the rate result. This will take you directly to the Freightview booking page to finalize the booking information and schedule a pickup and/or print the BOL.
+
+    ### Integrate Rating & Info (Book Later)
+
+    ![](../assets/img/api-flow-c.svg)
+    - Create & rate shipments via API
+    - View rate list in Freightview & save quote for booking later
+    - Select rate & book shipments in Freightview
+    - Retrieve [shipment information](#tag/Shipment) & documents via API
+
+    To see all available rates and save a quote for complete the booking process, use the provided url found in the `links.ratesUrl` property of the rate result. This will take you to our rate list page within Freightview.
+
+    ### Integrate Rating & Info (Spot Quote)
+
+    ![](../assets/img/api-flow-d.svg)
+
+    - Create & [rate](#tag/Rating) Spot Quote shipments via API
+    - Send out Spot Quote request emails in Freightview
+    - Select rate & book Shipments in Freightview
+    - Retrieve [shipment information](#tag/Shipment) & documents via API
+
+    > Note: This scenario is designed to be implemented in addition to one of the three preceeding scenarios.
+
+    To retrieve spot quotes for the shipment, use the provided url found in the `links.spotUrl` property of the rate result. This will take you to the spot quote page where you can select the equipment types and contacts you want to quote with.
+
+    ### Integrate Shipment Status & Info
+
+    - Rate & book within Freightview
+    - Retrieve [shipment information](#tag/Shipment) & documents via API
+
+    This scenario can help if you're looking to automatically pull in tracking status, or shipment documents or invoice details into your ERP after completing the rating & booking of a shipment within Freightview.
+
+  version: v1.0
+  # x-logo:
+  #   url: /assets/img/logo.svg
+  #   altText: Freightview logo
+  contact:
+    name: Freightview Support
+    email: support@freightview.com
+
+servers:
+  - url: https://www.freightview.com/api/v1.0
+    description: Production
+  - url: https://www.freightview.dev/api/v1.0
+    description: Sandbox
+paths:
+  /rates:
+    post:
+      summary: Rate LTL shipment
+      tags:
+        - Rating
+      description: Given a set of shipment attributes as input, Freightview will send back a list of rates.
+      parameters:
+        - in: query
+          name: timeout
+          schema:
+            type: integer
+            default: 30
+            minimum: 1
+            maximum: 30
+            example: 1
+          description: Specify how long to wait for rates from all carriers. Use a timeout of `1` if you just want to create quote in Freightview.
+        - in: query
+          name: carriers
+          schema:
+            type: array
+            items:
+              type: string
+            example: fxfe,rlca,exla
+          style: form
+          explode: false
+          description: List of carrier SCACs to use to filter the returned array of rates. See [list of SCACs](#section/Carrier-Codes)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Rates.LTL.RateOnlyRequest'
+                - $ref: '#/components/schemas/Rates.LTL.RateToBookRequest'
+            examples:
+              RateOnly:
+                summary: Minimum to rate
+                value:
+                  originPostalCode: "66204"
+                  destPostalCode: "55016"
+                  items:
+                    - weight: 500
+                      freightClass: 60
+              RateToBook:
+                summary: Minimum to rate then book
+                value:
+                  originCompany: Acme, Inc.
+                  originAddress: 1234 Main St.
+                  originCity: Overland Park
+                  originState: KS
+                  originPostalCode: "66204"
+                  originType: business dock
+                  originContactName: Wile E. Coyote
+                  originContactPhone: (555) 555-5555
+                  originDockHoursOpen: 9:00 AM
+                  originDockHoursClose: 5:00 PM
+                  destCompany: A Big Company
+                  destAddress: 9876 Big Avenue
+                  destCity: Cottage Grove
+                  destState: MN
+                  destPostalCode: "55016"
+                  destType: business dock
+                  items:
+                    - description: Widgets
+                      weight: 1200
+                      freightClass: 60
+                      length: 48
+                      width: 40
+                      height: 48
+                      package: Pallets_48x40
+                      pieces: 2
+              SpotQuote:
+                summary: Minimum for spot-quote
+                value:
+                  originPostalCode: "66204"
+                  destPostalCode: "55016"
+                  items:
+                    - weight: 25000
+                      pieces: 25
+                      package: Pallets_other
+              RateWithCharges:
+                summary: Minimum to rate + charges
+                value:
+                  originPostalCode: "66204"
+                  destPostalCode: "55016"
+                  items:
+                    - weight: 500
+                      freightClass: 60
+                  charges:
+                    - liftgate delivery
+                    - arrival schedule
+      responses:
+        '200':    # status code
+          description: The rates response echoes the elements that were included in the rate request, and also includes the shipment `id` and `rates` array. The `rates` array includes a rate object for each provider and service type combination.
+          x-summary: Rate response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rates.LTL.Response'
+              examples:
+                success:
+                  summary: Successful rates
+                  value:
+                    id: 570665116d0bfce422911668
+                    rates:
+                      - id: 34575116d0afce4229116467
+                        status: ok
+                        mode: LTL
+                        paymentTerms: Outbound Prepaid
+                        total: 123.45
+                        ref: ABC123456
+                        days: 3
+                        serviceType: Standard
+                        serviceDescription: Standard
+                        time: 530
+                        carrierId: 84528496d0afce4229282716
+                        carrier: Example Carrier
+                        carrierCode: exci
+                        charges:
+                          - name: linehaul
+                            amount: 1000
+                          - name: discount
+                            amount: -900
+                          - name: fuel
+                            amount: 23.45
+                        bookUrl: string
+                    links:
+                      ratesUrl: string
+                      spotUrl: string
+                rateError:
+                  summary: Error response from carrier
+                  value:
+                    id: 29283116d0bfce4472947274
+                    rates:
+                      - id: 4575116d0afce42113134337
+                        status: error
+                        error: An error message
+                        paymentTerms: Outbound Prepaid
+                        serviceType: Standard
+                        serviceDescription: Standard
+                        time: 530
+                        carrierId: 64528426d0afce4779272713
+                        carrier: Other Example Carrier
+                        carrierCode: oexc
+
+
+
+
+          # links:
+          #   BookShipmentById:
+          #     description: The `id` value in the response can be used as the `id` value in the request body of `POST /book`.
+          #     operationId: bookShipment
+          #     requestBody: $response.body#/id
+          # commented out because ReDoc doesn't support `links` yet, possibly changing in the next stable release.
+          # https://github.com/Redocly/redoc/issues/1292
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRatingRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /rates/parcel:
+    post:
+      summary: Rate Parcel shipment
+      tags:
+        - Rating
+      parameters:
+        - in: query
+          name: timeout
+          schema:
+            type: integer
+            default: 30
+            minimum: 1
+            maximum: 30
+            example: 1
+          description: Specify how long to wait for rates from all carriers. Use a timeout of `1` if you just want to create quote in Freightview
+        - in: query
+          name: carriers
+          schema:
+            type: array
+            items:
+              type: string
+            example: fxfe,upgf
+          style: form
+          explode: false
+          description: List of carrier SCACs to use to filter the returned array of rates. See [list of SCACs](#section/Carrier-Codes)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Rates.Parcel.RateOnlyRequest'
+                - $ref: '#/components/schemas/Rates.Parcel.RateToBookRequest'
+            examples:
+              RateOnly:
+                summary: Minimum to rate parcel
+                value:
+                  originPostalCode: "66204"
+                  destPostalCode: "55016"
+                  items:
+                    - weight: 15
+                      package: Custom
+              RateToBook:
+                summary: Minimum to rate then book parcel
+                value:
+                  originCompany: Acme, Inc.
+                  originAddress: 1234 Main St.
+                  originCity: Overland Park
+                  originState: KS
+                  originPostalCode: "66204"
+                  originContactName: Wile E. Coyote
+                  originContactPhone: (555) 555-5555
+                  originDockHoursOpen: 9:00 AM
+                  originDockHoursClose: 5:00 PM
+                  destCompany: A Big Company
+                  destAddress: 9876 Big Avenue
+                  destCity: Cottage Grove
+                  destState: MN
+                  destPostalCode: "55016"
+                  destContactName: Sally Smith
+                  destContactPhone: (555) 555-5555
+                  destContactEmail: sally@example.com
+                  items:
+                    - description: Widgets
+                      weight: 15
+                      package: Custom
+              RateMultiplePackages:
+                summary: Multiple packages with signature required
+                value:
+                  originPostalCode: "66204"
+                  destPostalCode: "55016"
+                  items:
+                    - weight: 15
+                      package: Custom
+                    - weight: 12
+                      package: Custom
+                  charges:
+                    - signature required
+
+      responses:
+        '200':
+          x-summary: Rate response
+          description: The rates response echoes the elements that were included in the rate request, and also includes the shipment `id` and `rates` array. The `rates` array includes a rate object for each provider and service type combination.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rates.Parcel.Response'
+              examples:
+                success:
+                  summary: Successful parcel rates
+                  value:
+                    id: 570665116d0bfce422911668
+                    rates:
+                      - id: 34575116d0afce4229116467
+                        status: ok
+                        total: 12.34
+                        days: 3
+                        serviceType: Ground
+                        serviceDescription: Ground by End of Day
+                        time: 624
+                        carrierId: 84528496d0afce4229282716
+                        carrier: Example Carrier
+                        carrierCode: exci
+                        charges:
+                          - name: base rate
+                            amount: 100
+                          - name: discount
+                            amount: -90
+                          - name: fuel
+                            amount: 2.34
+                        bookUrl: string
+                    links:
+                      ratesUrl: string
+                rateError:
+                  summary: Error response from carrier
+                  value:
+                    id: 29283116d0bfce4472947274
+                    rates:
+                      - id: 4575116d0afce42113134337
+                        status: error
+                        error: An error message
+                        serviceType: Ground
+                        serviceDescription: Ground by End of Day
+                        time: 530
+                        carrierId: 64528426d0afce4779272713
+                        carrier: Other Example Carrier
+                        carrierCode: oexc
+          # links:
+          #   BookShipmentById:
+          #     description: The `id` value in the response can be used as the `id` value in the request body of `POST /book`.
+          #     operationId: bookShipment
+          #     requestBody: $response.body#/id
+          # commented out because ReDoc doesn't support `link` yet, possibly changing in the next stable release.
+          # https://github.com/Redocly/redoc/issues/1292
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRatingRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /book:
+    post:
+      summary: Book a shipment
+      # operationId: bookShipment
+      tags:
+        - Booking
+      description: Book a specific shipment using a specific rate, in order to get a BOL back and/or create a pickup request.
+      parameters:
+        - in: query
+          name: labelSize
+          schema:
+            $ref: '#/components/schemas/LabelSize'
+        - in: query
+          name: labelCount
+          schema:
+            type: integer
+            enum:
+               - 1
+               - 2
+               - 4
+            description: |
+              The number of labels (per shipping item e.g. pallet) you would like to have returned for the shipment. See [here](#section/Labels) for more details on labels.
+
+              **N/A for parcel shipments**
+
+      requestBody:
+        $ref: '#/components/requestBodies/Shared.Book.Request'
+      responses:
+        '200':
+          description: Successfully booked shipment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book.Shared.Response'
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyBookingRequests'
+        '500':
+          description: Error booking shipment.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message regarding why there was an error booking the shipment.
+                  errorType:
+                    type: string
+                    description: The type of error.
+                    example: validation
+  /book/parcel/freightCollect:
+    post:
+      summary: Book parcel shipment (freight collect)
+      tags:
+        - Booking
+      description: |
+        Book a parcel shipment, and bill the recipient or a third party account.
+
+        Note: Scheduling a pickup is not supported for parcel freight collect shipments.
+      requestBody :
+        required : true
+        content:
+          application/json :
+            schema :
+              $ref: '#/components/schemas/ParcelFreightCollectBookRequest'
+            examples :
+              UPS :
+                summary : UPS Ground example
+                value :
+                  carrierCode : upgf
+                  serviceId : ground
+                  billToType : recipient
+                  accountNumber : <account_number>
+                  billingZipCode : <zip_code>
+                  charges :
+                    - signature required
+                  pickupDate : 2021-04-01
+                  originCompany: Acme, Inc.
+                  originAddress: 1234 Main St.
+                  originCity: Overland Park
+                  originState: KS
+                  originPostalCode: 66204
+                  originContactName: Wile E. Coyote
+                  originContactPhone: (555) 555-5555
+                  originDockHoursOpen: 9:00 AM
+                  originDockHoursClose: 5:00 PM
+                  destCompany: A Big Company
+                  destAddress: 9876 Big Avenue
+                  destCity: Cottage Grove
+                  destState: MN
+                  destPostalCode: 55016
+                  destContactName: Sally Smith
+                  destContactPhone: (555) 555-5555
+                  destContactEmail: sally@example.com
+                  items:
+                    - description: Widgets
+                      weight: 8
+                      package: Custom
+                    - description: Widgets
+                      weight: 6
+                      package: Custom
+              FedEx :
+                summary : FedEx Home Delivery example
+                value :
+                  carrierCode : fxfe
+                  serviceId : home_delivery
+                  billToType : third_party
+                  accountNumber : <account_number>
+                  billingZipCode : <zip_code>
+                  charges :
+                    - residential delivery
+                  originCompany: Acme, Inc.
+                  originAddress: 1234 Main St.
+                  originCity: Overland Park
+                  originState: KS
+                  originPostalCode: 66204
+                  originContactName: Wile E. Coyote
+                  originContactPhone: (555) 555-5555
+                  originDockHoursOpen: 9:00 AM
+                  originDockHoursClose: 5:00 PM
+                  destCompany: A Big Company
+                  destAddress: 9876 Big Avenue
+                  destCity: Cottage Grove
+                  destState: MN
+                  destPostalCode: 55016
+                  destType : residential
+                  destContactName: Sally Smith
+                  destContactPhone: (555) 555-5555
+                  destContactEmail: sally@example.com
+                  items:
+                    - description: Widgets
+                      weight: 15
+                      package: Custom
+      responses:
+        '200':
+          description: Successfully booked shipment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book.Parcel.FreightCollect.Shipment'
+
+  /shipments:
+    get:
+      summary: Search for shipments
+      deprecated: true
+      description: |
+
+        **This endpoint has been deprecated, as its [successor endpoint](v2#tag/Shipments/operation/shipmentsSearchShipments) is available in Freightview API 2.0.**
+
+        Search for shipment(s) in Freightview by:
+          - PRO / tracking number
+          - Freightview BOL number
+          - Shipper Reference Number
+          - PO Number
+          - Pickup Date
+          - Created Date
+
+        (You can search using more than one parameter to narrow your results, or use `pickupDate` to retrieve all the shipments scheduled for pickup on a given day, or `createdDate` to retrieve all shipments created on a given day).
+      tags:
+        - Shipment
+      parameters:
+        - in: query
+          name: pro
+          schema:
+            type: string
+          description: The PRO / tracking number for a shipment.
+        - in: query
+          name: bol
+          schema:
+            type: string
+          description: The Freightview generated BOL number for a shipment.
+        - in: query
+          name: ref
+          schema:
+            type: string
+          description: |
+            The shipper's reference number to search by. </br >
+            (This is whatever value was specified in `originReferenceNumber` in the rate request).
+        - in: query
+          name: po
+          schema:
+            type: string
+          description: |
+            The consignee's purchase order number of the shipment. </br >
+            (This is whatever value was specified in `destReferenceNumber` in the rate request).
+        - in: query
+          name: pickupDate
+          schema:
+            type: string
+            format: date
+          description: The requested date for pickup of the shipments being searched for.
+        - in: query
+          name: createdDate
+          schema:
+            type: string
+            format: date
+          description: The create date of the shipments being searched for.
+        - in: query
+          name: page
+          schema:
+            type: integer
+            format: int32
+          description: Page number, for result sets that exceed 25 items.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search.SearchResults'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManySearchRequests'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /shipments/{id}:
+    get:
+      summary: Get shipment information
+      deprecated: true
+      description: |
+
+        **This endpoint has been deprecated, as its [successor endpoint](v2#tag/Shipments/operation/shipmentsGetShipmentById) is available in Freightview API 2.0.**
+
+        Use this endpoint to retrieve shipment information, such as PRO number, shipment status & tracking history, documents (e.g. Bill of Lading, Proof of Delivery, Invoice) and original quote information (including charge breakdown).
+
+        > Note: The shipment info API only returns booked shipments; if the shipment is not in the correct status the endpoint will return a `404` status code.
+
+        This endpoint uses the unique `id` assigned to each shipment in Freightview. If you don't know the matching `id` for your shipment, you can search for it using the [search endpoint](#tag/Shipment/paths/~1shipments/get).
+
+      tags:
+        - Shipment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: Unique shipment identifier
+          required : true
+        - in: query
+          name: labelSize
+          schema:
+            $ref: '#/components/schemas/LabelSize'
+        - in: query
+          name: labelCount
+          schema:
+            type: integer
+            enum:
+               - 1
+               - 2
+               - 4
+            description: |
+              The number of labels (per shipping item e.g. pallet) you would like to have returned for the shipment. See [here](#section/Labels) for more details on labels.
+
+              **N/A for parcel shipments**
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment.Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+
+components:
+
+# REQUESTS
+
+  requestBodies:
+    Shared.Book.Request:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The shipment `id` to book.
+              rateId:
+                type: string
+                description: The specific rate `id` to use when booking the shipment.
+              schedulePickup:
+                type: boolean
+                description: |
+                  A flag that determines whether a pickup request is sent to the carrier. i.e. if you would like to just print a Bill of Lading/labels set to `false`.
+                  * For booking parcel shipments, if a pickup is needed, use `schedulePickup: true` in the rate request to ensure that the rate includes the cost of the pickup, and then don't include `schedulePickup` in the book request.
+              shareShipmentEmails:
+                type: array
+                description: An array of email addresses with which to share the shipment. This will allow the email recipient to view the shipment bill of lading, and tracking status.
+                items:
+                  type: string
+                  format: email
+              bolNum:
+                $ref: '#/components/schemas/BOLNumber'
+              originCompany:
+                type: string
+                description: Company name for the pickup location.
+              originAddress:
+                type: string
+                description: Address for the pickup location.
+              originAddress2:
+                type: string
+                description: Address line 2 for the pickup location.
+              originContactName:
+                type: string
+                description: Name of a contact person at the pickup location.
+              originContactPhone:
+                type: string
+                description: Phone number for the contact at the pickup location.
+                example: (555) 555-5555
+              originContactEmail:
+                type: string
+                format: email
+                description: Email for the contact at the pickup location. _(Required by some carriers for booking)_
+              originReferenceNumber:
+                type: string
+                description: Reference numbers for the origin. (e.g. Order number)
+              originInstructions:
+                type: string
+                description: Special instructions at the pickup location.
+              originDockHoursOpen:
+                type: string
+                description: The time the origin location will be open for pickups in 12-hour format. Format **(9:00 AM)**
+                example: 9:00 AM
+              originDockHoursClose:
+                type: string
+                description: The time the origin location will close for pickups in 12-hour format. Format **(5:00 PM)**
+                example: 5:00 PM
+              destCompany:
+                type: string
+                description: Company name for the delivery location.
+              destAddress:
+                type: string
+                description: Address for the delivery location.
+              destAddress2:
+                type: string
+                description: Address line 2 for the delivery location.
+              destContactName:
+                type: string
+                description: Name of a contact person at the delivery location.
+              destContactPhone:
+                type: string
+                description: Phone number for the contact at the delivery location.
+                example: (555) 555-5555
+              destContactEmail:
+                type: string
+                format: email
+                description: Email for the contact at the delivery location.
+              destReferenceNumber:
+                type: string
+                description: Reference numbers for the delivery location. (e.g. PO number)
+              destInstructions:
+                type: string
+                description: Special instructions for delivery.
+              destDockHoursOpen:
+                type: string
+                description: The time the destination location will be open for deliveries in 12-hour format. Format **(9:00 AM)**
+                example: 9:00 AM
+              destDockHoursClose:
+                type: string
+                description: The time the destination location will stop accepting deliveries in 12-hour format. Format **(5:00 PM)**
+                example: 5:00 PM
+              emergencyName:
+                type: string
+                description: Emergency contact name. _Required if any items on the shipment are hazardous._
+              emergencyPhone:
+                type: string
+                description: Emergency contact phone number. _Required if any items on the shipment are hazardous._
+                example: (555) 555-5555
+            required:
+              - id
+              - rateId
+
+    
+
+
+# RESPONSES
+
+  responses:
+    # Endpoint.Scope.Object
+
+    BadRequest:
+      description: The request is mis-formed.
+      x-summary: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message.
+              message:
+                type: string
+                description: A human-readable explanation of the error.
+            required:
+              - error
+    Unauthorized:
+      description: Authentication failed on the request.
+    PaymentRequired:
+      description: No active subscription with Freightview.
+    NotFound:
+      description: The requested resource does not exist.
+    TooManyRatingRequests:
+      description: Too many requests have been made to this endpoint. 90 rating requests across LTL and parcel are allowed per minute.
+    TooManyBookingRequests:
+      description: Too many requests have been made to this endpoint. 20 booking requests across LTL and parcel are allowed per minute.
+    TooManySearchRequests:
+      description: Too many requests have been made to this endpoint. 120 search requests are allowed per minute.
+    ServerError:
+      description: The server encountered an error.
+
+    
+
+    
+
+# SCHEMAS
+
+  schemas:
+
+    # Endpoint.Scope.Object
+
+    Rates.LTL.RateOnlyRequest:
+      description: This object shows required fields when the /rates endpoint will be used only for rating, and booking will happen within Freightview.
+      allOf:
+        - $ref: '#/components/schemas/Rates.LTL.Request'
+        - $ref: '#/components/schemas/OriginLocation'
+        - $ref: '#/components/schemas/DestinationLocation'
+        - $ref: '#/components/schemas/BillToLocation'
+        - $ref: '#/components/schemas/CustomsInfo'
+        - $ref: '#/components/schemas/EmergencyInfo'
+        - $ref: '#/components/schemas/LTLRateItems'
+      required:
+        - originPostalCode
+        - destPostalCode
+        - items
+
+    Rates.LTL.RateToBookRequest:
+      description: This object shows required fields when the /rates endpoint will be used in conjunction with the /book endpoint.
+      allOf:
+        - $ref: '#/components/schemas/Rates.LTL.Request'
+        - $ref: '#/components/schemas/OriginLocation'
+        - $ref: '#/components/schemas/DestinationLocation'
+        - $ref: '#/components/schemas/BillToLocation'
+        - $ref: '#/components/schemas/CustomsInfo'
+        - $ref: '#/components/schemas/EmergencyInfo'
+        - $ref: '#/components/schemas/LTLBookItems'
+        - properties:
+            bolNum:
+              $ref: '#/components/schemas/BOLNumber'
+      required:
+        - originCompany
+        - originAddress
+        - originCity
+        - originState
+        - originPostalCode
+        - originType
+        - originContactName
+        - originContactPhone
+        - originDockHoursOpen
+        - originDockHoursClose
+        - destCompany
+        - destAddress
+        - destCity
+        - destState
+        - destPostalCode
+        - destType
+        - items
+
+    # LTLRateToBookCustomsRequest:
+    #   allOf:
+    #     - $ref: '#/components/schemas/LTLRateToBookRequest'
+    #     - $ref: '#/components/schemas/CustomsBookInfo'
+
+    Rates.Parcel.RateOnlyRequest:
+      description: This object shows required fields when the /rates endpoint will be used only for rating, and booking will happen within Freightview.
+      allOf:
+        - $ref: '#/components/schemas/Rates.Parcel.Request'
+        - type: object
+          properties:
+            schedulePickup:
+              type: boolean
+              description: A flag that determines whether a pickup request is sent to the parcel carrier when the shipment is booked. If the origin location has a daily/recurring pickup with the carrier, set to `false`.
+              default: false
+        - $ref: '#/components/schemas/ParcelOriginLocation'
+        - $ref: '#/components/schemas/ParcelDestinationLocation'
+        - $ref: '#/components/schemas/ParcelRateItems'
+
+      required:
+        - originPostalCode
+        - destPostalCode
+        - items
+
+    Rates.Parcel.RateToBookRequest:
+      description: This object shows required fields when the /rates endpoint will be used in conjunction with the /book endpoint.
+      allOf:
+        - $ref: '#/components/schemas/Rates.Parcel.Request'
+        - type: object
+          properties:
+            schedulePickup:
+              type: boolean
+              description: A flag that determines whether a pickup request is sent to the parcel carrier when the shipment is booked. If the origin location has a daily/recurring pickup with the carrier, set to `false`.
+              default: false
+        - $ref: '#/components/schemas/ParcelOriginLocation'
+        - $ref: '#/components/schemas/ParcelDestinationLocation'
+        - $ref: '#/components/schemas/ParcelBookItems'
+
+      required:
+        - originCompany
+        - originAddress
+        - originCity
+        - originState
+        - originPostalCode
+        - originContactName
+        - originContactPhone
+        - originDockHoursOpen
+        - originDockHoursClose
+        - destCompany
+        - destAddress
+        - destCity
+        - destState
+        - destPostalCode
+        - destContactName
+        - destContactPhone
+        - destContactEmail
+        - items
+
+    Rates.LTL.Response:
+      type: object
+      description: The rate response includes the shipment details that were included in the rate request, along with an array of rate objects, one for each provider (carrier/broker) and service type combination.
+      properties:
+        id:
+          type: string
+          description: The unique identifier in Freightview for this shipment.
+        rates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rates.LTL.Rate'
+        links:
+          $ref: '#/components/schemas/Rates.LTL.RateLinks'
+
+    Rates.LTL.Rate:
+      allOf:
+        - $ref: '#/components/schemas/Shared.LTL.Rate'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: A unique identifier in Freightview for a specific rate.
+            status:
+              type: string
+              description: Status code for this rate. Only status `ok` rates are valid.
+              enum: [ok, error]
+            error:
+              type: string
+              description: Error message from carrier for this rate. Only present if `status` is `error`.
+            bookUrl:
+              type: string
+              description: A direct link to book the shipment with this rate within Freightview.
+            ref:
+              type: string
+              description: A provider-specific reference number. Not all providers send this back.
+
+    Rates.Parcel.Rate:
+      allOf:
+        - $ref: '#/components/schemas/Shared.Shared.Rate'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: A unique identifier in Freightview for a specific rate.
+            status:
+              type: string
+              description: Status code for this rate. Only status `ok` rates are valid.
+              enum: [ok, error]
+            error:
+              type: string
+              description: Error message from carrier for this rate. Only present if `status` is `error`.
+            bookUrl:
+              type: string
+              description: A direct link to book the shipment with this rate within Freightview.
+
+    Shared.LTL.Rate:
+      allOf:
+        - $ref: '#/components/schemas/Shared.Shared.Rate'
+        - type: object
+          properties:
+            interline:
+              type: boolean
+              description: A flag that indicates whether an interline carrier will be used to provide a portion of the shipment's transport.
+            daysPlus:
+              type: boolean
+              description: A flag that indicates that the transit time is not exact and will be longer than the transit time in `days`.
+            mode:
+              $ref: '#/components/schemas/Mode'
+            paymentTerms:
+              $ref: '#/components/schemas/PaymentTerms'
+            provider:
+              type: string
+              description: The name of the provider or freight broker that supplied this rate. _Only returned for freight broker rates._
+            providerCode:
+              type: string
+              description: The 4-digit SCAC code of the provider or freight broker that supplied this rate. _Only returned for freight broker rates._
+
+
+    Shared.Shared.Rate:
+      type: object
+      properties:
+        total:
+          type: number
+          format: double
+          description: The total dollar amount of this rate, in USD. Includes freight charges, fuel and all additional charges.
+        days:
+          type: integer
+          description: The number of transit days for this rate.
+        serviceType:
+          type: string
+          description: The service type for this rate.
+        serviceOption:
+          type: string
+          description: Delivery time of day for guaranteed or expedited rates, in 24 hour time.
+        serviceDescription:
+          type: string
+          description: Description of the service.
+        carrierId:
+          type: string
+          description: A Freightview internal identifier for a specific carrier.
+        carrier:
+          type: string
+          description: The name of the asset-based carrier that will actually move the shipment.
+        carrierCode:
+          type: string
+          description: The 4-digit SCAC code of the asset-based carrier that this rate would be moved under. See [list of SCACs](#section/Carrier-Codes)
+        time:
+          type: integer
+          description: The provider rate response time in milliseconds.
+        rural:
+          type: boolean
+          description: A flag that indicates the shipment includes a location that is considered rural by the carrier, and thus the transit time may not be consistent with the carrier's published transit times.
+        charges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shared.Shared.Charge'
+          description: The breakdown of the various charges that make up the rate `total`. _Not supported by all providers._
+
+    Book.Parcel.FreightCollect.Rate:
+      type: object
+      properties:
+        total:
+          type: number
+          format: double
+          description: Will be zero since freight charges are billed to recipient or third party.
+        serviceType:
+          type: string
+          description: The service type for this rate.
+        serviceOption:
+          type: string
+          description: Delivery time of day for guaranteed or expedited rates, in 24 hour time.
+        serviceDescription:
+          type: string
+          description: Description of the service.
+        carrierId:
+          type: string
+          description: A Freightview internal identifier for a specific carrier.
+        carrier:
+          type: string
+          description: The name of the carrier that is transporting the shipment.
+        carrierCode:
+          type: string
+          description: The SCAC of the carrier that is transporting the shipment.
+        createdDate:
+            type: string
+            format: date-time
+            description: The date/time this rate was provided.
+        mode:
+          type: string
+          description: The mode of transit this shipment will use.
+
+    Shared.Shared.Charge:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The short name of the charge (e.g. `linehaul`, `fuel`, `discount`).
+        amount:
+          type: number
+          format: double
+          description: The dollar amount of this specific charge.
+        providerDetail:
+          type: string
+          description: The rate provider's description of the charge. _Not supported by all providers._
+        code:
+          type: string
+          description: The rate provider's accessorial code. _Not supported by all providers._
+
+    Rates.LTL.RateLinks:
+      description: Links to various webpages inside Freightview.
+      type: object
+      properties:
+        ratesUrl:
+          type: string
+          description: A direct link to access all of the rate results for this shipment within Freightview.
+        spotUrl:
+          type: string
+          description: A direct link to start a spot quote for this shipment within Freightview.
+
+    Rates.Parcel.RateLinks:
+      description: Links to various webpages inside Freightview.
+      type: object
+      properties:
+        ratesUrl:
+          type: string
+          description: A direct link to access all of the rate results for this shipment within Freightview.
+
+    Book.LTL.Rate:
+      allOf:
+        - $ref: '#/components/schemas/Shared.LTL.Rate'
+        - type: object
+          properties:
+            createdDate:
+              type: string
+              format: date-time
+              description: The date/time this rate was provided.
+            mode:
+              type: string
+              description: The mode of transit this shipment will use.
+            quoteNum:
+              type: string
+              description: The quote number provided by the carrier or provider for this rate.
+
+    Book.Parcel.Rate:
+      allOf:
+        - $ref: '#/components/schemas/Shared.Shared.Rate'
+        - type: object
+          properties:
+            createdDate:
+              type: string
+              format: date-time
+              description: The date/time this rate was provided.
+            mode:
+              type: string
+              description: The mode of transit this shipment will use.
+
+    LTLBookItems:
+      type: object
+      properties:
+        items:
+          description: Array of handling units that make up the shipment. Each `items` object can have a `pieces` value minimum of 1 and maximum of 500. Think of each `items` object as a group of handling units that all share the same characteristics. (e.g. same `freightClass`, `length`, `width`, and `height`).
+          type: array
+          items:
+            $ref: '#/components/schemas/LTLBookItem'
+
+    Rates.LTL.Request:
+      type: object
+      properties:
+        pickupDate:
+          description: Pickup date for this rate request. If pickup date is omitted or falls on a non-shipping day, the pickup date will be the next available shipping day.
+          type: string
+          format: date
+        charges:
+          type: array
+          items:
+            $ref: '#/components/schemas/LTLAccessorial'
+          description: An array of strings for additional charges. See [list of accessorials](#section/Accessorials)
+
+    LTLRateItems:
+      type: object
+      properties:
+        items:
+          description: |
+            Array of handling units that make up the shipment. Each `items` object can have a `pieces` value minimum of 1 and maximum of 500. Think of each `items` object as a group of handling units that all share the same characteristics. (e.g. same `freightClass`, `length`, `width`, and `height`).
+            * Item dimensions are optional, however many freight brokers and carriers do not provide their best LTL rates without dimensions. For the best rates, enter dimensions.
+          type: array
+          items:
+            $ref: '#/components/schemas/LTLRateItem'
+
+    ParcelRateItems:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Each parcel package must be a separate object in the `items` array.
+          items:
+            $ref: '#/components/schemas/ParcelRateItem'
+
+    ParcelBookItems:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Each parcel package must be a separate object in the `items` array.
+          items:
+            $ref: '#/components/schemas/ParcelBookItem'
+
+    Rates.Parcel.Request:
+      type: object
+      properties:
+        pickupDate:
+          description: Pickup date for this rate request. If pickup date is omitted or falls on a non-shipping day, the pickup date will be the next available shipping day.
+          type: string
+          format: date
+        charges:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParcelAccessorial'
+          description: |
+            An array of strings for additional charges. See [list of accessorials](#section/Accessorials)
+
+    Rates.Parcel.Response:
+      type: object
+      description: The rate response includes the shipment details that were included in the rate request, along with an array of rate objects, one for each provider (carrier/broker) and service type combination.
+      properties:
+        id:
+          type: string
+          description: The unique identifier in Freightview for this shipment.
+        rates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rates.Parcel.Rate'
+        links:
+          $ref: '#/components/schemas/Rates.Parcel.RateLinks'
+
+    Book.Shared.Response:
+      oneOf:
+        - $ref: '#/components/schemas/Shared.LTL.Shipment'
+        - $ref: '#/components/schemas/Shared.Parcel.Shipment'
+
+    Shipment.Response:
+      oneOf:
+        - $ref: '#/components/schemas/Shared.LTL.Shipment'
+        - $ref: '#/components/schemas/Shared.Parcel.Shipment'
+
+    Search.SearchResults:
+      type: object
+      properties:
+        shipments:
+          type: array
+          description: An array of shipment objects that match the query parameters.
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Shared.LTL.Shipment'
+              - $ref: '#/components/schemas/Shared.Parcel.Shipment'
+        link:
+          type: object
+          description: An object with links to the previous and next pages of search results, for result sets that exceed 25 shipments.
+          properties:
+            previous:
+              type: string
+              description: API URL to get the previous page of results.
+            next:
+              type: string
+              description: API url to get the next page of results.
+        total:
+          type: integer
+          description: Total number of shipments that match the query parameters.
+        page:
+          type: integer
+          description: Current page of shipment search results returned.
+    Shared.LTL.Shipment:
+      allOf:
+        - $ref: '#/components/schemas/Shared.Shared.Shipment'
+        - type: object
+          properties:
+            bolNum:
+              $ref: "#/components/schemas/BOLNumber"
+            paymentTerms:
+              $ref: '#/components/schemas/PaymentTerms'
+            items:
+              type: array
+              items:
+                 $ref: '#/components/schemas/LTLItem'
+            rate:
+              $ref: '#/components/schemas/Book.LTL.Rate'
+            dispatch:
+              $ref: '#/components/schemas/Shared.LTL.Dispatch'
+
+
+    Shared.Parcel.Shipment:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              description: The unique identifier in Freightview for this shipment.
+            createdDate:
+              type: string
+              format: date-time
+              description: Date and time the shipment was created in Freightview.
+            archived:
+              type: boolean
+              description: Only `true` if the shipment has been archived in Freightview.
+              default : false
+            direction:
+              type: string
+              description: The direction the shipment is going based on your account locations.
+              enum:
+                - outbound
+                - inbound
+                - third-party
+            pickupDate:
+              type: string
+              format: date-time
+              description: The requested date for pickup of the shipment.
+            status:
+              type: string
+              description: The current shipment status within Freightview.
+            billTo:
+              $ref: '#/components/schemas/BillTo'
+            accessorials:
+              type: array
+              description: An array of the accessorial codes rated on this shipment.
+              items:
+                type: string
+            origin:
+              $ref: '#/components/schemas/Shared.Parcel.Location'
+            destination:
+              $ref: '#/components/schemas/Shared.Parcel.Location'
+            tracking:
+              $ref: '#/components/schemas/Shared.Shared.Tracking'
+            files:
+              type: array
+              description: An array of files available for the shipment. See [details on file types / subtypes](#section/File-Types).
+              items:
+                $ref: '#/components/schemas/File'
+            invoice:
+              $ref: '#/components/schemas/Invoice'
+            quotedBy:
+              type: string
+              description: The Freightview user account that quoted this shipment.
+            bookedBy:
+              type: string
+              description: The Freightview user account that booked this shipment.
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                 $ref: '#/components/schemas/ParcelItem'
+            rate:
+              $ref: '#/components/schemas/Book.Parcel.Rate'
+            dispatch:
+              $ref: '#/components/schemas/Shared.Parcel.Dispatch'
+
+    ParcelFreightCollectBookRequest:
+      allOf:
+        - type: object
+          properties :
+            carrierCode :
+              type : string
+              enum : [fxfe, upgf]
+              description : |
+                The carrier code to use when creating the shipment.
+                  - `fxfe` - FedEx
+                  - `upgf` - UPS
+
+                Note: Shipper must have carrier setup for parcel in their Freightview account to book parcel freight collect shipments.
+            serviceId :
+              type : string
+              enum :
+                - ground
+                - home_delivery
+                - first_overnight
+                - priority_overnight
+                - standard_overnight
+                - two_day_am
+                - two_day
+                - express_saver
+                - next_day
+                - next_day_saver
+                - next_day_early
+                - second_day
+                - second_day_am
+                - three_day_select
+              description : |
+                The service to use when creating the shipment. See [list of valid services per carrier](#section/Service-Identifiers).
+
+                Note: For FedEx Home Delivery®, in addition to a `serviceId` of `home_delivery`, `destType` must be `residential`, and `residential delivery` must be included in the `charges` array.
+            billToType :
+              type : string
+              enum : [recipient, third_party]
+              description : |
+                The bill-to account type.
+                - If the recipient's account is being billed, use `recipient`.
+                - If a third party's account is being billed, use `third_party`.
+            accountNumber :
+              type : string
+              description : |
+                The account number to which the shipment charges should be billed.
+                - UPS account numbers typically have 6 digits.
+                - FedEx account numbers have 9 digits.
+            billingZipCode :
+              type : string
+              description : The billing postal code associated with the `accountNumber`.
+          required :
+            - carrierCode
+            - serviceId
+            - billToType
+            - accountNumber
+            - billingZipCode
+        - type : object
+          properties :
+            charges:
+              type: array
+              items:
+                type : string
+                enum :
+                  - no signature
+                  - signature required
+                  - adult signature required
+                  - indirect signature required
+                  - residential delivery
+              description: |
+                An array of strings for additional charges.
+
+                #### Signature Options
+                Specify only one signature option per shipment.
+
+                Note : `indirect signature required` is only supported by FedEx, and only for `residential` destinations.
+
+                #### Residential Delivery
+                For shipments to residential locations, use charge `residential delivery`. Also ensure `destType` is `residential`, and for FedEx, ensure `serviceId` is `home_delivery`.
+            pickupDate:
+              description: Pickup date for the shipment.
+              type: string
+              format: date
+        - $ref: '#/components/schemas/ParcelRateItems'
+        - $ref: '#/components/schemas/ParcelOriginLocation'
+        - $ref: '#/components/schemas/ParcelDestinationLocation'
+      required:
+        - originCompany
+        - originAddress
+        - originCity
+        - originState
+        - originPostalCode
+        - originContactName
+        - originContactPhone
+        - originDockHoursOpen
+        - originDockHoursClose
+        - destCompany
+        - destAddress
+        - destCity
+        - destState
+        - destPostalCode
+        - destContactName
+        - destContactPhone
+        - destContactEmail
+        - items
+
+    Book.Parcel.FreightCollect.Shipment:
+      allOf:
+        - type: object
+          properties:
+            dispatch:
+              $ref: '#/components/schemas/Book.Parcel.FreightCollect.Dispatch'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: The unique identifier in Freightview for this shipment.
+            createdDate:
+              type: string
+              format: date-time
+              description: Date and time the shipment was created in Freightview.
+            archived:
+              type: boolean
+              description: Only `true` if the shipment has been archived in Freightview.
+              default : false
+            direction:
+              type: string
+              description: The direction the shipment is going based on your account locations.
+              enum:
+                - outbound
+                - inbound
+                - third-party
+            pickupDate:
+              type: string
+              format: date-time
+              description: The requested date for pickup of the shipment.
+            status:
+              type: string
+              description: The current shipment status within Freightview.
+            accessorials:
+              type: array
+              description: An array of the accessorial codes rated on this shipment.
+              items:
+                type: string
+            origin:
+              $ref: '#/components/schemas/Shared.Parcel.Location'
+            destination:
+              $ref: '#/components/schemas/Shared.Parcel.Location'
+            tracking:
+              $ref: '#/components/schemas/Shared.Shared.Tracking'
+            files:
+              type: array
+              description: An array of files available for the shipment. See [details on file types / subtypes](#section/File-Types).
+              items:
+                $ref: '#/components/schemas/File'
+            invoice:
+              $ref: '#/components/schemas/Invoice'
+            quotedBy:
+              type: string
+              description: The Freightview user account that quoted this shipment.
+            bookedBy:
+              type: string
+              description: The Freightview user account that booked this shipment.
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                 $ref: '#/components/schemas/ParcelItem'
+            rate:
+              $ref: '#/components/schemas/Book.Parcel.Rate'
+
+
+    Shared.Shared.Shipment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier in Freightview for this shipment.
+        createdDate:
+          type: string
+          format: date-time
+          description: Date and time the shipment was created in Freightview.
+        archived:
+          type: boolean
+          description: Only `true` if the shipment has been archived in Freightview.
+          default : false
+        direction:
+          type: string
+          description: The direction the shipment is going based on your account locations.
+          enum:
+            - outbound
+            - inbound
+            - third-party
+        pickupDate:
+          type: string
+          format: date-time
+          description: The requested date for pickup of the shipment.
+        status:
+          type: string
+          description: The current shipment status within Freightview.
+        billTo:
+          $ref: '#/components/schemas/BillTo'
+        accessorials:
+          type: array
+          description: An array of the accessorial codes rated on this shipment.
+          items:
+            type: string
+        origin:
+          $ref: '#/components/schemas/Shared.Shared.Location'
+        destination:
+          $ref: '#/components/schemas/Shared.Shared.Location'
+        tracking:
+          $ref: '#/components/schemas/Shared.Shared.Tracking'
+        files:
+          type: array
+          description: An array of files available for the shipment. See [details on file types / subtypes](#section/File-Types).
+          items:
+            $ref: '#/components/schemas/File'
+        invoice:
+          $ref: '#/components/schemas/Invoice'
+        shareShipmentEmails:
+          type : array
+          description : An array of the email addresses with which the shipment was shared.
+          items:
+            type : string
+        quotedBy:
+          type: string
+          description: The Freightview user account that quoted this shipment.
+        bookedBy:
+          type: string
+          description: The Freightview user account that booked this shipment.
+
+    Shared.Shared.DispatchItem:
+      type: object
+      properties:
+        itemId:
+          type: string
+          description: The identifier of the item in Freightview.
+        index:
+          type: number
+          description: The zero-based index of the individual item for the given group of items specified by the itemId.
+        trackingNum:
+          type: string
+          description: Tracking number for this item and index of the shipment.
+
+    Shared.Shared.Dispatch:
+      type: object
+      properties:
+        carrierId:
+          type: string
+          description: A Freightview internal identifier of the asset-based carrier, provider or freight broker that is handling moving this shipment.
+        carrier:
+          type: string
+          description: The name of the asset-based carrier that will actually move the shipment.
+        carrierCode:
+          type: string
+          description: The 4-digit SCAC code of the asset-based carrier that will actually move the shipment. See [list of SCACs](#section/Carrier-Codes)
+        schedulePickup:
+          type: boolean
+          description: Indicator for whether a pickup for the shipment was scheduled with the carrier within Freightview.
+        bolStatus:
+          type: string
+          description: Indicates the status of the BOL creation.
+          enum: [ok, pending, error]
+        pickupNum:
+          type: string
+          description: |
+            Pickup number provided by the asset-based carrier moving the shipment.
+            _(Not present if `schedulePickup` was `false`)_
+        items:
+          type: array
+          description: Item information provided by the asset-based carrier moving the shipment.
+          items:
+            $ref: '#/components/schemas/Shared.Shared.DispatchItem'
+
+    Shared.LTL.Dispatch:
+      allOf:
+        - $ref: '#/components/schemas/Shared.Shared.Dispatch'
+        - type: object
+          description : The results from dispatching the shipment.
+          properties:
+            proNum:
+              type: string
+              description: Pro number for tracking the shipment.
+
+    Shared.Parcel.Dispatch:
+      allOf:
+        - $ref: '#/components/schemas/Shared.Shared.Dispatch'
+        - type: object
+          description : The results from dispatching the shipment.
+          properties:
+            trackingNum:
+              type: string
+              description: Tracking number for the shipment.
+
+    Book.Parcel.FreightCollect.Dispatch:
+      type: object
+      description : The results from dispatching the shipment.
+      properties:
+        carrierId:
+          type: string
+          description: A Freightview internal identifier of the carrier that is moving this shipment.
+        carrier:
+          type: string
+          description: The name of the carrier moving the shipment.
+        carrierCode:
+          type: string
+          enum : [fxfe, upgf]
+          description : |
+            The carrier code used when creating the shipment.
+              - `fxfe` - FedEx
+              - `upgf` - UPS
+        bolStatus:
+          type: string
+          description: Indicates the status of the label creation.
+          enum: [ok, pending, error]
+        trackingNum:
+              type: string
+              description: Tracking number for the shipment.
+        items:
+          type: array
+          description: Item information provided by the asset-based carrier moving the shipment.
+          items:
+            $ref: '#/components/schemas/Shared.Shared.DispatchItem'
+
+    Shared.Shared.Location:
+      type: object
+      properties:
+        company:
+          type: string
+          description: Company name for the location.
+        address:
+          type: string
+          description: Address for the location.
+        address2:
+          type: string
+          description: Address line 2 for the location.
+        city:
+          type: string
+          description: City for the location.
+        state:
+          type: string
+          description: Two character state abbreviation for the location.
+        postalCode:
+          type: string
+          description: Postal code of the location.
+        country:
+          type: string
+          description: Two character country code for the location.
+          enum: [US,CA]
+        shipType:
+          $ref: '#/components/schemas/LocationType'
+        contactName:
+          type: string
+          description: Name of a contact person at the location.
+        contactPhone:
+          type: string
+          description: Phone number for the contact at the location.
+        contactEmail:
+          type: string
+          format: email
+          description: Email for the contact at the location.
+        referenceNumber:
+          type: string
+          description: Reference number for the location
+        instructions:
+          type: string
+          description: Special instructions for the location.
+        dockHoursOpen:
+          type: string
+          description: The time the location will open in 12-hour format.
+        dockHoursClose:
+          type: string
+          description: The time the location will close in 12-hour format.
+
+    Shared.Parcel.Location:
+      type: object
+      description : Details of a location.
+      properties:
+        company:
+          type: string
+          description: Company name for the location.
+        address:
+          type: string
+          description: Address for the location.
+        address2:
+          type: string
+          description: Address line 2 for the location.
+        city:
+          type: string
+          description: City for the location.
+        state:
+          type: string
+          description: Two character state abbreviation for the location.
+        postalCode:
+          type: string
+          description: Postal code of the location.
+        country:
+          type: string
+          description: Two character country code for the location.
+          enum: [US,CA]
+        contactName:
+          type: string
+          description: Name of a contact person at the location.
+        contactPhone:
+          type: string
+          description: Phone number for the contact at the location.
+        contactEmail:
+          type: string
+          format: email
+          description: Email for the contact at the location.
+        referenceNumber:
+          type: string
+          description: Reference number for the location
+        dockHoursOpen:
+          type: string
+          description: The time the location will open in 12-hour format.
+        dockHoursClose:
+          type: string
+          description: The time the location will close in 12-hour format.
+        shipType:
+          type: string
+          enum: [business dock,residential]
+          description: For parcel, a location is assumed to be a business, unless this field is set to `residential`.
+
+    Shared.Shared.Tracking:
+      type: object
+      description: Object containing tracking information.
+      properties:
+        status:
+          type: string
+          description: |
+            The current tracking status of the shipment.
+            * `pending` - shipment is waiting to be picked up
+            * `in transit` - shipment is in transit
+            * `delivered` - shipment has been delivered
+            * `failed` - shipment was unable to be tracked using the PRO / tracking number.
+          enum:
+            - pending
+            - in transit
+            - delivered
+            - failed
+        summary:
+          type: string
+          description: The current tracking summary
+        lastUpdatedDate:
+          type: string
+          format: date-time
+          description: The last time the tracking status changed
+        pickupDateActual:
+          type: string
+          format: date-time
+          description: The actual pickup date of the shipment, if returned by the carrier.
+        deliveryDateEstimate:
+          type: string
+          format: date-time
+          description: The estimated delivery date, if returned by the carrier.
+        deliveryDateActual:
+          type: string
+          format: date-time
+          description: The actual delivery date, if returned by the carrier.
+        history:
+          type: array
+          description: The shipment's entire tracking history.
+          items:
+            type: object
+            properties:
+              status:
+                $ref: '#/components/schemas/TrackingStatus'
+              summary:
+                type: string
+                description: Tracking summary for the tracking update.
+              createdDate:
+                type: string
+                format: date-time
+                description: Time the tracking update was created.
+
+    TrackingStatus:
+      type: string
+      enum:
+        - pending
+        - in transit
+        - delivered
+        - failed
+
+    File:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/FileTypes'
+        subtype:
+          type: string
+          description: The source of the file.
+          enum:
+            - freightview
+            - carrier
+            - shipper
+        mimeType:
+          $ref: '#/components/schemas/MimeTypes'
+        uploadDate:
+          type: string
+          format: date-time
+          description: Date and time the file was uploaded.
+        url:
+          type: string
+          description: A link to the file.
+
+    FileTypes:
+      type: string
+      description: The type of file
+      enum:
+        - quote
+        - customer-quote
+        - bol
+        - label
+        - label-combined
+        - signed bol
+        - proof of delivery
+        - invoice
+
+    MimeTypes:
+      type: string
+      description: The mime type of the file. Files will be of mime type `application/pdf` with the exception of parcel labels which can either be `application/pdf` or `application/zpl`. The preferred parcel label type can be adjusted within your Freightview account settings.
+      enum:
+        - application/pdf
+        - application/zpl
+        - image/jpeg
+        - image/png
+
+    Invoice:
+      type: object
+      description: An object with details of the invoice for the shipment. This object won't have data until the invoice details are entered by a user via Freightview's Audit functionality.
+      properties:
+        createdDate:
+          type: string
+          format: date-time
+          description: Day & time the invoice details were created in Freightview.
+        invoiceAmount:
+          type: number
+          format: double
+          description: The amount that was invoiced by the carrier.
+        invoiceNumber:
+          type: string
+          description: The carrier invoice number.
+        disputedAmount:
+          type: number
+          format: double
+          description: The amount of the discrepancy between the invoiced rate and the quoted rate in Freightview.
+        payments:
+          type: array
+          items:
+            type: object
+            properties:
+              amount:
+                type: number
+                format: double
+                description: The amount of the payment.
+                example: 100.45
+              remitted:
+                type: boolean
+                description: A flag to indicate to indicate that this amount has been exported out of the Audit tool (e.g. to an accounting group for payment to carrier).
+
+    LabelSize:
+      type: string
+      description: |
+        The size of labels you would like to generate for the shipment.
+
+        **N/A for parcel shipments**, which default to `4x6`.
+
+      default: 4x6
+      enum:
+        - 2.25x4
+        - 3x4
+        - 3x5
+        - 3.5x5
+        - 4x1
+        - 4x2
+        - 4x3.3
+        - 4x6
+        - 4x8
+        - 5.5x8.5
+        - 8.5x11
+
+    OriginLocation:
+      type: object
+      properties:
+        originCompany:
+          type: string
+          description: Company name for the pickup location.
+        originAddress:
+          type: string
+          description: Address for the pickup location.
+        originAddress2:
+          type: string
+          description: Address line 2 for the pickup location.
+        originCity:
+          type: string
+          description: City for the pickup location.
+        originState:
+          type: string
+          description: Two character state abbreviation for the pickup location.
+        originPostalCode:
+          type: string
+          description: Postal code of the shipment's origin location.
+        originCountry:
+          $ref: '#/components/schemas/CountryList'
+        originType:
+          $ref: '#/components/schemas/LocationType'
+        originContactName:
+          type: string
+          description: Name of a contact person at the pickup location.
+        originContactPhone:
+          type: string
+          description: Phone number for the contact at the pickup location.
+          example: (555) 555-5555
+        originContactEmail:
+          type: string
+          format: email
+          description: Email for the contact at the pickup location. _(Required by some carriers for booking)_
+        originReferenceNumber:
+          type: string
+          description: Reference numbers for the origin. (e.g. Order number)
+        originInstructions:
+          type: string
+          description: Special instructions at the pickup location.
+        originDockHoursOpen:
+          type: string
+          description: The time the origin location will be open for pickups in 12-hour format. Format **(9:00 AM)**
+          example: 9:00 AM
+        originDockHoursClose:
+          type: string
+          description: The time the origin location will close for pickups in 12-hour format. Format **(5:00 PM)**
+          example: 5:00 PM
+
+
+    DestinationLocation:
+      type: object
+      properties:
+        destCompany:
+          type: string
+          description: Company name for the delivery location.
+        destAddress:
+          type: string
+          description: Address for the delivery location.
+        destAddress2:
+          type: string
+          description: Address line 2 for the delivery location.
+        destCity:
+          type: string
+          description: City for the delivery location.
+        destState:
+          type: string
+          description: Two character state abbreviation for the delivery location.
+        destPostalCode:
+          type: string
+          description: Postal code of the shipment's destination location.
+        destCountry:
+          $ref: '#/components/schemas/CountryList'
+        destType:
+          $ref: '#/components/schemas/LocationType'
+        destContactName:
+          type: string
+          description: Name of a contact person at the delivery location.
+        destContactPhone:
+          type: string
+          description: Phone number for the contact at the delivery location.
+          example: (555) 555-5555
+        destContactEmail:
+          type: string
+          format: email
+          description: Email for the contact at the delivery location.
+        destReferenceNumber:
+          type: string
+          description: Reference numbers for the delivery location. (e.g. PO number)
+        destInstructions:
+          type: string
+          description: Special instructions for delivery.
+        destDockHoursOpen:
+          type: string
+          description: The time the destination location will be open for deliveries in 12-hour format. Format **(9:00 AM)**
+          example: 9:00 AM
+        destDockHoursClose:
+          type: string
+          description: The time the destination location will stop accepting deliveries in 12-hour format. Format **(5:00 PM)**
+          example: 5:00 PM
+
+    ParcelOriginLocation:
+      type: object
+      properties:
+        originCompany:
+          type: string
+          description: Company name for the pickup location.
+        originAddress:
+          type: string
+          description: Address for the pickup location.
+        originAddress2:
+          type: string
+          description: Address line 2 for the pickup location.
+        originCity:
+          type: string
+          description: City for the pickup location.
+        originState:
+          type: string
+          description: Two character state abbreviation for the pickup location.
+        originPostalCode:
+          type: string
+          description: Postal code of the shipment's origin location.
+        originCountry:
+          type: string
+          enum: [USA]
+          default: USA
+          description: Three digit country code for the location.
+        originType:
+          type: string
+          enum: [business dock,residential]
+          description: For parcel, a location is assumed to be a business, unless this field is set to `residential`.
+        originContactName:
+          type: string
+          description: Name of a contact person at the pickup location.
+        originContactPhone:
+          type: string
+          description: Phone number for the contact at the pickup location.
+          example: (555) 555-5555
+        originReferenceNumber:
+          type: string
+          description: Reference numbers for the origin. (e.g. Order number)
+        originDockHoursOpen:
+          type: string
+          description: The time the origin location will be open for pickups in 12-hour format. Format **(9:00 AM)**
+          example: 9:00 AM
+        originDockHoursClose:
+          type: string
+          description: The time the origin location will close for pickups in 12-hour format. Format **(5:00 PM)**
+          example: 5:00 PM
+
+    ParcelDestinationLocation:
+      type: object
+      properties:
+        destCompany:
+          type: string
+          description: Company name for the delivery location.
+        destAddress:
+          type: string
+          description: Address for the delivery location.
+        destAddress2:
+          type: string
+          description: Address line 2 for the delivery location.
+        destCity:
+          type: string
+          description: City for the delivery location.
+        destState:
+          type: string
+          description: Two character state abbreviation for the delivery location.
+        destPostalCode:
+          type: string
+          description: Postal code of the shipment's destination location.
+        destCountry:
+          type: string
+          enum: [USA]
+          default: USA
+          description: Three digit country code for the location.
+        destType:
+          type: string
+          enum: [business dock,residential]
+          description: For parcel, a location is assumed to be a business, unless this field is set to `residential`.
+        destContactName:
+          type: string
+          description: Name of a contact person at the delivery location.
+        destContactPhone:
+          type: string
+          description: Phone number for the contact at the delivery location.
+          example: (555) 555-5555
+        destContactEmail:
+          type: string
+          format: email
+          description: Email for the contact at the delivery location.
+        destReferenceNumber:
+          type: string
+          description: Reference numbers for the delivery location. (e.g. PO number)
+
+
+    BillToLocation:
+      type: object
+      properties:
+        billPostalCode:
+          type: string
+          description: Postal code for the billing party. Only used for third party rates.
+        billCountry:
+          $ref: '#/components/schemas/CountryList'
+
+    CustomsInfo:
+      type: object
+      description: Object to specify customs broker information for cross-border shipments.
+      properties:
+        customsBroker:
+          type: object
+          properties:
+            companyName:
+              type: string
+              description: |
+                The customs broker company name. </br >
+                _Required if customsBroker information is specified._
+            address:
+              type: string
+              description: |
+                Address line for the customs broker. </br >
+                _Required by some carriers._
+            address2:
+              type: string
+              description: Address line 2 for the customs broker.
+            city:
+              type: string
+              description: |
+                City for the customs broker. </br >
+                _Required by some carriers._
+            state:
+              type: string
+              description: |
+                State for the customs broker. </br >
+                _Required by some carriers._
+            postalCode:
+              type: string
+              description: |
+                Postal code for the customs broker. </br >
+                _Required by some carriers._
+            country:
+              type: string
+              enum:
+                - USA
+                - CAN
+              description: |
+                Country for the customs broker. </br >
+                _Required by some carriers._
+            phone:
+              type: string
+              description: |
+                The phone number of the customs broker. </br >
+                _Required if customsBroker information is specified._
+            email:
+              type: string
+              format: email
+              description: The email address of the customs broker.
+            declaredValue:
+              type: number
+              format: double
+              description: |
+                The declared value of the shipments for customs. </br >
+                _Required by some carriers._
+            type:
+              type: string
+              enum:
+                - import
+                - export
+              description: |
+                The role of the customs broker. </br >
+                _Required by some carriers._
+          required:
+            - companyName
+            - phone
+
+
+    # CustomsBookInfo:
+    #   allOf:
+    #     - $ref: '#components/schemas/CustomsInfo'
+    #   required:
+    #     - companyName
+    #     - phone
+
+    EmergencyInfo:
+      type: object
+      properties:
+        emergencyName:
+          type: string
+          description: Emergency contact name. _Required if any items on the shipment are hazardous._
+        emergencyPhone:
+          type: string
+          description: Emergency contact phone number. _Required if any items on the shipment are hazardous._
+          example: (555) 555-5555
+
+    CountryList:
+      type: string
+      enum: [USA,CAN]
+      default: USA
+      description: Three digit country code for the location.
+
+    Mode:
+      type: string
+      description: Transportation mode.
+      enum:
+        - Air
+        - Bulk
+        - Consolidated
+        - Flatbed
+        - Intermodal
+        - LTL
+        - Truckload
+
+    PaymentTerms:
+      type: string
+      description: Payment terms used for this rate.
+      enum:
+        - Outbound Prepaid
+        - Outbound Collect
+        - Inbound Collect
+        - Third Party Prepaid
+        - Third Party Collect
+
+    BillTo:
+      type: object
+      description: Object with bill-to information for the shipment.
+      properties:
+        company:
+          type: string
+          description: Company name for the billing party.
+        address:
+          type: string
+          description: Address for the billing party.
+        address2:
+          type: string
+          description: Address line 2 for the billing party.
+        city:
+          type: string
+          description: City for the billing party.
+        state:
+          type: string
+          description: Two character state abbreviation for the billing party.
+        postalCode:
+          type: string
+          description: Postal code for the billing party.
+        country:
+          type: string
+          description: Two character country code for the billing party.
+          enum: [US,CA]
+        contactName:
+          type: string
+          description: Contact name for the billing party.
+        contactEmail:
+          type: string
+          format: email
+          description: Email address for the billing party.
+        contactPhone:
+          type: string
+          description: Phone number for the billing party.
+
+    LTLRateItem:
+      allOf:
+        - $ref: '#/components/schemas/LTLItem'
+        - type: object
+          required:
+            - weight
+            - freightClass
+
+    LTLBookItem:
+      allOf:
+        - $ref: '#/components/schemas/LTLItem'
+        - type: object
+          required:
+            - weight
+            - freightClass
+            - length
+            - height
+            - width
+            - package
+            - pieces
+            - description
+
+    ParcelRateItem:
+      allOf:
+        - $ref: '#/components/schemas/ParcelItem'
+        - type: object
+          required:
+            - weight
+            - package
+
+    ParcelBookItem:
+      allOf:
+        - $ref: '#/components/schemas/ParcelItem'
+        - type: object
+          required:
+            - weight
+            - package
+            - description
+
+    LTLItem:
+      description: Item for LTL shipment.
+      type: object
+      properties:
+        itemId:
+          type: string
+          description: The unique identifier in Freightview for this item.
+          readOnly: true
+        description:
+          type: string
+          description: Description of the item.
+          example: Widgets
+        weight:
+          description: Total weight of this item in pounds.
+          type: integer
+          format: int32
+        freightClass:
+          $ref: '#/components/schemas/FreightClass'
+        length:
+          description: Length of this item in inches.
+          type: integer
+          format: int32
+        width:
+          description: Width of this item in inches.
+          type: integer
+          format: int32
+        height:
+          description: Height of this item in inches.
+          type: integer
+          format: int32
+        package:
+          $ref: '#/components/schemas/LTLPackagingType'
+        pieces:
+          type: integer
+          format: int32
+          description: Count of `package` in this `item`. (e.g. `2` for 2 pallets in this handling unit group)
+          default: 1
+        nmfc:
+          description: NMFC code for the item. _(Required by some carriers for more accurate rating)._
+          type: string
+          pattern: '^\d{4,6}(-\d{1,2}){0,1}$/i'
+          example: 123456-02
+        hazardous:
+          description: Hazardous materials flag. `true` indicates the item is hazardous.
+          type: boolean
+        hazard:
+          $ref: '#/components/schemas/HazardousMaterial'
+          required: [hazardous]
+        saidToContain:
+          type: integer
+          format: int32
+          description: The number of things an item contains.
+        saidToContainPackagingType:
+          oneOf:
+          - $ref: '#/components/schemas/SaidToContainOptions'
+          - $ref: '#/components/schemas/FluidSaidToContainOptions'
+        stackable:
+          type: boolean
+          description: Indicates the item is stackable.
+
+
+
+    LTLAccessorial:
+      type: string
+      enum:
+        - arrival notice
+        - arrival schedule
+        - liftgate pickup
+        - liftgate delivery
+        - inside pickup
+        - inside delivery
+        - sort and segregate
+        - protect from freezing
+
+    ParcelAccessorial:
+      type: string
+      enum:
+        - signature required
+        - adult signature required
+        - indirect signature required
+
+
+    ParcelItem:
+      description: Item for parcel shipment.
+      type: object
+      properties:
+        itemId:
+          type: string
+          description: The unique identifier in Freightview for this item.
+          readOnly: true
+        description:
+          type: string
+          description: Description of the item.
+          example: Widgets
+        weight:
+          description: Total weight of this item in pounds.
+          type: integer
+          format: int32
+        length:
+          description: Length of this item in inches.
+          type: integer
+          format: int32
+        width:
+          description: Width of this item in inches.
+          type: integer
+          format: int32
+        height:
+          description: Height of this item in inches.
+          type: integer
+          format: int32
+        package:
+          $ref: '#/components/schemas/ParcelPackagingType'
+        nonStandard:
+          type: boolean
+          description: Indicates that the packaging is non-standard (i.e. un-boxed/crated, not fully enclosed in cardboard).
+        declaredValue:
+          type: object
+          properties:
+            amount:
+              type: integer
+              description: The declared value amount (in US dollars) for the parcel item.
+
+    LocationType:
+      type: string
+      enum:
+        - business dock
+        - business no dock
+        - residential
+        - limited access
+        - trade show
+        - construction
+        - farm
+        - military
+        - airport
+        - place of worship
+        - school
+        - mine
+        - pier
+      default: business dock
+      description: Type of location.
+
+    LTLPackagingType:
+      description: Packaging types for this item. See [list of LTL packaging types](#section/Packaging-Types)
+      type: string
+      enum:
+        - Pallets_48x40
+        - Pallets_48x48
+        - Pallets_60x48
+        - Pallets_other
+        - Bags
+        - Bales
+        - Baskets
+        - Boxes
+        - Bundles
+        - Carpets
+        - Cases
+        - Coils
+        - Crates
+        - Cylinders
+        - Drums
+        - Jerricans
+        - Pails
+        - Pieces
+        - Reels
+        - Rolls
+        - Totes
+        - TubesPipes
+        - Unit
+
+    ParcelPackagingType:
+      type: string
+      description: |
+        Packaging type for this item. See [list of parcel packaging types](#section/Packaging-Types)
+
+      enum:
+        - Custom
+        - FedEx-envelope
+        - FedEx-pak
+        - FedEx-box
+        - FedEx-small-box
+        - FedEx-medium-box
+        - FedEx-large-box
+        - FedEx-extra-large-box
+        - FedEx-tube
+        - FedEx-10kg-box
+        - FedEx-25kg-box
+        - UPS-letter
+        - UPS-tube
+        - UPS-pak
+        - UPS-express-box-small
+        - UPS-express-box-medium
+        - UPS-express-box-large
+        - UPS-10kg-box
+        - UPS-25kg-box
+
+    FreightClass:
+      type: number
+      description: Freight class of the handling unit. See [list of valid freight classes.](#section/Freight-Class)
+      enum:
+        - 50
+        - 55
+        - 60
+        - 65
+        - 70
+        - 77.5
+        - 85
+        - 92.5
+        - 100
+        - 110
+        - 125
+        - 150
+        - 175
+        - 200
+        - 250
+        - 300
+        - 400
+        - 500
+
+    HazardousMaterial:
+      type: object
+      description: Details of the hazardous material.
+      properties:
+        hazmatId:
+          type: string
+          description: The UN/NA hazardous material identification number for the item
+          example: UN1170
+        hazardClass:
+          type: string
+          description: The hazard classification of the hazardous material.
+          enum:
+            - '1.1A'
+            - '1.1B'
+            - '1.1C'
+            - '1.1D'
+            - '1.1E'
+            - '1.1F'
+            - '1.1G'
+            - '1.1J'
+            - '1.1L'
+            - '1.2B'
+            - '1.2C'
+            - '1.2D'
+            - '1.2E'
+            - '1.2F'
+            - '1.2G'
+            - '1.2H'
+            - '1.2J'
+            - '1.2K'
+            - '1.2L'
+            - '1.3C'
+            - '1.3F'
+            - '1.3G'
+            - '1.3H'
+            - '1.3J'
+            - '1.3K'
+            - '1.3L'
+            - '1.4B'
+            - '1.4C'
+            - '1.4D'
+            - '1.4E'
+            - '1.4F'
+            - '1.4G'
+            - '1.4S'
+            - '1.5D'
+            - '2.1'
+            - '2.2'
+            - '2.3'
+            - '3'
+            - '4.1'
+            - '4.2'
+            - '4.3'
+            - '5.1'
+            - '5.2'
+            - '6.1'
+            - '6.2'
+            - '7'
+            - '8'
+            - '9'
+        hazardSubClass1:
+          type: string
+          description: The sub-risk hazard classification of the hazardous material. (Also known as secondary hazard class).
+        hazardSubClass2:
+          type: string
+          description: The sub-risk hazard classification of the hazardous material. (Also known as tertiary hazard class).
+        packingGroup:
+          type: string
+          enum: [I-Great Danger,II-Medium Danger,III-Minor Danger]
+          description: The packing group that accords with the degree of danger of the hazardous material.
+        specialPermit:
+          type: string
+          description: US DOT special permit number.
+
+    SaidToContainOptions:
+      type: string
+      description: The package type for "said to contain".
+      enum:
+        - Bags
+        - Bales
+        - Baskets
+        - Boxes
+        - Bundles
+        - Carpets
+        - Cases
+        - Coils
+        - Crates
+        - Cylinders
+        - Drums
+        - Jerricans
+        - Kegs
+        - Pails
+        - Pieces
+        - Reels
+        - Rolls
+        - Totes
+        - Tubes/Pipes
+
+    FluidSaidToContainOptions:
+      type: string
+      description: The package type for "said to contain", when it contains fluid.
+      enum:
+        - Bags
+        - Bales
+        - Baskets
+        - Boxes
+        - Bundles
+        - Carpets
+        - Cases
+        - Coils
+        - Crates
+        - Cylinders
+        - Drums
+        - gallons
+        - Jerricans
+        - Kegs
+        - liters
+        - ounces
+        - Pails
+        - Pieces
+        - Reels
+        - Rolls
+        - Totes
+        - Tubes/Pipes
+    BOLNumber:
+      type: string
+      description:  The Bill of Lading number for this shipment. Auto-generated by Freightview upon booking unless value provided by shipper.
+
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: |
+        Freightview API authentication is handled by passing your **user API key** in the username field for HTTP basic auth.
+        * You do not need to supply a password, just the API key.
+        * The user API key is available in your Freightview user settings (gear icon in the upper right), under the "API Integration" section.
+        * All API requests must be transmitted over HTTPS.
+
+
+        Test connecting to the Freightview API using your API key with the following `cURL` example:
+
+        ```
+        curl -u user_api_key: -X GET "https://www.freightview.com/api/v1.0/authenticate"
+        ```
+
+        (cURL is a utility for testing network requests. You can find more information about it here: http://curl.haxx.se).
+
+        If your request was successful, the response will have status `200` and a message that says `user@example.com successfully authenticated.`
+
+security:
+  - BasicAuth: []
+
+tags:
+
+  - name: Rating
+    description: |
+      The rating endpoint allows you to rate shipments directly from your application. You can see your carrier rates & service levels, along with the full rate details (linehaul, fuel, accessorials).
+
+      > Note: To rate parcel shipments, you'll need to contact Freightview support to get the `parcel` product added to your Freightview account.
+
+      # Rating tips
+
+      ### Shipment direction
+      To help ensure the shipment direction (outbound, inbound, third party) is set correctly by Freightview when rating a shipment, be sure the location address sent in the rating request matches the corresponding location setup in your Freightview account.
+
+      #### Outbound
+
+      For outbound shipments from your location, ensure the origin address information matches the address of the account location setup in your Freightview account.
+
+      #### Inbound
+
+      For inbound shipments to your location, ensure the destination address information matches the address of the account location setup in your Freightview account.
+
+      #### Third Party
+
+      For third party shipments, ensure the `billPostalCode` and `billCountry` values are specified in the rating request, using the postal code and country associated with the address setup for third party billing in your Freightview account.
+
+      ### NMFC
+      Some LTL rates are based on specific NMFC numbers, so to retreive those rates, ensure the NMFC numbers for the item are specified in the `nmfc` field.
+
+      ### Dimensions
+      Some LTL rates are based on shipment dimensions, so to retrieve those rates, ensure the each item in the `items` array has `length`, `width`, and `height` values specified.
+
+      # Shipment items
+
+      The `items` array can be confusing, so here are some examples. Think of each items object as a group of handling units that all share the same characteristics. (i.e. same `freightClass`, `length`, `width`, and `height`).
+
+      ### One pallet
+      This is one pallet.
+
+      ```json
+      "items": [
+        {
+              "description": "Widgets",
+              "weight": 350,
+              "freightClass": 60,
+              "length": 48,
+              "width": 40,
+              "height": 48,
+              "package": "Pallets_48x40",
+              "pieces": 1
+        }
+      ]
+      ```
+
+      ### One pallet, with contents
+      This is one pallet, that has 35 boxes on it.
+
+      ```json
+      "items": [
+        {
+              "description": "Widgets",
+              "weight": 350,
+              "freightClass": 60,
+              "length": 48,
+              "width": 40,
+              "height": 48,
+              "package": "Pallets_48x40",
+              "pieces": 1,
+              "saidToContain" : 35,
+              "saidToContainPackagingType" : "Boxes"
+        }
+      ]
+      ```
+      ### More than one pallet, same characteristics
+      This is two pallets, totaling 700lbs, and both pallets are 48x40x48 and freight class 60.
+
+      ```json
+      "items": [
+        {
+              "description": "Widgets",
+              "weight": 700,
+              "freightClass": 60,
+              "length": 48,
+              "width": 40,
+              "height": 48,
+              "package": "Pallets_48x40",
+              "pieces": 2
+        }
+      ]
+      ```
+
+      ### More than one pallet, different characteristics
+      This is two pallets, but they are different freight classes and different dimensions.
+
+      ```json
+      "items": [
+        {
+              "description": "Widgets",
+              "weight": 350,
+              "freightClass": 60,
+              "length": 48,
+              "width": 40,
+              "height": 48,
+              "package": "Pallets_48x40",
+              "pieces": 1
+        },
+        {
+              "description": "Different widgets",
+              "weight": 400,
+              "freightClass": 77.5,
+              "length": 75,
+              "width": 55,
+              "height": 37,
+              "package": "Pallets_other",
+              "pieces": 1
+        }
+      ]
+      ```
+      ### Drum
+      This is one drum, that contains 55 gallons.
+
+      ```json
+      "items": [
+        {
+              "description": "Liquid awesomeness",
+              "weight": 350,
+              "freightClass": 60,
+              "length": 23,
+              "width": 23,
+              "height": 34,
+              "package": "Drums",
+              "pieces": 1,
+              "saidToContain": 55,
+              "saidToContainPackagingType" : "gallons"
+        }
+      ]
+      ```
+      # Rate errors
+
+      In each rate object in the `rates` array returned by the [/rates](#tag/Rating/paths/~1rates/post) endpoint, there is a `status` field. When the `status` is `error`, then the `error` field is populated with an error message regarding why the rate was not successfully retrieved. Not all errors indicate an issue with the rate request. Here are some common examples of this:
+
+      ### Service area errors
+      Some LTL carriers do not service the entire United States & Canada. Thus, if a shipment's origin and/or destination postal code is outside their service area, the carrier may return an error stating that the shipment could not be rated, because it is outside their service area.
+
+      ### Spot volume errors
+      Some LTL carriers provide spot volume rates (which are for larger shipments and are moved only through a carrier's backhaul network) through their main LTL rating API. Spot volume rate errors may be returned if spot volume rating has not been setup for a given customer, or if the shipment in question does not qualify for spot volume pricing. This could be either due to shipment size (most carriers require shipments to be several thousand pounds to qualify for spot volume rates), or service lane availability (spot volume lanes are variable, as they depend on carrier backhaul capacity in a given lane, which can fluctuate).
+
+  - name: Booking
+    description: |
+      ## Booking process
+
+      ### LTL
+
+      1. First call the `/rates` endpoint using the `Rates.LTL.RateToBookRequest` schema. Make sure all the fields that are required to rate and then book are included. The rate response will return the shipment with a shipment `id` and an array of rates, each with its own rate `id`.
+
+      2. Select one of the rates returned and use its rate `id` along with its shipment `id` in the request body for the `/book` endpoint.
+
+      3. If origin / destination address line(s), company name, location contact information, special instructions and dock hours weren't specified in the rating request, then they can be included in the book request.
+
+      4. Use the `schedulePickup` flag to indicate if you want a pickup request sent to the carrier or to just generate the Bill of Lading and/or labels for the shipment.
+
+      #### LTL Billing Recipient / Third Party
+
+      Creating "bill recipient / third party" (a.k.a. "customer routed") LTL shipments is not supported via the Freightview API, only through the Freightview website.
+
+      ### Parcel
+
+      1. First call the `/rates/parcel` endpoint using the `Rates.Parcel.RateToBookRequest` schema. Make sure all the fields that are required to rate and then book are included. The rate response will return the shipment with a shipment `id` and an array of rates, each with its own rate `id`.
+
+      2. Select one of the rates returned and use its rate `id` along with its shipment `id` in the request body for the `/book` endpoint.
+
+      3. If origin / destination address line(s), company name, location contact information, special instructions and dock hours weren't specified in the rating request, then they can be included in the book request.
+
+      4. For booking parcel shipments, if the origin location does not have a regular pickup and a pickup request needs to be created, use `schedulePickup: true` in the rate request to ensure that the rate includes the cost of the pickup, and then don't include `schedulePickup` in the book request, as that will be remembered since it was specified when rating.
+
+      #### Parcel Billing Recipient / Third Party
+
+      To create a "bill recipient / third party" parcel shipment, use the [Book parcel (freight collect)](#tag/Booking/paths/~1book~1parcel~1freightCollect/post) endpoint.
+
+      ## Booking response
+
+      ### Booking errors
+
+      - If you receive an error, for example "Address 1 is too long", for a field that is updateable via the `/book` request, you can pass in the correct value in the appropriate field and re-try booking.
+      - If the field referenced in the error is not in the list of fields that can be included in the `/book` request, then you will have to re-rate the shipment using the `/rates` endpoint after revising the input data, and then try booking the shipment again using the new shipment `id` and rate `id`.
+
+      ### Successful booking
+
+      - If the booking is successful, a shipment object will be returned with the labels/BOL in the `files` object and the PRO number / pickup number in the `dispatch` object.
+      - See [documentation on the files array](#section/File-Types) for more information on the `bol` and `label` document types.
+
+  - name: Shipment
+    description: Search for shipments and retrieve detailed shipment information.
+
+  - name: reference
+    x-displayName: "Reference"
+    description: |
+      The following sections provide reference information for many of the fields in the Freightview API requests and responses.
+
+      # Accessorials
+
+      ### LTL
+      List these strings in the `charges` array of LTL rate requests.
+
+      *  `arrival notice` - see note below
+      *  `arrival schedule` - see note below
+      *  `liftgate pickup`
+      *  `liftgate delivery`
+      *  `inside pickup`
+      *  `inside delivery`
+      *  `sort and segregate`
+      *  `protect from freezing`
+
+      #### Arrival notice / Arrival schedule
+
+      - `arrival notice` - This accessorial indicates that the destination location has indicated they would like to be notified before delivery.
+      - `arrival schedule` - This accessorial indicates that the destination location requires a delivery appointment.
+
+      Note: `arrival notice` and `arrival schedule` are mutually exclusive, i.e. include one or the other, but not both.
+
+      #### Facility type charges
+      Location based charges (residential delivery, tradeshow delivery, etc) will be automatically added based on the location type used.
+
+      ### Parcel
+      List these strings in the `charges` array of the parcel rate requests.
+
+      * `signature required`
+      * `adult signature required`
+      * `indirect signature required` &#42;
+
+      &#42; `indirect signature required` is only supported by FedEx, and only for `residential` destinations.
+
+      # Carrier Codes
+      | Name                               | SCAC   |
+      |------------------------------------|--------|
+      | A. Duie Pyle                       | `pyle` |
+      | A&B Freight Line                   | `abfl` |
+      | AAA Cooper Transportation          | `aact` |
+      | ABF Freight System                 | `abfs` |
+      | ACI Motor Freight                  | `agce` |
+      | AMA Transportation                 | `amap` |
+      | Averitt Express                    | `avrt` |
+      | Beaver Express Service             | `beav` |
+      | Best Overnite Express              | `btvp` |
+      | C & M Forwarding                   | `cmfc` |
+      | Central Freight Lines              | `cenf` |
+      | Central Transport                  | `ctii` |
+      | CH Robinson                        | `rblt` |
+      | Clear Lane Freight Systems         | `clni` |
+      | Coyote Logistics                   | `cllq` |
+      | CRH Transportation, Inc            | `crhm` |
+      | CrossCountry Freight Solutions     | `ccyq` |
+      | Daylight Transport                 | `dylt` |
+      | Dayton Freight Lines               | `dafg` |
+      | Dependable Highway Express         | `dphe` |
+      | Diamond Line Delivery Systems      | `dlds` |
+      | Dohrn Transfer Company             | `dhrn` |
+      | DotLine Transportation             | `dolr` |
+      | Double D Express                   | `dbde` |
+      | Dugan Truck Line                   | `dubl` |
+      | Echo Global Logistics              | `echo` |
+      | EDI Express                        | `edxi` |
+      | Estes Express Lines                | `exla` |
+      | Express 2000                       | `eqxt` |
+      | FedEx Freight                      | `fxfe` |
+      | Forward Air                        | `fwdn` |
+      | Freightcenter                      | `frcd` |
+      | Freightquote                       | `frci` |
+      | Frontline Freight                  | `fcsy` |
+      | Hercules Freight                   | `hrcf` |
+      | Hot-Line Transport                 | `hlnf` |
+      | Jahn Transfer Inc                  | `jahl` |
+      | JP Express Service                 | `jpxs` |
+      | Magnum                             | `mgul` |
+      | Mainfreight                        | `tgaf` |
+      | Mountain Valley Express            | `mtvl` |
+      | N&M Transfer                       | `nmtf` |
+      | Numark Transportation              | `numk` |
+      | Oak Harbor Freight Lines           | `oakh` |
+      | Old Dominion Freight Line          | `odfl` |
+      | Panama Transfer                    | `pana` |
+      | Peninsula Truck Lines              | `pens` |
+      | Pilot Freight Services             | `paaf` |
+      | Pitt Ohio                          | `pitd` |
+      | R+L Carriers                       | `rlca` |
+      | Rist Transport                     | `risf` |
+      | Roadrunner Transportation Services | `rdfs` |
+      | Rude Transport Inc                 | `rude` |
+      | Saia Motor Freight Line            | `saia` |
+      | Smith-Cargo Transportation         | `sctp` |
+      | Southeastern Freight Lines         | `sefl` |
+      | Southwestern Motor Transport       | `smtl` |
+      | Standard Forwarding                | `stdf` |
+      | Sutton Transport                   | `suon` |
+      | TForce Freight                     | `upgf` |
+      | TForce Worldwide                   | `dlwi` |
+      | The Custom Companies               | `ctbv` |
+      | Titan Freight Systems              | `ttfy` |
+      | Total Quality Logistics            | `tqyl` |
+      | U.S. Road                          | `usrd` |
+      | UPS (Parcel)                       | `upgf` |
+      | US Special Delivery                | `uppn` |
+      | Valley Cartage                     | `valc` |
+      | Vision Express                     | `vsxp` |
+      | Volpe Express                      | `volp` |
+      | Ward Transport                     | `ward` |
+      | White Arrow                        | `warw` |
+      | XPO Logistics                      | `cnwy` |
+      | Xpress Global Systems              | `xgsi` |
+      | Zip Xpress Inc.                    | `zpxs` |
+
+      # File Types
+
+      The following is a list of the most common document types/subtypes and their descriptions available in the shipment `files` array:
+
+      | Type                | Subtype       | Description                                                                                                                      |
+      |---------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------|
+      | `quote`             | `freightview` | The rate detail for the quote that was used to book the shipment </br >(_with_ carrier discount and any applicable user markup). |
+      | `customer-quote`    | `freightview` | The rate detail for the quote that was used to book the shipment </br >(_without_ the carrier discount and user markup).         |
+      | `bol`               | `carrier`     | The carrier's Bill of Lading for the shipment.                                                                                   |
+      | `bol`               | `freightview` | The Freightview Bill of Lading for the shipment.                                                                                 |
+      | `bol`               | `shipper`     | The Bill of Loading that the shipper has uploaded for the shipment.                                                              |
+      | `label`             | `freightview` | The Freightview handling unit label.                                                                                             |
+      | `label`             | `carrier`     | The carrier label for the handling unit.                                                                                         |
+      | `label-combined`    | `carrier`     | All carrier labels for the handling units, combined into one PDF or ZPL document, one label per page.                            |
+      | `signed bol`        | `carrier`     | The signed Bill of Lading for the shipment.                                                                                      |
+      | `proof of delivery` | `carrier`     | The proof of delivery for the shipment.                                                                                          |
+      | `invoice`           | `carrier`     | The carrier's invoice for the shipment.                                                                                          |
+
+
+      ### Subtypes
+      * Subtype definitions:
+        * `freightview` - file was created by Freightview.
+        * `carrier` - file was created by carrier.
+        * `shipper` - file was created/uploaded by shipper.
+      * Subtype of `shipper` will only appear if a user uploaded a document through the Freightview site.
+
+      ### Important notes
+
+      * Documents are added to the shipment throughout the shipment lifecyle. (e.g. a `signed bol` won't be available until after the shipment is delivered)
+      * Not all carriers support all document types.
+      * Document types will vary by shipment mode, i.e. some documents will not be available for `parcel` shipments that are available for `ltl` shipments.
+      * Example: `bol` is not available for `parcel` shipments.
+
+
+      # Freight Class
+      Freightview supports the following standard NMFC freight classes.
+
+      * `50`
+      * `55`
+      * `60`
+      * `65`
+      * `70`
+      * `77.5`
+      * `85`
+      * `92.5`
+      * `100`
+      * `110`
+      * `125`
+      * `150`
+      * `175`
+      * `200`
+      * `250`
+      * `300`
+      * `400`
+      * `500`
+
+      # Location Type
+      Use these location types in the `originType` and `destType` fields to insure accurate rating.
+
+      * `business dock`
+      * `business no dock`
+      * `residential`
+      * `limited access`
+      * `trade show`
+      * `construction`
+      * `farm`
+      * `military`
+      * `airport`
+      * `place of worship`
+      * `school`
+      * `mine`
+      * `pier`
+
+      ### Liftgates
+
+      Liftgate charges will not be added automatically. If you need a liftgate at the pickup or delivery, include `liftgate pickup` or `liftgate delivery` in the `charges` array in the rate request.
+
+      # Packaging Types
+
+      ### LTL
+
+      * `Pallets_48x40`
+      * `Pallets_48x48`
+      * `Pallets_60x48`
+      * `Pallets_other`
+      * `Bags`
+      * `Bales`
+      * `Baskets`
+      * `Boxes`
+      * `Bundles`
+      * `Carpets`
+      * `Cases`
+      * `Coils`
+      * `Crates`
+      * `Cylinders`
+      * `Drums`
+      * `Jerricans`
+      * `Pails`
+      * `Pieces`
+      * `Reels`
+      * `Rolls`
+      * `Totes`
+      * `TubesPipes`
+      * `Unit`
+
+      #### Pallet dimensions
+
+      Pallet packaging types with dimensions (`Pallets_48x40`, etc) will automatically set the corresponding `length` & `width` dimensions of the item (You'll still need to specify a `height`). To specify pallets with a custom dimension, use `Pallets_other` and set the `length`, `width`, and `height` of the item.
+
+      ### Parcel
+
+      #### Your own packaging
+      * `Custom` - Custom packaging
+
+      #### Carrier-specific packaging
+      Setting `package` to a carrier-specific packaging type will limit the rates returned to only those of that carrier. (e.g. specifying `FedEx-box` will result in only FedEx rates & service levels being returned).
+
+      ##### FedEx
+      * `FedEx-envelope` - FedEx&reg; Envelope
+      * `FedEx-pak` - FedEx&reg; Pak
+      * `FedEx-box` - FedEx&reg; Box
+      * `FedEx-small-box` - FedEx&reg; Small Box
+      * `FedEx-medium-box` - FedEx&reg; Medium Box
+      * `FedEx-large-box` - FedEx&reg; Large Box
+      * `FedEx-extra-large-box` - FedEx&reg; Extra Large Box
+      * `FedEx-tube` - FedEx&reg; Tube
+      * `FedEx-10kg-box` - FedEx&reg; 10kg Box
+      * `FedEx-25kg-box` - FedEx&reg; 25kg Box
+
+      ##### UPS
+      * `UPS-letter` - UPS Letter
+      * `UPS-tube` - UPS Tube
+      * `UPS-pak` - UPS Pak
+      * `UPS-express-box-small` - UPS Express Small Box
+      * `UPS-express-box-medium` - UPS Express Medium Box
+      * `UPS-express-box-large` - UPS Express Large Box
+      * `UPS-10kg-box` - UPS 10kg Box
+      * `UPS-25kg-box` - UPS 25kg Box
+
+      #### Non-standard packaging
+
+      For parcel shipments where the item is un-boxed/crated, or not fully enclosed in cardboard, use `Custom` as the `package` value, and also set the item `nonStandard` flag to `true`.
+
+      # Payment Terms
+
+      * `Outbound Prepaid`
+      * `Outbound Collect`
+      * `Inbound Collect`
+      * `Third Party Prepaid`
+      * `Third Party Collect`
+
+      # Service Identifiers
+
+      For the parcel freight collect endpoint, the following are the valid `serviceId` values, by `carrierCode`.
+
+      ### FedEx
+
+      - `ground` - FedEx Ground®
+      - `home_delivery` - FedEx Home Delivery®
+      - `first_overnight` - FedEx First Overnight®
+      - `priority_overnight` - FedEx Priority Overnight®
+      - `standard_overnight` - FedEx Standard Overnight®
+      - `two_day_am` - FedEx 2Day A.M.®
+      - `two_day` - FedEx 2Day®
+      - `express_saver` - FedEx Express Saver®
+
+      ### UPS
+
+      - `ground` - UPS Ground
+      - `next_day` - UPS Next Day Air
+      - `next_day_saver` - UPS Next Day Air Saver
+      - `next_day_early` - UPS Next Day Air Early
+      - `second_day` - UPS 2nd Day Air
+      - `second_day_am` - UPS 2nd Day Air A.M.
+      - `three_day_select` - UPS 3 Day Select
+
+      # Labels
+
+      On the [book](#tag/Booking/paths/~1book/post) and [shipment information](#tag/Shipment/paths/~1shipments~1%7Bid%7D/get) endpoints, the `labelSize` and `labelCount` query parameters can be used to indicate what size of labels and how many labels to return for the shipment. (These query parameters do not apply to parcel shipments, whose labels are 4x6 and are generated by the carrier).
+
+      ### Label Size
+      The labels Freightview generates fall into two categories, roll and sheet. Below are the `labelSize` values, divided by category.
+
+      #### Sheet
+
+      - `8.5x11` - full page label
+      - `5.5x8.5` - two labels per page
+      - `3.5x5` - four labels per page
+      - `4x3.3` - six labels per page
+      - `4x2` - ten labels per page
+
+
+      #### Roll
+
+      - `4x8`
+      - `4x6`
+      - `3x5`
+      - `3x4`
+      - `2.25x4`
+      - `4x1`
+
+      ### Label Count
+
+      The label count determines how many labels get generated per shipping item, e.g. pallet. The supported `labelCount` values are `1`, `2`, and `4`.
+
+      The number of shipping items is calculated by determining the sum of all `pieces` values on all items object in the `items` array. For more details on shipping items, see [this section](#section/Shipment-items) of the API documentation.

@@ -3,7 +3,7 @@
 import { authSchema, optsSchema } from "@/types/optsSchema";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult, IOrder } from "shipstation-node/typings/models";
-import type { paths, components } from "@/types/schema";
+import type { paths, components } from "@/types/book-freight/schema";
 import createClient from "openapi-fetch";
 import date from 'date-and-time';
 import { neon } from '@neondatabase/serverless';
@@ -14,7 +14,7 @@ import { Schema } from "zod";
 import { alias } from "drizzle-orm/pg-core";
 
 
-type FreightProductData = Awaited<ReturnType<typeof getData>>;
+type FreightData = Awaited<ReturnType<typeof getData>>;
 async function getData(sku: string) { 
   const hardCodedSku = 'M1G-9XQ-Q4C'
   console.log('Getting data: ' + hardCodedSku)
@@ -93,28 +93,9 @@ export async function getOrder(
 export async function bookFreight(orderData: IOrderPaginationResult, lifgate: boolean) {
   try {
     console.log(orderData.orders);
-    const token = await generateToken();
-    if (token.error) {
-      return {
-        error: {
-          message: token.error.message,
-        }
-      }
-    }
-    const validatedToken = authSchema.safeParse(token);
-    console.log(validatedToken);
-    if (!validatedToken.success) {
-      let errorMessage = "";
-      validatedToken.error.issues.forEach((issue) => {
-        errorMessage = issue.message + ". ";
-      });
-      return {
-        error: {
-          message: errorMessage,
-        }
-      };
-    }
-    const access_token = validatedToken.data.data.access_token;
+    orderData.orders.map((order) => {
+       rateLtlShipment(order);
+    })
     if (orderData.orders[0]?.items[0] !== undefined) {
       const freightProduct = await getData(orderData.orders[0].items[0].sku);
       // const response = await createShipment(access_token, orderData, lifgate, freightProduct);
@@ -125,15 +106,20 @@ export async function bookFreight(orderData: IOrderPaginationResult, lifgate: bo
   }
 };
 
-async function generateToken() { 
-  return await client.POST("/v2.0/auth/token", {
+
+async function rateLtlShipment(order: IOrder, orderData: IOrderPaginationResult, liftgate: boolean, freightProduct: FreightData) {
+  const now = new Date();
+  const todayDate  = date.format(now, 'YYYY-MM-DD');
+  return await client.POST("/rates", {
     body: {
-      client_id: process.env.VERCEL_FREIGHTVIEW_CLIENT_ID || '',
-      client_secret: process.env.VERCEL_FREIGHTVIEW_CLIENT_SECRET || '',
-      grant_type: "client_credentials", 
+      pickupDate: todayDate,
+      charges
+
     }
-  });
-};
+  })
+  
+  return;
+}
 
 function parseWeight(order: IOrder): number {
   const weightRegex = /(\d+)\s*(LBS|pound|pounds)/i;
@@ -145,6 +131,62 @@ function parseWeight(order: IOrder): number {
       throw new Error('Invalid weight in internal notes');
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* V2 API Oauth token generation */
+
+// async function generateToken() { 
+//   const token = await client.POST("/v2.0/auth/token", {
+//     body: {
+//       client_id: process.env.VERCEL_FREIGHTVIEW_CLIENT_ID || '',
+//       client_secret: process.env.VERCEL_FREIGHTVIEW_CLIENT_SECRET || '',
+//       grant_type: "client_credentials", 
+//     }
+//   });
+//   if (token.error) {
+//     return {
+//       error: {
+//         message: token.error.message,
+//       }
+//     }
+//   }
+//   const validatedToken = authSchema.safeParse(token);
+//   console.log(validatedToken);
+//   if (!validatedToken.success) {
+//     let errorMessage = "";
+//     validatedToken.error.issues.forEach((issue) => {
+//       errorMessage = issue.message + ". ";
+//     });
+//     return {
+//       error: {
+//         message: errorMessage,
+//       }
+//     };
+//   }
+//   const access_token = validatedToken.data.data.access_token;
+//   return access_token;
+// };
+
+
 
 // async function createShipment(access_token: string, orderData: IOrderPaginationResult, liftgate: boolean, freightProduct: FreightProductData) {
 
