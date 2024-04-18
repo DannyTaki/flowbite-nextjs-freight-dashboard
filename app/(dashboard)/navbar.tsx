@@ -10,6 +10,7 @@ import {
   Navbar,
   TextInput,
   Tooltip,
+  useThemeMode,
 } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,6 +34,7 @@ import {
 
 export function DashboardNavbar() {
   const sidebar = useSidebarContext();
+  const { computedMode } = useThemeMode();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   function handleToggleSidebar() {
@@ -73,13 +75,15 @@ export function DashboardNavbar() {
               <Image
                 className="mr-3 h-8"
                 alt=""
-                src="/images/logo.svg"
-                width={32}
-                height={32}
+                src={
+                  computedMode === "light"
+                    ? "/images/alliancechemical.svg"
+                    : "/images/alliancechemical_dark.svg"
+                }
+                width={200}
+                height={200}
               />
-              <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
-                Flowbite
-              </span>
+
             </Navbar.Brand>
             <form className="hidden lg:block lg:pl-2">
               <Label htmlFor="search" className="sr-only">
@@ -104,16 +108,15 @@ export function DashboardNavbar() {
               </button>
               <NotificationBellDropdown />
               <AppDrawerDropdown />
-              <div className="hidden dark:block">
-                <Tooltip content="Toggle light mode">
+              <Tooltip
+                content={
+                  computedMode === "light"
+                    ? "Toggle dark mode"
+                    : "Toggle light mode"
+                }
+              >
                   <DarkThemeToggle />
                 </Tooltip>
-              </div>
-              <div className="dark:hidden">
-                <Tooltip content="Toggle dark mode">
-                  <DarkThemeToggle />
-                </Tooltip>
-              </div>
               <div className="ml-3 flex items-center">
                 <UserDropdown />
               </div>

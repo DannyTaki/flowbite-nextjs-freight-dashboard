@@ -1,0 +1,226 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "products": {
+      "name": "products",
+      "schema": "",
+      "columns": {
+        "product_id": {
+          "name": "product_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sku": {
+          "name": "sku",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "products_sku_key": {
+          "columns": [
+            "sku"
+          ],
+          "nullsNotDistinct": false,
+          "name": "products_sku_key"
+        }
+      }
+    },
+    "product_freight_links": {
+      "name": "product_freight_links",
+      "schema": "",
+      "columns": {
+        "link_id": {
+          "name": "link_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "classification_id": {
+          "name": "classification_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_freight_links_product_id_fkey": {
+          "name": "product_freight_links_product_id_fkey",
+          "tableFrom": "product_freight_links",
+          "tableTo": "products",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "product_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "product_freight_links_classification_id_fkey": {
+          "name": "product_freight_links_classification_id_fkey",
+          "tableFrom": "product_freight_links",
+          "tableTo": "freight_classifications",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "classification_id"
+          ],
+          "columnsTo": [
+            "classification_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "freight_classifications": {
+      "name": "freight_classifications",
+      "schema": "",
+      "columns": {
+        "classification_id": {
+          "name": "classification_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mode": {
+          "name": "mode",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "package": {
+          "name": "package",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "declared_value": {
+          "name": "declared_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight": {
+          "name": "weight",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "height": {
+          "name": "height",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "length": {
+          "name": "length",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "width": {
+          "name": "width",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stackable": {
+          "name": "stackable",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pieces": {
+          "name": "pieces",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nmfc": {
+          "name": "nmfc",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "freight_class": {
+          "name": "freight_class",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hazardous": {
+          "name": "hazardous",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hazard": {
+          "name": "hazard",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "said_to_contain": {
+          "name": "said_to_contain",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "said_to_contain_packaging_type": {
+          "name": "said_to_contain_packaging_type",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "non_standard": {
+          "name": "non_standard",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}
