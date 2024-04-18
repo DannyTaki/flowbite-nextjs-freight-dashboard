@@ -49,7 +49,8 @@ export default function BookFreight() {
   const [chevronItemRight, setChevronItemRight] = useState<boolean | null>(
     true,
   );
-  const [isChecked, setIsChecked] = useState<boolean>(false)
+  const [isLiftgateRequired, setIsLiftgateRequired] = useState<boolean>(false)
+  const [isLimitedAccess, setIsLimitedAccess] = useState<boolean>(false)
 
   function handleChevronClick(section: string) {
     if (section === "shipment") {
@@ -71,7 +72,7 @@ export default function BookFreight() {
       setIcon(<HiExclamation className="size-5" />)
       return;
     }
-    const response = await bookFreight(orderData, isChecked);
+    const response = await bookFreight(orderData, isLiftgateRequired, isLimitedAccess);
     if (response == null || response === undefined) {
       setShowToast(true);
       setToastMessage("Error booking freight. Please try again.");
@@ -183,8 +184,10 @@ export default function BookFreight() {
                 Enter a Shipstation Order Number
               </Label>
               <div className="flex items-center gap-2">
-               <Checkbox id="liftgate" onClick={() => setIsChecked(!isChecked)} />
+               <Checkbox id="liftgate" onClick={() => setIsLiftgateRequired(!isLiftgateRequired)} />
                <Label htmlFor="liftgate">Liftgate Required</Label>
+               <Checkbox id="limitedAccess" onClick={() => setIsLimitedAccess(!isLimitedAccess)} />
+               <Label htmlFor="limitedAccess">Limited Access</Label>
                </div>
             <TextInput
               id="order-number"

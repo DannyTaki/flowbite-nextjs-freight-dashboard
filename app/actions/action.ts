@@ -12,9 +12,12 @@ import * as schema from '@/app/db/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { Schema } from "zod";
 import { alias } from "drizzle-orm/pg-core";
+import { DrawerItems } from "flowbite-react";
 
 
-type FreightData = Awaited<ReturnType<typeof getData>>;
+type EnrichedProduct = Awaited<ReturnType<typeof getEnrichedOrder>>;
+
+
 async function getData(sku: string) { 
   const hardCodedSku = 'M1G-9XQ-Q4C'
   console.log('Getting data: ' + hardCodedSku)
@@ -90,33 +93,89 @@ export async function getOrder(
   }
 }
 
-export async function bookFreight(orderData: IOrderPaginationResult, lifgate: boolean) {
-  try {
-    console.log(orderData.orders);
-    orderData.orders.map((order) => {
-       rateLtlShipment(order);
-    })
-    if (orderData.orders[0]?.items[0] !== undefined) {
-      const freightProduct = await getData(orderData.orders[0].items[0].sku);
-      // const response = await createShipment(access_token, orderData, lifgate, freightProduct);
+async function getEnrichedOrders(orderData: IOrderPaginationResult) {
+  // Prepare to accumulate all enriched order data
+  const enrichedOrders = [];
+
+  for (const order of orderData.orders) {
+    console.log(`Processing order: ${order.orderId}`);
+    
+    // Array to hold enriched items for this order
+    const enrichedItems = [];
+
+    for (const item of order.items) { 
+      const itemData = await getData(item.sku);
+      console.log(`Data for item ${item.sku} in order ${order.orderNumber}:`, itemData);
+
+      enrichedItems.push({
+        ...item,
+        additionalData: itemData
+      })
     }
-  } catch (error) {
+    const enrichedOrder = {
+      ...order, 
+      enrichedItems: enrichedItems
+    };
+    enrichedOrders.push(enrichedOrder);
+  }
+  return enrichedOrders;
+}
+
+export async function bookFreight(orderData: IOrderPaginationResult, liftgate: boolean, limitedAccess: boolean) {
+  try {
+    if (!orderData || orderData.orders.length === 0) {
+      console.log("No orders found");
+      return 'No orders available';
+    }
+
+      const enrichedOrders = await getEnrichedOrders(orderData);
+      const shipmentResult = await rateLtlShipment(enrichedOrders, liftgate, limitedAccess)
+    } catch (error) {
     console.log(error);
     return null;
   }
 };
 
 
-async function rateLtlShipment(order: IOrder, orderData: IOrderPaginationResult, liftgate: boolean, freightProduct: FreightData) {
+async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boolean, limitedAccess: boolean) {
   const now = new Date();
   const todayDate  = date.format(now, 'YYYY-MM-DD');
+  for (const order of enrichedOrders) {   
   return await client.POST("/rates", {
     body: {
       pickupDate: todayDate,
-      charges
+      charges: liftgate ? ["liftgate delivery"] : undefined,
+      originCompany: "Alliance Chemical",
+      originAddress: "204 South Edmond Street",
+      originCity: "Taylor",
+      originState: "TX",
+      originPostalCode: "76574",
+      originCountry: "USA",
+      originType: "business dock",
+      originContactName: "Adnan Heikal",
+      originContactPhone: "512-365-6838",
+      originContactEmail: "adnan.heikal@alliancechemical.com",
+      originReferenceNumber: order.orderNumber,
+      originDockHoursOpen: "09:00 AM",
+      originDockHoursClose: "04:00 PM",
+      destCompany: order.shipTo.company ? order.shipTo.company : undefined,
+      destAddress: order.shipTo.street1,
+      destAddress2: order.shipTo.street2 ? order.shipTo.street2 : undefined,  
+      destCity: order.shipTo.city,
+      destState: order.shipTo.state,
+      destPostalCode: order.shipTo.postalCode,
+      destCountry: "USA",
+      destType: order.
+
+
+
+      
+
 
     }
   })
+}
+
   
   return;
 }
