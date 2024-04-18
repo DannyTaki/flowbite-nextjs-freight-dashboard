@@ -13,6 +13,7 @@ import { eq } from 'drizzle-orm';
 import { Schema } from "zod";
 import { alias } from "drizzle-orm/pg-core";
 import { DrawerItems } from "flowbite-react";
+import { isMetamaskError } from "@clerk/nextjs";
 
 
 type EnrichedProduct = Awaited<ReturnType<typeof getEnrichedOrders>>;
@@ -141,7 +142,12 @@ export async function bookFreight(orderData: IOrderPaginationResult, liftgate: b
 };
 
 function mapToLTLItem(item: EnrichedItem ) {
-
+  return LTLItem = {
+    description: item.productName,
+    weight: 
+    nmfc: item.nmfc,
+    
+  }
 }
 
 async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boolean, limitedAccess: boolean) {
@@ -150,10 +156,9 @@ async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boole
   for (const order of enrichedOrders) { 
     let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
     let items: components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
-    order.enrichedItems.forEach(item => mapToLTLItem(item.additionalData));
-
+    order.enrichedItems.forEach( item => mapToLTLItem(item.additionalData));
   
-    if (liftgate && !order.shipTo.resident) { 
+    if (liftgate && !order.shipTo.residential) { 
       destType = "business no dock";
     } else if (order.shipTo.residential) {
       destType = "residential";
