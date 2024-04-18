@@ -15,7 +15,9 @@ import { alias } from "drizzle-orm/pg-core";
 import { DrawerItems } from "flowbite-react";
 
 
-type EnrichedProduct = Awaited<ReturnType<typeof getEnrichedOrder>>;
+type EnrichedProduct = Awaited<ReturnType<typeof getEnrichedOrders>>;
+
+type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 
 
 async function getData(sku: string) { 
@@ -121,6 +123,8 @@ async function getEnrichedOrders(orderData: IOrderPaginationResult) {
   return enrichedOrders;
 }
 
+
+
 export async function bookFreight(orderData: IOrderPaginationResult, liftgate: boolean, limitedAccess: boolean) {
   try {
     if (!orderData || orderData.orders.length === 0) {
@@ -136,13 +140,18 @@ export async function bookFreight(orderData: IOrderPaginationResult, liftgate: b
   }
 };
 
+function mapToLTLItem(item: EnrichedItem ) {
+
+}
 
 async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boolean, limitedAccess: boolean) {
   const now = new Date();
   const todayDate  = date.format(now, 'YYYY-MM-DD');
   for (const order of enrichedOrders) { 
     let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
- 
+    let items: components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
+    order.enrichedItems.forEach(item => mapToLTLItem(item.additionalData));
+
   
     if (liftgate && !order.shipTo.resident) { 
       destType = "business no dock";
@@ -178,6 +187,17 @@ async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boole
       destPostalCode: order.shipTo.postalCode,
       destCountry: "USA",
       destType: destType,
+      destContactName: order.shipTo.name,
+      destContactPhone: order.shipTo.phone,
+      destContactEmail: order.customerEmail,
+      destReferenceNumber: order.orderNumber,
+      destDockHoursOpen: "09:00 AM",
+      destDockHoursClose: "04:00 PM",
+      billPostalCode: order.shipTo.postalCode,
+      billCountry: "USA",
+      items: [
+
+      ]
 
 
 
