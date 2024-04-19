@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.29.12",
+    "@clerk/nextjs": "^5.0.1",
     "@neondatabase/serverless": "^0.9.1",
     "date-and-time": "^3.1.1",
     "drizzle-orm": "^0.30.8",

@@ -13,12 +13,14 @@ import { eq } from 'drizzle-orm';
 import { Schema } from "zod";
 import { alias } from "drizzle-orm/pg-core";
 import { DrawerItems } from "flowbite-react";
-import { isMetamaskError } from "@clerk/nextjs";
+import { Component } from "react";
 
 
 type EnrichedProduct = Awaited<ReturnType<typeof getEnrichedOrders>>;
 
 type EnrichedItem = Awaited<ReturnType<typeof getData>>;
+type LTLItem = components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
+type FreightClass = components["schemas"]["FreightClass"]
 
 
 async function getData(sku: string) { 
@@ -134,20 +136,37 @@ export async function bookFreight(orderData: IOrderPaginationResult, liftgate: b
     }
 
       const enrichedOrders = await getEnrichedOrders(orderData);
-      const shipmentResult = await rateLtlShipment(enrichedOrders, liftgate, limitedAccess)
+      console.log(enrichedOrders);
+      // const shipmentResult = await rateLtlShipment(enrichedOrders, liftgate, limitedAccess)
     } catch (error) {
     console.log(error);
     return null;
   }
 };
 
-function mapToLTLItem(item: EnrichedItem ) {
-  return LTLItem = {
-    description: item.productName,
-    weight: 
-    nmfc: item.nmfc,
-    
-  }
+function validateFreightClass(freightClass: number | undefined): FreightClass {
+  if (freightClass?.includes(Number(freightClass))) {
+
+}
+
+function mapToLTLItem(items: EnrichedItem ): LTLItem {
+  let LTLitems: LTLItem;
+  items.forEach(item => {
+    LTLitems.forEach( ltlItem => {
+      ltlItem.description = item.product.name,
+      ltlItem.freightClass = validateFreightClass(item.freightClass.freightClass),
+
+
+    })
+  })
+const order: LTLItem = [{
+  description: 
+
+}]
+  
+ }
+  return item;
+   
 }
 
 async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boolean, limitedAccess: boolean) {
@@ -155,7 +174,7 @@ async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boole
   const todayDate  = date.format(now, 'YYYY-MM-DD');
   for (const order of enrichedOrders) { 
     let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
-    let items: components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
+   
     order.enrichedItems.forEach( item => mapToLTLItem(item.additionalData));
   
     if (liftgate && !order.shipTo.residential) { 
