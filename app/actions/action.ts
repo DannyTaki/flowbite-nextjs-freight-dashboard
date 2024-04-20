@@ -16,9 +16,9 @@ import { DrawerItems } from "flowbite-react";
 import { Component } from "react";
 
 
-type EnrichedProduct = Awaited<ReturnType<typeof getEnrichedOrders>>;
-
+type EnrichedOrder = Awaited<ReturnType<typeof getEnrichedOrder>>;
 type EnrichedItem = Awaited<ReturnType<typeof getData>>;
+type Dimensions = Awaited<ReturnType<typeof parseDimensions>>;
 type LTLItem = components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
 type FreightClass = components["schemas"]["FreightClass"]
 
@@ -98,32 +98,30 @@ export async function getOrder(
   }
 }
 
-async function getEnrichedOrders(orderData: IOrderPaginationResult) {
+async function getEnrichedOrder(orderData: IOrderPaginationResult) {
   // Prepare to accumulate all enriched order data
-  const enrichedOrders = [];
+  const order = orderData.orders[0];
 
-  for (const order of orderData.orders) {
-    console.log(`Processing order: ${order.orderId}`);
+
+  console.log(`Processing order: ${order.orderId}`);
     
-    // Array to hold enriched items for this order
-    const enrichedItems = [];
+  // Array to hold enriched items for this order
+  const enrichedItems = [];
 
-    for (const item of order.items) { 
-      const itemData = await getData(item.sku);
-      console.log(`Data for item ${item.sku} in order ${order.orderNumber}:`, itemData);
+  for (const item of order.items) { 
+    const itemData = await getData(item.sku);
+    console.log(`Data for item ${item.sku} in order ${order.orderNumber}:`, itemData);
 
-      enrichedItems.push({
-        ...item,
-        additionalData: itemData
-      })
-    }
-    const enrichedOrder = {
-      ...order, 
-      enrichedItems: enrichedItems
-    };
-    enrichedOrders.push(enrichedOrder);
+    enrichedItems.push({
+      ...item,
+      additionalData: itemData
+    })
   }
-  return enrichedOrders;
+  const enrichedOrder = {
+    ...order, 
+    enrichedItems: enrichedItems
+  };
+  return enrichedOrder;
 }
 
 
@@ -134,10 +132,14 @@ export async function bookFreight(orderData: IOrderPaginationResult, liftgate: b
       console.log("No orders found");
       return 'No orders available';
     }
+    if (orderData.orders.length > 1) {
+      console.log("Only one order can be processed at a time");
+      return 'Only one order can be processed at a time';
+    }
 
-      const enrichedOrders = await getEnrichedOrders(orderData);
-      console.log(enrichedOrders);
-      // const shipmentResult = await rateLtlShipment(enrichedOrders, liftgate, limitedAccess)
+      const enrichedOrder = await getEnrichedOrder(orderData);
+      console.log(enrichedOrder);
+      // const shipmentResult = await rateLtlShipment(EnrichedOrder, liftgate, limitedAccess)
     } catch (error) {
     console.log(error);
     return null;
@@ -145,47 +147,56 @@ export async function bookFreight(orderData: IOrderPaginationResult, liftgate: b
 };
 
 function validateFreightClass(freightClass: number | undefined): FreightClass {
-  if (freightClass?.includes(Number(freightClass))) {
+  const validClasses: number[] = [50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500];
+  if (freightClass !== undefined && validClasses.includes(freightClass)) {
+    return freightClass as FreightClass;
+  } else {
+    throw new Error('Invalid freight class');
+  }
+    
+    
 
-}
 
-function mapToLTLItem(items: EnrichedItem ): LTLItem {
+
+
+function mapToLTLItem(items: EnrichedItem, weight: number, dimensions: Dimensions): LTLItem {
   let LTLitems: LTLItem;
+  
   items.forEach(item => {
     LTLitems.forEach( ltlItem => {
       ltlItem.description = item.product.name,
-      ltlItem.freightClass = validateFreightClass(item.freightClass.freightClass),
-
+      ltlItem.weight = weight,
+      ltlItem.freightClass = validateFreightClass(parseInt(item.freightClass.freightClass, 10)),
+      ltlItem.length = dimensions.length,
+      ltlItem.width = dimensions.width,
+      ltlItem.height = dimensions.height, 
 
     })
   })
-const order: LTLItem = [{
-  description: 
-
-}]
-  
- }
-  return item;
-   
+  return items;
 }
+  
 
-async function rateLtlShipment(enrichedOrders: EnrichedProduct , liftgate: boolean, limitedAccess: boolean) {
+
+   
+
+
+async function rateLtlShipment(order: EnrichedOrder , liftgate: boolean, limitedAccess: boolean) {
   const now = new Date();
   const todayDate  = date.format(now, 'YYYY-MM-DD');
-  for (const order of enrichedOrders) { 
-    let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
-   
-    order.enrichedItems.forEach( item => mapToLTLItem(item.additionalData));
-  
-    if (liftgate && !order.shipTo.residential) { 
-      destType = "business no dock";
-    } else if (order.shipTo.residential) {
-      destType = "residential";
-    } else if (limitedAccess) {
-      destType = "limited access";
-    } else {
-      destType = "business dock";
-    }
+  const totalWeight = parseWeight(order) 
+  const dimensions = parseDimensions(order);
+  let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
+  order.enrichedItems.forEach( item => mapToLTLItem(item.additionalData, totalWeight, dimensions));
+  if (liftgate && !order.shipTo.residential) { 
+    destType = "business no dock";
+  } else if (order.shipTo.residential) {
+     destType = "residential";
+  } else if (limitedAccess) {
+    destType = "limited access";
+  } else {
+    destType = "business dock";
+  }
   return await client.POST("/rates", {
     body: {
       pickupDate: todayDate,
@@ -245,6 +256,26 @@ function parseWeight(order: IOrder): number {
       return parseFloat(weight.toFixed(2));
   } else {
       throw new Error('Invalid weight in internal notes');
+  }
+}
+
+
+function parseDimensions(order: EnrichedOrder): { length: number; width: number; height: number }{
+  const regex = /(\d+)x(\d+)x(\d+)/; // Pattern to match 'Length x Width x Height'
+  const match = order.internalNotes.match(regex);
+
+  if (match) {
+      const length = parseInt(match[1], 10);
+      const width = parseInt(match[2], 10);
+      const height = parseInt(match[3], 10);
+
+      return {
+          length: length,
+          width: width,
+          height: height,
+      };
+  } else {
+      throw new Error('Invalid dimensions in internal notes');
   }
 }
 
