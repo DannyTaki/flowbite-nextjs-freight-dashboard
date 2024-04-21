@@ -161,6 +161,9 @@ function validateFreightClass(freightClass: number | undefined): FreightClass {
 
 function mapToLTLItem(items: EnrichedItem, weight: number, dimensions: Dimensions): LTLItem {
   let LTLitems: LTLItem;
+
+  // How many shipments are there in the order? => check the internal notes parse qty
+  const numberOfShipments = parse
   
   items.forEach(item => {
     LTLitems.forEach( ltlItem => {
@@ -185,7 +188,7 @@ async function rateLtlShipment(order: EnrichedOrder , liftgate: boolean, limited
   const now = new Date();
   const todayDate  = date.format(now, 'YYYY-MM-DD');
   const totalWeight = parseWeight(order) 
-  const dimensions = parseDimensions(order);
+  const dimensions = parseDimensionsAndQty(order);
   let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
   order.enrichedItems.forEach( item => mapToLTLItem(item.additionalData, totalWeight, dimensions));
   if (liftgate && !order.shipTo.residential) { 
@@ -260,25 +263,26 @@ function parseWeight(order: IOrder): number {
 }
 
 
-function parseDimensions(order: EnrichedOrder): { length: number; width: number; height: number }{
-  const regex = /(\d+)x(\d+)x(\d+)/; // Pattern to match 'Length x Width x Height'
+function parseDimensionsAndQty(order: EnrichedOrder): { qty: number; length: number; width: number; height: number } {
+  const regex = /(\d+)@(\d+)x(\d+)x(\d+)/; // Pattern to match 'Qty@Length x Width x Height'
   const match = order.internalNotes.match(regex);
 
   if (match) {
-      const length = parseInt(match[1], 10);
-      const width = parseInt(match[2], 10);
-      const height = parseInt(match[3], 10);
+    const qty = parseInt(match[1], 10);
+    const length = parseInt(match[2], 10);
+    const width = parseInt(match[3], 10);
+    const height = parseInt(match[4], 10);
 
-      return {
-          length: length,
-          width: width,
-          height: height,
-      };
+    return {
+      qty: qty,
+      length: length,
+      width: width,
+      height: height,
+    };
   } else {
-      throw new Error('Invalid dimensions in internal notes');
+    throw new Error('Invalid dimensions and qty in internal notes');
   }
 }
-
 
 
 
