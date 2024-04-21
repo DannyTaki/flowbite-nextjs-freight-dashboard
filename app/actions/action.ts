@@ -18,7 +18,7 @@ import { Component } from "react";
 
 type EnrichedOrder = Awaited<ReturnType<typeof getEnrichedOrder>>;
 type EnrichedItem = Awaited<ReturnType<typeof getData>>;
-type Dimensions = Awaited<ReturnType<typeof parseDimensions>>;
+type Dimensions = Awaited<ReturnType<typeof parseDimensionsAndQty>>;
 type LTLItem = components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
 type FreightClass = components["schemas"]["FreightClass"]
 
@@ -159,11 +159,11 @@ function validateFreightClass(freightClass: number | undefined): FreightClass {
 
 
 
-function mapToLTLItem(items: EnrichedItem, weight: number, dimensions: Dimensions): LTLItem {
+function getItems(items: EnrichedOrder, weight: number, dimensions: Dimensions): LTLItem {
   let LTLitems: LTLItem;
 
   // How many shipments are there in the order? => check the internal notes parse qty
-  const numberOfShipments = parse
+ 
   
   items.forEach(item => {
     LTLitems.forEach( ltlItem => {
@@ -187,10 +187,10 @@ function mapToLTLItem(items: EnrichedItem, weight: number, dimensions: Dimension
 async function rateLtlShipment(order: EnrichedOrder , liftgate: boolean, limitedAccess: boolean) {
   const now = new Date();
   const todayDate  = date.format(now, 'YYYY-MM-DD');
-  const totalWeight = parseWeight(order) 
+  const weight = parseWeight(order) 
   const dimensions = parseDimensionsAndQty(order);
   let destType: "business dock" | "business no dock" | "residential" | "limited access" | "trade show" | "construction" | "farm" | "military" | "airport" | "place of worship" | "school" | "mine" | "pier" | undefined;
-  order.enrichedItems.forEach( item => mapToLTLItem(item.additionalData, totalWeight, dimensions));
+  const items: LTLItem = getItems(order, weight, dimensions);
   if (liftgate && !order.shipTo.residential) { 
     destType = "business no dock";
   } else if (order.shipTo.residential) {
