@@ -1,6 +1,5 @@
 "use server";
 
-
 import type { components, paths } from "@/types/book-freight/schema";
 import { optsSchema } from "@/types/optsSchema";
 import date from "date-and-time";
@@ -17,26 +16,19 @@ import { getPackingGroup } from "@/helpers/getPackingGroup";
 import { getEnrichedOrder, EnrichedOrder } from "@/helpers/EnrichedOrder";
 import { Dimensions, parseDimensionsAndQty  } from "@/helpers/parse-dims";
 import { parseWeight } from "@/helpers/parse-weight";
+import { getHazard, Hazard } from "@/helpers/getHazard";
+import type { 
+  LTLItem,
+  FreightClass,
+  PackagingType,
+  SaidToContainOptions,
+  LTLPackagingType,
+  ErrorResult
+} from "@/types/book-freight/action-types";
 
 
-type LTLItem = components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
-type FreightClass = components["schemas"]["FreightClass"];
-type PackagingType = components["schemas"]["LTLPackagingType"];
-type Hazard = components["schemas"]["HazardousMaterial"];
 
 
-
-
-
-const client = createClient<paths>({
-  baseUrl: process.env.SANDBOX_FREIGHTVIEW_BASE_URL,
-});
-
-interface ErrorResult {
-  error: {
-    message: string;
-  };
-}
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,
@@ -47,6 +39,11 @@ const shipStation = new Shipstation({
   apiKey: credentials.key,
   apiSecret: credentials.secret,
 });
+
+const client = createClient<paths>({
+  baseUrl: process.env.SANDBOX_FREIGHTVIEW_BASE_URL,
+});
+
 
 export async function getOrder(
   opts: unknown,
@@ -102,37 +99,38 @@ export async function bookFreight(
 }
 
 
-// function getItems(
-//   items: EnrichedOrder,
-//   weight: number,
-//   dimensions: Dimensions,
-// ): LTLItem {
-//   let LTLitems: LTLItem;
+function getItems(
+  items: EnrichedOrder,
+  weight: number,
+  dimensions: Dimensions,
+): LTLItem {
+  let LTLitems: LTLItem;
 
-//   for (let i = 0; i < dimensions.qty; i++) {
-//     LTLitems.push({
-//       description: items.product.name,
-//       weight: weight,
-//       freightClass: validateFreightClass(
-//         parseInt(items.freightClass.freightClass, 10),
-//       ),
-//       length: dimensions.length,
-//       width: dimensions.width,
-//       height: dimensions.height,
-//       package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
-//       pieces: 1,
-//       nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?,
-//       hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?,
-//       hazard: getHazard() as Hazard,
-
-
-
-//     });
-//   }
+  for (let i = 0; i < dimensions.qty; i++) {
+    LTLitems.push({
+      description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
+      weight: weight,
+      freightClass: validateFreightClass(
+        parseInt(items.enrichedItems[i].additionalData[i].freightClass.freightClass, 10),
+      ),
+      length: dimensions.length,
+      width: dimensions.width,
+      height: dimensions.height,
+      package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
+      pieces: 1,
+      nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined, 
+      hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?? undefined,
+      hazard: getHazard(items) as Hazard,
+      saidToContain: items.enrichedItems[i].additionalData[i].product.unitContainerType as SaidToContainOptions,
 
 
-//   return items;
-// }
+
+    });
+  }
+
+
+  return items;
+}
 
 //   async function rateLtlShipment(
 //     order: EnrichedOrder,

@@ -4,7 +4,7 @@ import { getPackingGroup, PackingGroup } from "@/helpers/getPackingGroup";
 
 export type Hazard = components["schemas"]["HazardousMaterial"];
 
-function getHazard(items: EnrichedOrder): Hazard | undefined {
+export function getHazard(items: EnrichedOrder): Hazard | undefined {
     const packingGroup = items.enrichedItems[0].additionalData[0].freightClass.packingGroup
     if (items.enrichedItems[0].additionalData[0].freightClass.hazardId)
       {
