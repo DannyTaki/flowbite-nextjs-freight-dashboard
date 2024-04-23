@@ -213,7 +213,8 @@ function validateFreightClass(freightClass: number | undefined): FreightClass {
         pieces: 1,
         nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc?,
         hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous?,
-        hazard: getHazard(),
+        hazard: getHazard() as Hazard,
+        
 
 
       });
