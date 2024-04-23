@@ -1,13 +1,13 @@
 "use server";
 
-import * as schema from "@/app/db/drizzle/schema";
+
 import type { components, paths } from "@/types/book-freight/schema";
 import { optsSchema } from "@/types/optsSchema";
-import { neon } from "@neondatabase/serverless";
+
 import date from "date-and-time";
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/neon-http";
-import { alias } from "drizzle-orm/pg-core";
+
+
+import { getData, EnrichedItem } from "@/helpers/getData";
 import { DevBundlerService } from "next/dist/server/lib/dev-bundler-service";
 import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
@@ -15,9 +15,8 @@ import type {
   IOrder,
   IOrderPaginationResult,
 } from "shipstation-node/typings/models";
+import { validateFreightClass } from "@/helpers/validateFreight";
 
-type EnrichedOrder = Awaited<ReturnType<typeof getEnrichedOrder>>;
-type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 type Dimensions = Awaited<ReturnType<typeof parseDimensionsAndQty>>;
 type LTLItem = components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
 type FreightClass = components["schemas"]["FreightClass"];
@@ -26,34 +25,7 @@ type Hazard = components["schemas"]["HazardousMaterial"];
 type PackingGroup = components["schemas"]["HazardousMaterial"]["packingGroup"];
 
 
-async function getData(sku: string) {
-  const hardCodedSku = "M1G-9XQ-Q4C";
-  console.log("Getting data: " + hardCodedSku);
-  const sql = neon(process.env.DATABASE_URL!);
-  const db = drizzle(sql, { schema });
 
-  const freightLinks = alias(schema.productFreightLinks, "freightLinks");
-  const freightClass = alias(schema.freightClassifications, "freightClass");
-  const product = await db
-    .select({
-      product: schema.products,
-      freightClassifications: freightLinks,
-      freightClass: freightClass,
-    })
-    .from(schema.products)
-    .innerJoin(
-      freightLinks,
-      eq(schema.products.productId, freightLinks.productId),
-    )
-    .innerJoin(
-      freightClass,
-      eq(freightLinks.classificationId, freightClass.classificationId),
-    )
-    .where(eq(schema.products.sku, hardCodedSku))
-    .execute();
-  console.log(product);
-  return product;
-}
 
 const client = createClient<paths>({
   baseUrl: process.env.SANDBOX_FREIGHTVIEW_BASE_URL,
@@ -168,61 +140,39 @@ function getPackingGroup(packingGroup: string | null): PackingGroup | null {
 }
 
 
-function getHazard(items: EnrichedOrder): Hazard | undefined {
-  const packingGroup = items.enrichedItems[0].additionalData[0].freightClass.packingGroup
-  if (items.enrichedItems[0].additionalData[0].freightClass.hazardId)
-    {
-    return { 
-      hazmatId: items.enrichedItems[0].additionalData[0].freightClass.hazardId,
-      packingGroup: getPackingGroup(packingGroup) as PackingGroup,
-    }
-  } else {
-    return undefined;
+
+
+function getItems(
+  items: EnrichedOrder,
+  weight: number,
+  dimensions: Dimensions,
+): LTLItem {
+  let LTLitems: LTLItem;
+
+  for (let i = 0; i < dimensions.qty; i++) {
+    LTLitems.push({
+      description: items.product.name,
+      weight: weight,
+      freightClass: validateFreightClass(
+        parseInt(items.freightClass.freightClass, 10),
+      ),
+      length: dimensions.length,
+      width: dimensions.width,
+      height: dimensions.height,
+      package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
+      pieces: 1,
+      nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?,
+      hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?,
+      hazard: getHazard() as Hazard,
+
+
+
+    });
   }
+
+
+  return items;
 }
-
-export function validateFreightClass(freightClass: number | undefined): FreightClass {
-  const validClasses: number[] = [
-    50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300,
-    400, 500,
-  ];
-  if (freightClass !== undefined && validClasses.includes(freightClass)) {
-    return freightClass as FreightClass;
-  } else {
-    throw new Error("Invalid freight class");
-  }
-
-  function getItems(
-    items: EnrichedOrder,
-    weight: number,
-    dimensions: Dimensions,
-  ): LTLItem {
-    let LTLitems: LTLItem;
-
-    for (let i = 0; i < dimensions.qty; i++) {
-      LTLitems.push({
-        description: items.product.name,
-        weight: weight,
-        freightClass: validateFreightClass(
-          parseInt(items.freightClass.freightClass, 10),
-        ),
-        length: dimensions.length,
-        width: dimensions.width,
-        height: dimensions.height,
-        package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
-        pieces: 1,
-        nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc?,
-        hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous?,
-        hazard: getHazard() as Hazard,
-        
-
-
-      });
-    }
-
-
-    return items;
-  }
 
   async function rateLtlShipment(
     order: EnrichedOrder,
