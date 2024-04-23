@@ -1,0 +1,149 @@
+{
+    "orders": [
+        {
+            "orderId": 337559555,
+            "orderNumber": "A13601",
+            "orderKey": "103279",
+            "orderDate": "2024-04-23T06:46:00.0000000",
+            "createDate": "2024-04-23T07:26:16.8300000",
+            "modifyDate": "2024-04-23T10:51:41.5370000",
+            "paymentDate": "2024-04-23T06:46:00.0000000",
+            "shipByDate": null,
+            "orderStatus": "awaiting_shipment",
+            "customerId": 143003926,
+            "customerUsername": "tertel@aeroflexusa.com",
+            "customerEmail": "tertel@aeroflexusa.com",
+            "billTo": {
+                "name": "TONYA ERTEL",
+                "company": "Aeroflex USA Inc.",
+                "street1": null,
+                "street2": null,
+                "street3": null,
+                "city": null,
+                "state": null,
+                "postalCode": null,
+                "country": null,
+                "phone": "4238369572",
+                "residential": null,
+                "addressVerified": null
+            },
+            "shipTo": {
+                "name": "TONYA ERTEL",
+                "company": "AEROFLEX USA INC.",
+                "street1": "1102 N MAIN ST",
+                "street2": "",
+                "street3": null,
+                "city": "SWEETWATER",
+                "state": "TN",
+                "postalCode": "37874-1805",
+                "country": "US",
+                "phone": "4238369572",
+                "residential": false,
+                "addressVerified": "Address validated successfully"
+            },
+            "items": [
+                {
+                    "orderItemId": 1202165750491,
+                    "lineItemKey": "15268",
+                    "sku": "DH-ICRJ-A2G1",
+                    "name": "Toluene - 55 Gallon Drum",
+                    "imageUrl": "https://alliancechemical.com/app/uploads/2022/12/toluene-55-gallon-1-100x100.jpg",
+                    "weight": {
+                        "value": 0,
+                        "units": "ounces",
+                        "WeightUnits": 1
+                    },
+                    "quantity": 1,
+                    "unitPrice": 950,
+                    "taxAmount": null,
+                    "shippingAmount": null,
+                    "warehouseLocation": null,
+                    "options": [
+                        {
+                            "name": "Size",
+                            "value": "55 Gallon"
+                        },
+                        {
+                            "name": "Packaging type",
+                            "value": "Drum"
+                        }
+                    ],
+                    "productId": 10464369,
+                    "fulfillmentSku": null,
+                    "adjustment": false,
+                    "upc": null,
+                    "createDate": "2024-04-23T07:26:16.533",
+                    "modifyDate": "2024-04-23T07:26:16.533"
+                }
+            ],
+            "orderTotal": 950,
+            "amountPaid": 950,
+            "taxAmount": 0,
+            "shippingAmount": 0,
+            "customerNotes": "",
+            "internalNotes": "40x48x40\n470 LBS\nWayne\n\nSoutheastern Freight Line PRO \n\n",
+            "gift": false,
+            "giftMessage": null,
+            "paymentMethod": "helcimjs",
+            "requestedShippingService": "Free shipping",
+            "carrierCode": "ups",
+            "serviceCode": "ups_ground",
+            "packageCode": "package",
+            "confirmation": "none",
+            "shipDate": null,
+            "holdUntilDate": null,
+            "weight": {
+                "value": 0,
+                "units": "ounces",
+                "WeightUnits": 1
+            },
+            "dimensions": {
+                "units": "inches",
+                "length": 11.5,
+                "width": 7,
+                "height": 5
+            },
+            "insuranceOptions": {
+                "provider": null,
+                "insureShipment": false,
+                "insuredValue": 0
+            },
+            "internationalOptions": {
+                "contents": null,
+                "customsItems": null,
+                "nonDelivery": null
+            },
+            "advancedOptions": {
+                "warehouseId": 127362,
+                "nonMachinable": false,
+                "saturdayDelivery": false,
+                "containsAlcohol": false,
+                "mergedOrSplit": false,
+                "mergedIds": [],
+                "parentId": null,
+                "storeId": 112096,
+                "customField1": "Drum",
+                "customField2": null,
+                "customField3": null,
+                "source": null,
+                "billToParty": "my_other_account",
+                "billToAccount": null,
+                "billToPostalCode": null,
+                "billToCountryCode": null,
+                "billToMyOtherAccount": 93044
+            },
+            "tagIds": [
+                44123
+            ],
+            "userId": "e4480229-77f2-4c9b-808b-29923e742556",
+            "externallyFulfilled": false,
+            "externallyFulfilledBy": null,
+            "externallyFulfilledById": null,
+            "externallyFulfilledByName": null,
+            "labelMessages": null
+        }
+    ],
+    "total": 1,
+    "page": 1,
+    "pages": 1
+}

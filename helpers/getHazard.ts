@@ -1,6 +1,8 @@
 import type { components, paths } from "@/types/book-freight/schema";
+import type { EnrichedOrder } from "@/helpers/EnrichedOrder";
+import { getPackingGroup, PackingGroup } from "@/helpers/getPackingGroup";
 
-type Hazard = components["schemas"]["HazardousMaterial"];
+export type Hazard = components["schemas"]["HazardousMaterial"];
 
 function getHazard(items: EnrichedOrder): Hazard | undefined {
     const packingGroup = items.enrichedItems[0].additionalData[0].freightClass.packingGroup

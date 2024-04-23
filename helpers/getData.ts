@@ -8,7 +8,7 @@ export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 
 export async function getData(sku: string) {
     const hardCodedSku = "M1G-9XQ-Q4C";
-    console.log("Getting data: " + hardCodedSku);
+    console.log("Getting data: " + sku);
     const sql = neon(process.env.DATABASE_URL!);
     const db = drizzle(sql, { schema });
   
@@ -29,7 +29,7 @@ export async function getData(sku: string) {
         freightClass,
         eq(freightLinks.classificationId, freightClass.classificationId),
       )
-      .where(eq(schema.products.sku, hardCodedSku))
+      .where(eq(schema.products.sku, sku))
       .execute();
     console.log(product);
     return product;

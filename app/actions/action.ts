@@ -3,10 +3,7 @@
 
 import type { components, paths } from "@/types/book-freight/schema";
 import { optsSchema } from "@/types/optsSchema";
-
 import date from "date-and-time";
-
-
 import { getData, EnrichedItem } from "@/helpers/getData";
 import { DevBundlerService } from "next/dist/server/lib/dev-bundler-service";
 import createClient from "openapi-fetch";
@@ -16,13 +13,17 @@ import type {
   IOrderPaginationResult,
 } from "shipstation-node/typings/models";
 import { validateFreightClass } from "@/helpers/validateFreight";
+import { getPackingGroup } from "@/helpers/getPackingGroup";
+import { getEnrichedOrder, EnrichedOrder } from "@/helpers/EnrichedOrder";
+import { Dimensions, parseDimensionsAndQty  } from "@/helpers/parse-dims";
+import { parseWeight } from "@/helpers/parse-weight";
 
-type Dimensions = Awaited<ReturnType<typeof parseDimensionsAndQty>>;
+
 type LTLItem = components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
 type FreightClass = components["schemas"]["FreightClass"];
 type PackagingType = components["schemas"]["LTLPackagingType"];
 type Hazard = components["schemas"]["HazardousMaterial"];
-type PackingGroup = components["schemas"]["HazardousMaterial"]["packingGroup"];
+
 
 
 
@@ -74,33 +75,7 @@ export async function getOrder(
   }
 }
 
-async function getEnrichedOrder(orderData: IOrderPaginationResult) {
-  // Prepare to accumulate all enriched order data
-  const order = orderData.orders[0];
 
-  console.log(`Processing order: ${order.orderId}`);
-
-  // Array to hold enriched items for this order
-  const enrichedItems = [];
-
-  for (const item of order.items) {
-    const itemData = await getData(item.sku);
-    console.log(
-      `Data for item ${item.sku} in order ${order.orderNumber}:`,
-      itemData,
-    );
-
-    enrichedItems.push({
-      ...item,
-      additionalData: itemData,
-    });
-  }
-  const enrichedOrder = {
-    ...order,
-    enrichedItems: enrichedItems,
-  };
-  return enrichedOrder;
-}
 
 export async function bookFreight(
   orderData: IOrderPaginationResult,
@@ -126,165 +101,116 @@ export async function bookFreight(
   }
 }
 
-function getPackingGroup(packingGroup: string | null): PackingGroup | null {
-  if (packingGroup) {
-    const packingOptions: string[] = ["I-Great Danger", "II-Medium Danger", "III-Minor Danger"];
-    const index: number = parseInt(packingGroup) - 1;
-    if (index >= 0 && index < packingOptions.length) {
-      return packingOptions[index] as PackingGroup;
-    }
-    return null; // Return null if the input is not 1, 2, or 3
-  } else {
-    return null;
-  }
-}
+
+// function getItems(
+//   items: EnrichedOrder,
+//   weight: number,
+//   dimensions: Dimensions,
+// ): LTLItem {
+//   let LTLitems: LTLItem;
+
+//   for (let i = 0; i < dimensions.qty; i++) {
+//     LTLitems.push({
+//       description: items.product.name,
+//       weight: weight,
+//       freightClass: validateFreightClass(
+//         parseInt(items.freightClass.freightClass, 10),
+//       ),
+//       length: dimensions.length,
+//       width: dimensions.width,
+//       height: dimensions.height,
+//       package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
+//       pieces: 1,
+//       nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?,
+//       hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?,
+//       hazard: getHazard() as Hazard,
 
 
 
-
-function getItems(
-  items: EnrichedOrder,
-  weight: number,
-  dimensions: Dimensions,
-): LTLItem {
-  let LTLitems: LTLItem;
-
-  for (let i = 0; i < dimensions.qty; i++) {
-    LTLitems.push({
-      description: items.product.name,
-      weight: weight,
-      freightClass: validateFreightClass(
-        parseInt(items.freightClass.freightClass, 10),
-      ),
-      length: dimensions.length,
-      width: dimensions.width,
-      height: dimensions.height,
-      package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
-      pieces: 1,
-      nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?,
-      hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?,
-      hazard: getHazard() as Hazard,
+//     });
+//   }
 
 
+//   return items;
+// }
 
-    });
-  }
+//   async function rateLtlShipment(
+//     order: EnrichedOrder,
+//     liftgate: boolean,
+//     limitedAccess: boolean,
+//   ) {
+//     const now = new Date();
+//     const todayDate = date.format(now, "YYYY-MM-DD");
+//     const weight = parseWeight(order);
+//     const dimensions = parseDimensionsAndQty(order);
+//     let destType:
+//       | "business dock"
+//       | "business no dock"
+//       | "residential"
+//       | "limited access"
+//       | "trade show"
+//       | "construction"
+//       | "farm"
+//       | "military"
+//       | "airport"
+//       | "place of worship"
+//       | "school"
+//       | "mine"
+//       | "pier"
+//       | undefined;
+//     const items: LTLItem = getItems(order, weight, dimensions);
+//     if (liftgate && !order.shipTo.residential) {
+//       destType = "business no dock";
+//     } else if (order.shipTo.residential) {
+//       destType = "residential";
+//     } else if (limitedAccess) {
+//       destType = "limited access";
+//     } else {
+//       destType = "business dock";
+//     }
+//     return await client.POST("/rates", {
+//       body: {
+//         pickupDate: todayDate,
+//         charges: liftgate ? ["liftgate delivery"] : undefined,
+//         originCompany: "Alliance Chemical",
+//         originAddress: "204 South Edmond Street",
+//         originCity: "Taylor",
+//         originState: "TX",
+//         originPostalCode: "76574",
+//         originCountry: "USA",
+//         originType: "business dock",
+//         originContactName: "Adnan Heikal",
+//         originContactPhone: "512-365-6838",
+//         originContactEmail: "adnan.heikal@alliancechemical.com",
+//         originReferenceNumber: order.orderNumber,
+//         originDockHoursOpen: "09:00 AM",
+//         originDockHoursClose: "04:00 PM",
+//         destCompany: order.shipTo.company ? order.shipTo.company : undefined,
+//         destAddress: order.shipTo.street1,
+//         destAddress2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
+//         destCity: order.shipTo.city,
+//         destState: order.shipTo.state,
+//         destPostalCode: order.shipTo.postalCode,
+//         destCountry: "USA",
+//         destType: destType,
+//         destContactName: order.shipTo.name,
+//         destContactPhone: order.shipTo.phone,
+//         destContactEmail: order.customerEmail,
+//         destReferenceNumber: order.orderNumber,
+//         destDockHoursOpen: "09:00 AM",
+//         destDockHoursClose: "04:00 PM",
+//         billPostalCode: order.shipTo.postalCode,
+//         billCountry: "USA",
+//         items: [],
+//       },
+//     });
+//   }
+
+//   return;
+// }
 
 
-  return items;
-}
 
-  async function rateLtlShipment(
-    order: EnrichedOrder,
-    liftgate: boolean,
-    limitedAccess: boolean,
-  ) {
-    const now = new Date();
-    const todayDate = date.format(now, "YYYY-MM-DD");
-    const weight = parseWeight(order);
-    const dimensions = parseDimensionsAndQty(order);
-    let destType:
-      | "business dock"
-      | "business no dock"
-      | "residential"
-      | "limited access"
-      | "trade show"
-      | "construction"
-      | "farm"
-      | "military"
-      | "airport"
-      | "place of worship"
-      | "school"
-      | "mine"
-      | "pier"
-      | undefined;
-    const items: LTLItem = getItems(order, weight, dimensions);
-    if (liftgate && !order.shipTo.residential) {
-      destType = "business no dock";
-    } else if (order.shipTo.residential) {
-      destType = "residential";
-    } else if (limitedAccess) {
-      destType = "limited access";
-    } else {
-      destType = "business dock";
-    }
-    return await client.POST("/rates", {
-      body: {
-        pickupDate: todayDate,
-        charges: liftgate ? ["liftgate delivery"] : undefined,
-        originCompany: "Alliance Chemical",
-        originAddress: "204 South Edmond Street",
-        originCity: "Taylor",
-        originState: "TX",
-        originPostalCode: "76574",
-        originCountry: "USA",
-        originType: "business dock",
-        originContactName: "Adnan Heikal",
-        originContactPhone: "512-365-6838",
-        originContactEmail: "adnan.heikal@alliancechemical.com",
-        originReferenceNumber: order.orderNumber,
-        originDockHoursOpen: "09:00 AM",
-        originDockHoursClose: "04:00 PM",
-        destCompany: order.shipTo.company ? order.shipTo.company : undefined,
-        destAddress: order.shipTo.street1,
-        destAddress2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
-        destCity: order.shipTo.city,
-        destState: order.shipTo.state,
-        destPostalCode: order.shipTo.postalCode,
-        destCountry: "USA",
-        destType: destType,
-        destContactName: order.shipTo.name,
-        destContactPhone: order.shipTo.phone,
-        destContactEmail: order.customerEmail,
-        destReferenceNumber: order.orderNumber,
-        destDockHoursOpen: "09:00 AM",
-        destDockHoursClose: "04:00 PM",
-        billPostalCode: order.shipTo.postalCode,
-        billCountry: "USA",
-        items: [],
-      },
-    });
-  }
-
-  return;
-}
-
-function parseWeight(order: IOrder): number {
-  const weightRegex = /(\d+)\s*(LBS|pound|pounds)/i;
-  const match = order.internalNotes.match(weightRegex);
-  if (match && match[1]) {
-    const weight = parseFloat(match[1]);
-    return parseFloat(weight.toFixed(2));
-  } else {
-    throw new Error("Invalid weight in internal notes");
-  }
-}
-
-function parseDimensionsAndQty(order: EnrichedOrder): {
-  qty: number;
-  length: number;
-  width: number;
-  height: number;
-} {
-  const regex = /(\d+)@(\d+)x(\d+)x(\d+)/; // Pattern to match 'Qty@Length x Width x Height'
-  const match = order.internalNotes.match(regex);
-
-  if (match) {
-    const qty = parseInt(match[1], 10);
-    const length = parseInt(match[2], 10);
-    const width = parseInt(match[3], 10);
-    const height = parseInt(match[4], 10);
-
-    return {
-      qty: qty,
-      length: length,
-      width: width,
-      height: height,
-    };
-  } else {
-    throw new Error("Invalid dimensions and qty in internal notes");
-  }
-}
 
 /* V2 API Oauth token generation */
 
