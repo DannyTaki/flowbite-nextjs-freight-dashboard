@@ -8,6 +8,7 @@ import date from "date-and-time";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
+import { DevBundlerService } from "next/dist/server/lib/dev-bundler-service";
 import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type {
@@ -22,6 +23,8 @@ type LTLItem = components["schemas"]["Rates.LTL.RateToBookRequest"]["items"];
 type FreightClass = components["schemas"]["FreightClass"];
 type PackagingType = components["schemas"]["LTLPackagingType"];
 type Hazard = components["schemas"]["HazardousMaterial"];
+type PackingGroup = components["schemas"]["HazardousMaterial"]["packingGroup"];
+
 
 async function getData(sku: string) {
   const hardCodedSku = "M1G-9XQ-Q4C";
@@ -151,8 +154,31 @@ export async function bookFreight(
   }
 }
 
-function getHazard(items: EnrichedOrder): Hazard {
+function getPackingGroup(packingGroup: string | null): PackingGroup | null {
+  if (packingGroup) {
+    const packingOptions: string[] = ["I-Great Danger", "II-Medium Danger", "III-Minor Danger"];
+    const index: number = parseInt(packingGroup) - 1;
+    if (index >= 0 && index < packingOptions.length) {
+      return packingOptions[index] as PackingGroup;
+    }
+    return null; // Return null if the input is not 1, 2, or 3
+  } else {
+    return null;
+  }
+}
 
+
+function getHazard(items: EnrichedOrder): Hazard | undefined {
+  const packingGroup = items.enrichedItems[0].additionalData[0].freightClass.packingGroup
+  if (items.enrichedItems[0].additionalData[0].freightClass.hazardId)
+    {
+    return { 
+      hazmatId: items.enrichedItems[0].additionalData[0].freightClass.hazardId,
+      packingGroup: getPackingGroup(packingGroup) as PackingGroup,
+    }
+  } else {
+    return undefined;
+  }
 }
 
 function validateFreightClass(freightClass: number | undefined): FreightClass {
