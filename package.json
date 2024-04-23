@@ -12,7 +12,9 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "generate": "drizzle-kit generate:pg",
-    "introspect": "drizzle-kit introspect:pg"
+    "introspect": "drizzle-kit introspect:pg",
+    "test": "vitest",
+    "ui": "vitest --ui"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.0.1",
@@ -36,11 +38,14 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.4",
+    "@testing-library/react": "^15.0.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/ui": "^1.5.0",
     "autoprefixer": "^10",
     "cz-conventional-changelog": "^3.3.0",
     "drizzle-kit": "^0.20.14",
@@ -51,12 +56,14 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-tailwindcss": "^3.15.1",
+    "jsdom": "^24.0.0",
     "openapi-typescript": "^7.0.0-next.8",
     "postcss": "^8",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.0"
   }
 }

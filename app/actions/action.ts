@@ -181,7 +181,7 @@ function getHazard(items: EnrichedOrder): Hazard | undefined {
   }
 }
 
-function validateFreightClass(freightClass: number | undefined): FreightClass {
+export function validateFreightClass(freightClass: number | undefined): FreightClass {
   const validClasses: number[] = [
     50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300,
     400, 500,
