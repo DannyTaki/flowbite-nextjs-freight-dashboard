@@ -1,0 +1,255 @@
+classification_id,description,mode,package,declared_value,weight,height,length,width,stackable,pieces,nmfc,freight_class,hazardous,hazard,said_to_contain,said_to_contain_packaging_type,non_standard
+241," Lubricating Oil, NOI, in drums",ltl,,,,,,,f,,145000-2,65,f,,0,,f
+242," Lubricating Oil, NOI, in metal cans in crates",ltl,,,,,,,f,,145000-1,85,f,,0,,f
+243,ACETONE (FLAMMABLE LIQUID),ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+244,"AMMONIUM HYDROXIDE 29% ACS, REAGENT GRADE",ltl,,,,,,,f,,45615-5,70,f,,1,,f
+245,"Adhesives, NOI, other than combustible, density 20 pcf or greater",ltl,,,,,,,f,,4620-6,60,f,,0,,f
+246,"Ammonia solution, relative density between 0.880 and 0.957 at 15 degrees C in water, with more than 10 percent but not more than 35 percent ammonia, 8, PGIII",ltl,,,,,,,f,,44155-03,70,f,,,,f
+247,"BATTERY WATER, NON-DOT REGULATED",ltl,,,,,,,f,,59380-1,55,f,,180,,f
+248,Battery Fluid Acid,ltl,,,,,,,f,,44155-2,85,f,,8,,f
+249,"Battery Fluid Acid, (Sulfuric Acid)",ltl,,,,,,,f,,44155-2,85,f,,100,,f
+250,"Boric Acid in inner containers in boxes, or bags, or drums",ltl,,,,,,,f,,43540-2,70,f,,0,,f
+251,"Bottles, Carboys or Jars, NOI, density 6 but less than 8 pcf",ltl,,,,,,,f,,87700-5,125,f,,,,f
+252,"Bottles, Carboys or Jars, empty, NOI, other than cut, density 15 but less than 22.5 pcf",ltl,,,,,,,f,,87700-9,70,f,,0,,f
+253,"Bottles, in cardboard pkging, density 12 but less than 15 pcf",ltl,,,,,,,f,,87700-8,85,f,,,,f
+254,"Boxes, cartons, empty, NOI, density 1 but less than 2 pcf",ltl,,,,,,,f,,29785-2,300,f,,0,,f
+255,"Boxes, cartons, empty, NOI, density 10 but less than 12 pcf",ltl,,,,,,,f,,29785-7,92.5,f,,0,,f
+256,"Boxes, cartons, empty, NOI, density 10 but less than 12 pcf",ltl,,,,,,,f,,29785-7,85,f,,1,,f
+257,"Boxes, cartons, empty, NOI, density 12 but less than 15 pcf",ltl,,,,,,,f,,29785-8,85,f,,0,,f
+258,"Boxes, cartons, empty, NOI, density 15 but less than 22.5 pcf",ltl,,,,,,,f,,29785-9,70,f,,0,,f
+259,"Boxes, cartons, empty, NOI, density 2 but less than 4 pcf",ltl,,,,,,,f,,29785-3,250,f,,0,,f
+260,"Boxes, cartons, empty, NOI, density 22.5 but less than 30 pcf",ltl,,,,,,,f,,29785-10,65,f,,0,,f
+261,"Boxes, cartons, empty, NOI, density 30 pcf or greater",ltl,,,,,,,f,,29785-11,60,f,,0,,f
+262,"Boxes, cartons, empty, NOI, density 4 but less than 5 pcf",ltl,,,,,,,f,,29785-4,175,f,,0,,f
+263,"Boxes, cartons, empty, NOI, density 6 but less than 8 pcf",ltl,,,,,,,f,,29785-5,125,f,,0,,f
+264,"Boxes, cartons, empty, NOI, density 8 but less than 10 pcf",ltl,,,,,,,f,,29785-6,100,f,,0,,f
+265,"Boxes, cartons, empty, NOI, density less than 1 pcf",ltl,,,,,,,f,,29785-1,400,f,,0,,f
+266,"Cadmium Compounds, N.O.S.,",ltl,,,,,,,f,,43940,85,f,,3,,f
+267,"Calcium Chloride, other than liquid, in bags",ltl,,,,,,,f,,43730-1,60,f,,0,,f
+268,"Carbonate, Monohydrate, in bags, or in bulin in boxes or drums",ltl,,,,,,,f,,46220-2,55,f,,0,,f
+269,Chromium Trioxide Technical Grade,ltl,,,,,,,f,,43940-2,85,f,,48,,f
+270,"Chromium Trioxide, Anhydrous",ltl,,,,,,,f,,43940-2,85,f,,64,,f
+271,"Citric Acid Monohydrate, in inner containers in boxes or drums",ltl,,,,,,,f,,46220-1,60,f,,0,,f
+272,"Corrosive (Non-Combustible), Ammonium Hydroxide 29% ACS, Reagent Grade",ltl,,,,,,,f,,44155-3,70,f,,1,,f
+273,"Corrosive (Non-Combustible), Ammonium Hydroxide 29% Technical Grade",ltl,,,,,,,f,,44155-3,70,f,,1,,f
+274,"Corrosive Material, NOI, HYDROCHLORIC ACID",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+275,"Corrosive Material, NOI, HYDROCHLORIC ACID 15 Gallon",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+276,"Corrosive Material, NOI, HYDROCHLORIC ACID 20 Be",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+277,"Corrosive Material, NOI, HYDROCHLORIC ACID 31% 15 Gallon",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+278,"Corrosive Material, NOI, Nitric Acid",ltl,,,,,,,f,,43940-2,85,f,,,,f
+279,"Corrosive Material, NOI, Phosphoric Acid",ltl,,,,,,,f,,44155-3,70,f,,1,,f
+280,"Corrosive Material, NOI, Phosphoric Acid Solution 85%",ltl,,,,,,,f,,44155-3,70,f,,1,,f
+281,"Corrosive Material, NOI, Phosphoric Acid Solution 85% Technical Grade",ltl,,,,,,,f,,44155-3,70,f,,8,,f
+282,"Corrosive Material, NOI, Phosphoric Acid Solution 85%- Technical Grade",ltl,,,,,,,f,,44155-3,70,f,,1,,f
+283,"Corrosive Material, NOI, Sodium Bisulfite 40% NSF Grade, n.o.s.,",ltl,,,,,,,f,,44155-3,70,f,,0,,f
+284,"Corrosive Material, NOI, Sodium Hypochlorite 12.5% NSF Grade",ltl,,,,,,,f,,44155-3,70,f,,,,f
+285,"Corrosive Material, NOI, Sodium Hypochlorite 5.2%",ltl,,,,,,,f,,44155-3,70,f,,36,,f
+286,"Corrosive Material, PHOSPHORIC ACID 75%",ltl,,,,,,,f,,45615-5,70,f,,,,f
+287,"Corrosive Materials, Ammonia Solution, Tech Name Ammonium Hydroxide 29%",ltl,,,,,,,f,,44155-3,70,f,,1,,f
+288,"Corrosive Materials, NOI, Bisulfites Aqueous Solutions, N.O.S.",ltl,,,,,,,f,,44155-3,70,f,,0,,f
+289,"Corrosive Materials, NOI, Ferric Chloride 40%, Solution",ltl,,,,,,,f,,44155-3,70,f,,12,,f
+290,"Corrosive Materials, NOI, Ferric Chloride Solution",ltl,,,,,,,f,,44155-3,70,f,,0,,f
+291,"Corrosive Materials, NOI, HYDROCHLORIC ACID - Muratic Acid 18%",ltl,,,,,,,f,,44155-2,85,f,,3,,f
+292,"Corrosive Materials, NOI, Sodium Hydroxide Solid",ltl,,,,,,,f,,44155-2,85,f,,13,,f
+293,"Corrosive Materials, NOI, Sodium Hydroxide Solution",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+294,"Corrosive Materials, NOI, Sulfuric Acid 50% Electrolyte",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+295,"Corrosive Materials, NOI, Water Reactive, Corrosive, Sulfuric Acid 93%",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+296,"Corrosive Solid Reagent, Potassium Hydroxide, Solid",ltl,,,,,,,f,,60000,85,f,,1,,f
+297,"Corrosive Solid, Basic, Inorganic, N.O.S., Trisodium Phosphate Anhydrous",ltl,,,,,,,f,,44155-2,85,f,,0,,f
+298,"Corrosive, Acidic, Inorganic, N.O.S, Aluminum Sulfate, in drums or pails",ltl,,,,,,,f,,44155-2,85,f,,0,,f
+299,"Corrosive, Monoethanolamine 99%",ltl,,,,,,,f,,44155-3,70,f,,252,,f
+300,"Corrosive, NOI, other than toxic, HYDROFLUOROSILICIC ACID",ltl,,,,,,,f,,44155-2,85,f,,5,,f
+301,"Corrosive, NOI, other than toxic, Sodium Bisulfite",ltl,,,,,,,f,,44155-3,70,f,,0,,f
+302,"Corrosive, Water-Reactive, Sulfuric Acid",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+303,"Corrosive, Water-Reactive, Sulfuric Acid 93%",ltl,,,,,,,f,,44155-2,85,f,,1,,f
+304,"Corrosive, Water-Reactive, Sulfuric Acid 98% ACS Reagent Grade",ltl,,,,,,,f,,44155-2,85,f,,0,,f
+305,"Corrosive, other than toxic, Sodium Hydroxide Solution 50% ",ltl,,,,,,,f,,44155-2,85,f,,0,,f
+306,D - LIMONENE 100%,ltl,,,,,,,f,,44500-3,85,f,,1,,f
+307,D-Limonene - 55 Gallon Drum,ltl,,,,,,,f,,,65,f,,,,f
+308,DIPROPYLENE GLYCOL MONOMETHYL ETHER - non-hazardous,ltl,,,,,,,f,,44620,65,f,,0,,f
+309,Deionized Water - Tote Tank,ltl,,,,,,,f,,,55,f,,,,f
+310,Deionzed Water - NON DOT REGULATED,ltl,,,,,,,f,,59380-1,55,f,,1,,f
+311,"Diamines, compounds, organic, ETHACURE 100",ltl,,,,,,,f,,144790,65,f,,0,,f
+312,Distilled Water - NOI,ltl,,,,,,,f,,59380-7,85,f,,0,,f
+313,"Drums, empty, NOI, density 6 but less than 8 pcf",ltl,,,,,,,f,,174610-5,125,f,,0,,f
+314,ETHYL ACETATE,ltl,,,,,,,f,,44460-1,70,f,,1,,f
+315,ETHYLENE GLYCOL 100%,ltl,,,,,,,f,,44620,65,f,,1,,f
+316,ETHYLENE GLYCOL 100% - Electronic Grade,ltl,,,,,,,f,,44620,65,f,,1,,f
+317,ETHYLENE GLYCOL 100% - Non-stackable,ltl,,,,,,,f,,44620,65,f,,20,,f
+318,ETHYLENE GLYCOL 100% ELECTRONIC GRADE - non-DOT regulated,ltl,,,,,,,f,,44620,65,f,,1,,f
+319,Empty Trigger sprays,ltl,,,,,,,f,,,70,f,,,,f
+320,"Emulsions, Oil Emulsion, liquid, in bulk in drums",ltl,,,,,,,f,,155041,60,f,,0,,f
+321,"Enviromentally Hazardous Substance, Solid, N.O.S., NOI, in bags, boxes or drums",ltl,,,,,,,f,,46510,85,f,,0,,f
+322,"Environmentally Hazardous Substance, Solid, N.O.S., 9, PG III",ltl,,,,,,,f,,43940-2,85,f,,2,,f
+323,"Ethanol, Chemicals, NOI,  (Denatured Alcohol)",ltl,,,,,,,f,,43940-2,85,f,,1,,f
+324,Ethyl Acetate in boxes,ltl,,,,,,,f,,44460-3,77.5,f,,0,,f
+325,"Ethyl Acetate, in bulk in drums",ltl,,,,,,,f,,44460,70,f,,1,,f
+326,"Ethylene Glycol Technical Grade, non-DOT regulated",ltl,,,,,,,f,,44620,65,f,,20,,f
+327,"Ethylene Glycol, non-DOT regulated",ltl,,,,,,,f,,44620,65,f,,4,,f
+328,"FLAMMABLE LIQUIDS, METHYL ISOBUTYL KETONE",ltl,,,,,,,f,,44500-2,92.5,f,,12,,f
+329,"Flammable Liquid, (Water-Immiscible), Petroleum Distillates, N.O.S.",ltl,,,,,,,f,,44500-2,92.5,f,,0,,f
+330,"Flammable Liquid, Kerosene",ltl,,,,,,,f,,44500-3,85,f,,6,,f
+331,"Flammable Liquid, NOI, Acetone",ltl,,,,,,,f,,44500-2,92.5,f,,0,,f
+332,"Flammable Liquids, (Water-Immiscible), Kerosene",ltl,,,,,,,f,,44500-2,85,f,,6,,f
+333,"Flammable Liquids, (Water-Miscible / Noxious), Butanols",ltl,,,,,,,f,,44500-3,85,f,,1,,f
+334,"Flammable Liquids, NOI,  n-Propanol Propyl Alcohol, normal",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+335,"Flammable Liquids, NOI, Acetic Acid Glacial 100%",ltl,,,,,,,f,,44500-2,92.5,f,,0,,f
+336,"Flammable Liquids, NOI, Butyl Acetates",ltl,,,,,,,f,,44500-3,85,f,,0,,f
+337,"Flammable Liquids, NOI, Cyclohexanone",ltl,,,,,,,f,,44500-3,85,f,,0,,f
+338,"Flammable Liquids, NOI, Denatured Ethyl Alcohol 200 Proof, N.O.S",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+339,"Flammable Liquids, NOI, Ethyl Acetate",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+340,"Flammable Liquids, NOI, Isopropanol",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+341,"Flammable Liquids, NOI, Isopropanol 91%",ltl,,,,,,,f,,44500-2,92.5,f,,4,,f
+342,"Flammable Liquids, NOI, Isopropanol 91% USP Grade",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+343,"Flammable Liquids, NOI, Isopropanol, Alcohol  99%",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+344,"Flammable Liquids, NOI, Isopropanol, Alcohol  99.9%",ltl,,,,,,,f,,44500-2,92.5,f,,,,f
+345,"Flammable Liquids, NOI, Isopropanol, Alcohol  99.9%, ACS Grade,",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+346,"Flammable Liquids, NOI, Isopropanol, Alcohol 70%",ltl,,,,,,,f,,44500-2,92.5,f,,3,,f
+347,"Flammable Liquids, NOI, Isopropanol, Alcohol 70% USP Grade",ltl,,,,,,,f,,44500-2,92.5,f,,6,,f
+348,"Flammable Liquids, NOI, Isopropanol, Alcohol 99%",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+349,"Flammable Liquids, NOI, Isopropanol, Alcohol 99% Technical Grade",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+350,"Flammable Liquids, NOI, Isopropanol, Alcohol 99.9%",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+351,"Flammable Liquids, NOI, Isopropanol, Alcohol 99.9%  ACS Grade,",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+352,"Flammable Liquids, NOI, Isopropanol, Alcohol 99.9%  ACS Reagent Grade",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+353,"Flammable Liquids, NOI, Isopropanol, Alcohol ACS Grade,",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+354,"Flammable Liquids, NOI, Isopropanol, Alcohol ACS,",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+355,"Flammable Liquids, NOI, Isopropanol, Alcohol ACS, Reagent",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+356,"Flammable Liquids, NOI, Isopropanol, Alcohol Grade",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+357,"Flammable Liquids, NOI, Isopropryl Alcohol",ltl,,,,,,,f,,44500-2,92.5,f,,10,,f
+358,"Flammable Liquids, NOI, Isopropryl Alcohol 99%",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+359,"Flammable Liquids, NOI, Isopropryl Alcohol 99% Technical Grade",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+360,"Flammable Liquids, NOI, Isopropyl Acetate",ltl,,,,,,,f,,44500-2,92.5,f,,0,,f
+361,"Flammable Liquids, NOI, Isopropyl Alcohol Semiconductor",ltl,,,,,,,f,,44500-2,92.5,f,,4,,f
+362,"Flammable Liquids, NOI, Isopropyl Alcohol, Technical",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+363,"Flammable Liquids, NOI, Isopropyl Alcohol, Technical Grade",ltl,,,,,,,f,,44500-2,92.5,f,,2,,f
+364,"Flammable Liquids, NOI, Ketones, Liquid, N.O.S.",ltl,,,,,,,f,,44500-2,92.5,f,,0,,f
+365,"Flammable Liquids, NOI, METHYL ETHYL KETONE, in bulk in drums",ltl,,,,,,,f,,44500-2,92.5,f,,0,,f
+366,"Flammable Liquids, NOI, Methanol",ltl,,,,,,,f,,44500-2,92.5,f,,0,,f
+367,"Flammable Liquids, NOI, Methanol ACS Regent Grade",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+368,"Flammable Liquids, NOI, Methanol Technical Grade",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+369,"Flammable Liquids, NOI, Methyl  Ethyl Ketone,",ltl,,,,,,,f,,44500-2,92.5,f,,105,,f
+370,"Flammable Liquids, NOI, Methyl Isobutyl Ketone",ltl,,,,,,,f,,44500-2,92.5,f,,,,f
+371,"Flammable Liquids, NOI, Methyl Propyl Ketone",ltl,,,,,,,f,,44500-2,92.5,f,,4,,f
+372,"Flammable Liquids, NOI, Methyl n-AMYL Ketone",ltl,,,,,,,f,,045615-5,70,f,,4,,f
+373,"Flammable Liquids, NOI, Octanes, Isooctane Reference Fuel",ltl,,,,,,,f,,44500-2,92.5,f,,6,,f
+374,"Flammable Liquids, NOI, Petroleum Ether",ltl,,,,,,,f,,44500-1,100,f,,0,,f
+375,"Flammable Liquids, NOI, TRICHLOROETHYLENE",ltl,,,,,,,f,,44500-3,85,f,,1,,f
+376,"Flammable Liquids, NOI, Terpene Hydrocarbons, N.O.S.",ltl,,,,,,,f,,44500-3,85,f,,0,,f
+377,"Flammable Liquids, NOI, Tert Butyl Acetate",ltl,,,,,,,f,,44500-3,92.5,f,,,,f
+378,"Flammable Liquids, NOI, Toluene",ltl,,,,,,,f,,44500-3,92.5,f,,0,,f
+379,"Flammable Liquids, NOI, Toluene, 3 PG II",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+380,"Flammable Liquids, NOI, Xylene",ltl,,,,,,,f,,44500-3,85,f,,1,,f
+381,"Flammable Liquids, NOI, Xylene",ltl,,,,,,,f,,44500-2,92.5,f,,,,f
+382,"Flammable Liquids, NOI, Xylene, Xylol, Dimethylbenzene",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+383,"Flammable Liquids, NOI, and Corrosive, Water-Sensitive, TOLUENE",ltl,,,,,,,f,,44500-2,92.5,f,,1,,f
+384,"Flammable Liquids, or Cumbustible Liquids, NOI, Paint",ltl,,,,,,,f,,44500-3,85,f,,0,,f
+385,GLYCERINE,ltl,,,,,,,f,,44610-3,70,f,,,,f
+386,"GREASE, general purpose, NON-DOT REGULATED, NOI, in boxes, crates or drums",ltl,,,,,,,f,,90890-2,65,f,,0,,f
+387,"Glycerin, non DOT Regulated (non-hazmat)",ltl,,,,,,,f,,44610-3,70,f,,1,,f
+388,"Glycerine, other than crude, in bulk in drums",ltl,,,,,,,f,,44610-3,70,f,,0,,f
+389,"Glycols, Ethylene",ltl,,,,,,,f,,44620,65,f,,0,,f
+390,HYDROGEN PEROXIDE 35%,ltl,,,,,,,f,,43940-2,85,f,,1,,f
+391,"HYDROGEN PEROXIDE, AQUEOUS SOLUTIONS",ltl,,,,,,,f,,43940-2,85,f,,,,f
+392,"Hexane ACS, Reagent",ltl,,,,,,,f,,43940,85,f,,5,,f
+393,Hexanes,ltl,,,,,,,f,,43940,85,f,,,,f
+394,Hexanes Solvent Technical,ltl,,,,,,,f,,43940,85,f,,1,,f
+395,ISOPROPYL ALCOHOL 99.9% ACS,ltl,,,,,,,f,,,85,f,,,,f
+396,"Labels, paper, plain, printed or lithographed in pkge",ltl,,,,,,,f,,153500-2,55,f,,0,,f
+397,"Limestone, hydrated, common Lime, in pkgs",ltl,,,,,,,f,,42160,50,f,,0,,f
+398,"Lubricating Oil, NOI, in boxes, drums or pkgs",ltl,,,,,,,f,,145000-2,65,f,,0,,f
+399,"Lubricating Oil, NOI, in drums",ltl,,,,,,,f,,145000-2,65,f,,,,f
+400,"Lubricating Oil, NOI, in metal cans in crates",ltl,,,,,,,f,,145000-1,85,f,,50,,f
+401,"Lubricating Oil, NON-DOT REGULATED",ltl,,,,,,,f,,145000-1,85,f,,50,,f
+402,METHYL N-PROPYL KETONE,ltl,,,,,,,f,,43940-2,85,f,,10,,f
+403,Magnesium Hydroxide NON DOT REGULATED ITEM,ltl,,,,,,,f,,45070,55,f,,6,,f
+404,"Metabisulfite, Potassium Metabisulfite, in drums",ltl,,,,,,,f,,45800,77.5,f,,0,,f
+405,"Metal Cans, Metal Articles, NOI, released value exceeding $0.40 but less than $1/lb. ",ltl,,,,,,,f,,136500-2,100,f,,0,,f
+406,"Methyl Butyl Ketone, in containers in boxes or drums",ltl,,,,,,,f,,45280-2,70,f,,0,,f
+407,Monoethanolamine (MEA),ltl,,,,,,,f,,44155-03,70,f,,0,,f
+408,"NON-DOT REGULATED, FERROUS SULFATE HEPTAHYDRATE ACS",ltl,,,,,,,f,,43940-2,85,f,,6,,f
+409,"NON-DOT REGULATED, LUBRICATING OIL, P/N: MOBIL VACUUM PUMP OIL",ltl,,,,,,,f,,145000-2,65,f,,1,,f
+410,"NON-DOT REGULATED, Lubricating Oil, GEAR, P/N: MOBIL DELVAC SYNTHETIC GEAR OIL 75W90",ltl,,,,,,,f,,145000-1,85,f,,18,,f
+411,"NON-DOT REGULATED, Lubricating Oil, GEAR, P/N: MOBIL DELVAC SYNTHETIC OIL 75W90",ltl,,,,,,,f,,145000-1,85,f,,18,,f
+412,"NON-DOT REGULATED, POLYETHYLENE GLYCOL PEG 200",ltl,,,,,,,f,,,65,f,,,,f
+413,"NON-DOT REGULATED, SODIUM CARBONATE ANHYDROUS TECHNICAL GRADE",ltl,,,,,,,f,,46220-2,55,f,,4,,f
+414,"NON-DOT REGULATED, SODIUM PHOSPHATE, TRIBASIC, ANHYDROUS, TECHNICAL",ltl,,,,,,,f,,43940-2,85,f,,10,,f
+415,"New, empty, Plastic Jugs",ltl,,,,,,,f,,,250,f,,,,f
+416,Nitric Acid,ltl,,,,,,,f,,43940-2,85,f,,18,,f
+417,Non- Hazardous per DOT Exception 49CFR Description: D- Limonene,ltl,,,,,,,f,,42660-03,65,f,,1,,f
+418,Non-Hazardous Per DOT Exception 49 CFR - 173.150(f) D-limonene,ltl,,,,,,,f,,42660,65,f,,6,,f
+419,Non-Hazardous Per DOT Exception 49 CFR - 173.150(f) Item: D-limonene,ltl,,,,,,,f,,42660,65,f,,6,,f
+420,"Non-Hazardous per DOT Exception 49CFR, Description: d-Limonene",ltl,,,,,,,f,,,65,f,,4,,f
+421,PERCHLOROETHYLENE,ltl,,,,,,,f,,,125,f,,2,,f
+422,"PETROLEUM DISTILLATES, N.O.S.",ltl,,,,,,,f,,155250,85,f,,42,,f
+423,PETROLEUM LUBRICANTS,ltl,,,,,,,f,,155250,65,f,,0,,f
+424,"PETROLEUM LUBRICANTS, NON-HAZMAT",ltl,,,,,,,f,,155250,65,f,,0,,f
+425,"POLYETHYLENE GLYCOL (PEG) 200, NON-DOT REGULATED",ltl,,,,,,,f,,,65,f,,2,,f
+426,PROPYLENE GLYCOL - (Arctic Assist),ltl,,,,,,,f,,44620,65,f,,8,,f
+427,"PROPYLENE GLYCOL Techinical, non-DOT Regulated",ltl,,,,,,,f,,44620,65,f,,4,,f
+428,PROPYLENE GLYCOL USP GRADE,ltl,,,,,,,f,,44620,65,f,,1,,f
+429,"PROPYLENE GLYCOL USP GRADE, non-DOT Regulated",ltl,,,,,,,f,,44620,65,f,,0,,f
+430,PROPYLENE GLYCOL - USP GRADE FOOD GRADE,ltl,,,,,,,f,,44620,65,f,,2,,f
+431,"PROPYLENE GLYCOL, non-DOT Regulated",ltl,,,,,,,f,,043940-03,70,f,,2,,f
+432,"Paint Related Materials, Chemicals, NOI, in bags, boxes, drums or pkgs",ltl,,,,,,,f,,43940-2,85,f,,4,,f
+433,"Pallet, empty, shipping, wooden, NOI, density 4 but less than 6 pcf",ltl,,,,,,,f,,150390-4,175,f,,0,,f
+434,"Personal Care Products, NOI, density 10 but less than 15 pcf",ltl,,,,,,,f,,59420-2,85,f,,1,,f
+435,"Petroleum Lubricates,  not required by the D.O.T. to bear hazmat label",ltl,,,,,,,f,,155250,65,f,,3,,f
+436,"Petroleum Oils, Greases and Related Products",ltl,,,,,,,f,,155250,65,f,,5,,f
+437,Petroluem Lubricants,ltl,,,,,,,f,,155250,65,f,,0,,f
+438,"Phosphate, NOI, in bags, boxes, drums",ltl,,,,,,,f,,46510,55,f,,0,,f
+439,"Plastic Articles, density 2 but less than 4 pcf ",ltl,,,,,,,f,,156600-3,250,f,,0,,f
+440,"Plastic Articles, other than expanded, density 6 but less than 8 pcf",ltl,,,,,,,f,,156600-5,125,f,,,,f
+441,"Plastic Totes, New, Plastic Articles, density 12 but less than 15 pcf",ltl,,,,,,,f,,156600-8,85,f,,,,f
+442,"Plastic Totes, New, density 12 but less than 15 pcf",ltl,,,,,,,f,,156600-8,85,f,,0,,f
+443,"Poisonous Materials, Trichloroethylene",ltl,,,,,,,f,,45615-5,70,f,,0,,f
+444,Polyethylene Glycol,ltl,,,,,,,f,,44620,65,f,,0,,f
+445,Polyethylene Glycol Peg 200,ltl,,,,,,,f,,44620,65,f,,1,,f
+446,Potassium Bicarbonate,ltl,,,,,,,f,,45680-1,70,f,,0,,f
+447,"Potassium Bicarbonate, in inner containers in boxes or drums",ltl,,,,,,,f,,45680-2,77.5,f,,0,,f
+448,Potassium Cyanide,ltl,,,,,,,f,,45760,70,f,,0,,f
+449,Propeleye Glycol- Carboy,ltl,,,,,,,f,,,55,f,,2,,f
+450,"Resin, petroleum, or Resin Compounds, not required by the US D.O.T to bear hazard class.",ltl,,,,,,,f,,46030,55,f,,0,,f
+451,SODIUM BISULFITE,ltl,,,,,,,f,,44155-2,85,f,,55,,f
+452,"Salt, common (Sodium Chloride), containing food curing or preserving ingredients.",ltl,,,,,,,f,,74660,60,f,,0,,f
+453,"Sodium Bicarbonate, in inner containers in boxes/drums",ltl,,,,,,,f,,46220-1,60,f,,0,,f
+454,Sodium Chlorate Oxidizer,ltl,,,,,,,f,,45467-2,100,f,,36,,f
+455,"Sodium Chloride (Common Salt), in pkgs",ltl,,,,,,,f,,46260-1,55,f,,0,,f
+456,"Sodium Chloride Tech, NON-DOT REGULATED",ltl,,,,,,,f,,46260-1,55,f,,240,,f
+457,"Sodium Chloride, NON-DOT REGULATED",ltl,,,,,,,f,,46260-1,55,f,,240,,f
+458,Sodium Hydroxide 50% Solution,ltl,,,,,,,f,,44155-02,85,f,,,,f
+459,"Sodium Phosphate, NOI, in bags.boxes or drums",ltl,,,,,,,f,,46510,55,f,,0,,f
+460,Sodium chlorohydrate 50%,ltl,,,,,,,f,,,55,f,,,,f
+461,"Sponges, density 10 but less than 12 pcf",ltl,,,,,,,f,,177320-7,92.5,f,,10,,f
+462,"Sulfate (Ferrous Sulfate) (Copperas), Containing less than 40% water, in bags, or inbulk in boxes/drums",ltl,,,,,,,f,,44820-3,55,f,,0,,f
+463,"Sulfate (Ferrous Sulfate) (Copperas), in bags, boxes or drums",ltl,,,,,,,f,,44820-3,55,f,,0,,f
+464,TETRACHLOROETHYLENE (PERCHLOROETHYLENE TECHNICAL),ltl,,,,,,,f,,45510,70,f,,1,,f
+465,"Talc Technical Grade, ground or pulverized, in inner containers in boxes",ltl,,,,,,,f,,90400-1,60,f,,6,,f
+466,"Talc, ground or pulverized, in inner containers in boxes",ltl,,,,,,,f,,90400-1,60,f,,0,,f
+467,"Toxic Material, Ferric Chloride 40% Copper Etchant Solution",ltl,,,,,,,f,,45615-5,70,f,,0,,f
+468,"Toxic Materials, Bisulfite, Aqueous Solutions, n.o.s., liquid, in drums",ltl,,,,,,,f,,45615-5,70,f,,2,,f
+469,"Toxic Materials, Bisulfite, liquid, in drums ",ltl,,,,,,,f,,45615-5,70,f,,0,,f
+470,"Toxic Materials, Hydrochloric Acid",ltl,,,,,,,f,,45615-4,85,f,,4,,f
+471,"Toxic Materials, PHOSPHORIC ACID 75%",ltl,,,,,,,f,,45615-5,70,f,,1,,f
+472,"Toxic Materials, PHOSPHORIC ACID 85%",ltl,,,,,,,f,,45615-5,70,f,,1,,f
+473,"Toxic Solid, Inorganic, N.O.S",ltl,,,,,,,f,,45615-4,85,f,,4,,f
+474,"Toxic and/or Corrosive (Non-Combustable), Ammonium Hydroxide 29%",ltl,,,,,,,f,,45615-5,70,f,,0,,f
+475,"Toxic and/or Corrosive (Non-Combustible), Ammonium Hydroxide 29%",ltl,,,,,,,f,,45615-5,70,f,,1,,f
+476,"Toxic and/or Corrosive (non-combustible), Sulfuric Acid, Battery Fluid Acid",ltl,,,,,,,f,,45615-4,85,f,,,,f
+477,"Toxic and/or Corrosive, (non-cumbustible), Hypochlorite Solutions",ltl,,,,,,,f,,45615-3,70,f,,,,f
+478,"Toxic, Ferric Chloride Solution",ltl,,,,,,,f,,15616-5,70,f,,0,,f
+479,"Toxic, Nitric Acid 67%",ltl,,,,,,,f,,45615-4,85,f,,0,,f
+480,"Trisodium Phosphate, chlorinated",ltl,,,,,,,f,,46670,55,f,,0,,f
+481,"Vegetable Glycerin, Non Dot Regulated (Non-Hazmat)",ltl,,,,,,,f,,44610-3,70,f,,1,,f
+482,"Vermiculite, density 15 but less than 22.5 pcf",ltl,,,,,,,f,,48395-9,70,f,,0,,f
+483,"Vermiculite, density 2 but less than 4 pcf",ltl,,,,,,,f,,48395-3,250,f,,0,,f
+484,"Vermiculite, density 6 but less than 8 pcf",ltl,,,,,,,f,,48395-5,125,f,,10,,f
+485,"Vermiculite, density 8 but less than 10 pcf",ltl,,,,,,,f,,48395-6,100,f,,0,,f
+486,"Vermiculite, in bags, density 12 but less than 15 pcf",ltl,,,,,,,f,,48395-8,85,f,,60,,f
+487,"WATER, DISTILLED DEIONIZED WATER , NOI, in Boxes",ltl,,,,,,,f,,59380-7,85,f,,12,,f
+488,"Water, NOI, other than carbonated, distilled, in inner containers other than intravenous dispensing type, in boxes, drums",ltl,,,,,,,f,,196500-4,60,f,,0,,f
+489,"Water, distilled, NOI, in boxes",ltl,,,,,,,f,,59380-7,85,f,,0,,f
+490,"d-Limonene Food Grade & Kosher, Cleaning Compound, NOI",ltl,,,,,,,f,,48580,70,f,,0,,f
+491,ethanolamine-monoethanolamonie,ltl,,,,,,,f,,45330-2,60,f,,1,,f
+492,"petroleum distillates, oils, greases and related products",ltl,,,,,,,f,,155250,85,f,,25,,f
+494,"Acetic Acid Solution, with more than 10 percent and less than 50 percent",ltl,,,,,,,f,,44155-3,70,f,,false,,f
+493,"Acetic Acid Solution, with more than 50 percent and less than 80 percent",ltl,,,,,,,f,,44155-2,85,f,,false,,f

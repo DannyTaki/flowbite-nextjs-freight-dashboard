@@ -10,7 +10,9 @@
     "format:check": "prettier . --check",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate:pg",
+    "introspect": "drizzle-kit introspect:pg"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.0.1",
