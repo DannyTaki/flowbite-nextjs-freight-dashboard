@@ -1,0 +1,259 @@
+﻿description,hazardous,hazardId,packingGroup
+"lubricating oil, noi, in drums",FALSE,,
+"lubricating oil, noi, in metal cans in crates",FALSE,,
+acetone (flammable liquid),TRUE,UN1090,2
+"ammonium hydroxide 29% acs, reagent grade",TRUE,UN2672,3
+"adhesives, noi, other than combustible, density 20 pcf or greater",FALSE,,
+"ammonia solution, relative density between 0.880 and 0.957 at 15 degrees c in water, with more than 10 percent but not more than 35 percent ammonia, 8, pgiii",TRUE,UN2672,3
+"battery water, non-dot regulated",FALSE,,
+battery fluid acid,TRUE,UN2796,2
+"battery fluid acid, (sulfuric acid)",TRUE,UN2796,2
+"boric acid in inner containers in boxes, or bags, or drums",FALSE,,
+"bottles, carboys or jars, noi, density 6 but less than 8 pcf",FALSE,,
+"bottles, carboys or jars, empty, noi, other than cut, density 15 but less than 22.5 pcf",FALSE,,
+"bottles, in cardboard pkging, density 12 but less than 15 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 1 but less than 2 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 10 but less than 12 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 10 but less than 12 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 10 but less than 12 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 10 but less than 12 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 12 but less than 15 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 15 but less than 22.5 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 2 but less than 4 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 22.5 but less than 30 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 30 pcf or greater",FALSE,,
+"boxes, cartons, empty, noi, density 4 but less than 5 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 6 but less than 8 pcf",FALSE,,
+"boxes, cartons, empty, noi, density 8 but less than 10 pcf",FALSE,,
+"boxes, cartons, empty, noi, density less than 1 pcf",FALSE,,
+"cadmium compounds, n.o.s.,",TRUE,UN2570,1
+"calcium chloride, other than liquid, in bags",FALSE,,
+"carbonate, monohydrate, in bags, or in bulin in boxes or drums",FALSE,,
+chromium trioxide technical grade,TRUE,UN1463,2
+"chromium trioxide, anhydrous",TRUE,UN1463,2
+"citric acid monohydrate, in inner containers in boxes or drums",FALSE,,
+"corrosive (non-combustible), ammonium hydroxide 29% acs, reagent grade",TRUE,UN2672,3
+"corrosive (non-combustible), ammonium hydroxide 29% technical grade",TRUE,UN2672,3
+"corrosive material, noi, hydrochloric acid",TRUE,UN1789,2
+"corrosive material, noi, hydrochloric acid 15 gallon",TRUE,UN1789,2
+"corrosive material, noi, hydrochloric acid 20 be",TRUE,UN1789,2
+"corrosive material, noi, hydrochloric acid 31% 15 gallon",TRUE,UN1789,2
+"corrosive material, noi, nitric acid",TRUE,UN2031,2
+"corrosive material, noi, phosphoric acid",TRUE,UN1805,3
+"corrosive material, noi, phosphoric acid solution 85%",TRUE,UN1805,3
+"corrosive material, noi, phosphoric acid solution 85% technical grade",TRUE,UN1805,3
+"corrosive material, noi, phosphoric acid solution 85%- technical grade",TRUE,UN1805,3
+"corrosive material, noi, sodium bisulfite 40% nsf grade, n.o.s.,",TRUE,UN2693,3
+"corrosive material, noi, sodium hypochlorite 12.5% nsf grade",TRUE,UN1791,3
+"corrosive material, noi, sodium hypochlorite 5.2%",,,
+"corrosive material, phosphoric acid 75%",TRUE,UN1805,3
+"corrosive materials, ammonia solution, tech name ammonium hydroxide 29%",TRUE,UN2672,3
+"corrosive materials, noi, bisulfites aqueous solutions, n.o.s.",TRUE,UN2693,3
+"corrosive materials, noi, ferric chloride 40%, solution",TRUE,UN2582,3
+"corrosive materials, noi, ferric chloride solution",TRUE,UN2582,3
+"corrosive materials, noi, hydrochloric acid - muratic acid 18%",TRUE,UN1789,2
+"corrosive materials, noi, sodium hydroxide solid",TRUE,UN1823,2
+"corrosive materials, noi, sodium hydroxide solution",TRUE,UN1824,2
+"corrosive materials, noi, sulfuric acid 50% electrolyte",TRUE,UN2796,2
+"corrosive materials, noi, water reactive, corrosive, sulfuric acid 93%",TRUE,UN1830,2
+"corrosive solid reagent, potassium hydroxide, solid",TRUE,UN1813,2
+"corrosive solid, basic, inorganic, n.o.s., trisodium phosphate anhydrous",TRUE,UN3262,2
+"corrosive, acidic, inorganic, n.o.s, aluminum sulfate, in drums or pails",TRUE,UN3264,2
+"corrosive, monoethanolamine 99%",TRUE,UN2491,3
+"corrosive, noi, other than toxic, hydrofluorosilicic acid",TRUE,UN1778,2
+"corrosive, noi, other than toxic, sodium bisulfite",TRUE,UN2693,3
+"corrosive, water-reactive, sulfuric acid",TRUE,UN1830,2
+"corrosive, water-reactive, sulfuric acid 93%",TRUE,UN1830,2
+"corrosive, water-reactive, sulfuric acid 98% acs reagent grade",TRUE,UN1830,2
+"corrosive, other than toxic, sodium hydroxide solution 50%",TRUE,UN1824,2
+d - limonene 100%,,,
+d-limonene - 55 gallon drum,FALSE,,
+dipropylene glycol monomethyl ether - non-hazardous,FALSE,,
+deionized water - tote tank,FALSE,,
+deionzed water - non dot regulated,FALSE,,
+"diamines, compounds, organic, ethacure 100",FALSE,,
+distilled water - noi,FALSE,,
+"drums, empty, noi, density 6 but less than 8 pcf",FALSE,,
+ethyl acetate,TRUE,UN1173,2
+ethylene glycol 100%,FALSE,,
+ethylene glycol 100% - electronic grade,FALSE,,
+ethylene glycol 100% - non-stackable,FALSE,,
+ethylene glycol 100% electronic grade - non-dot regulated,FALSE,,
+empty trigger sprays,FALSE,,
+"emulsions, oil emulsion, liquid, in bulk in drums",FALSE,,
+"enviromentally hazardous substance, solid, n.o.s., noi, in bags, boxes or drums",TRUE,UN3077,3
+"environmentally hazardous substance, solid, n.o.s., 9, pg iii",TRUE,UN3077,3
+"ethanol, chemicals, noi,  (denatured alcohol)",TRUE,UN1170,2
+ethyl acetate in boxes,TRUE,UN1173,2
+"ethyl acetate, in bulk in drums",TRUE,UN1173,2
+"ethylene glycol technical grade, non-dot regulated",FALSE,,
+"ethylene glycol, non-dot regulated",FALSE,,
+"flammable liquids, methyl isobutyl ketone",TRUE,UN1245,2
+"flammable liquid, (water-immiscible), petroleum distillates, n.o.s.",TRUE,UN1268,2
+"flammable liquid, kerosene",TRUE,UN1223,3
+"flammable liquid, noi, acetone",TRUE,UN1090,2
+"flammable liquids, (water-immiscible), kerosene",TRUE,UN1223,3
+"flammable liquids, (water-miscible / noxious), butanols",TRUE,UN1120,3
+"flammable liquids, noi,  n-propanol propyl alcohol, normal",TRUE,UN1274,2
+"flammable liquids, noi, acetic acid glacial 100%",TRUE,UN2789,2
+"flammable liquids, noi, butyl acetates",TRUE,UN1123,3
+"flammable liquids, noi, cyclohexanone",TRUE,UN1915,3
+"flammable liquids, noi, denatured ethyl alcohol 200 proof, n.o.s",,,
+"flammable liquids, noi, ethyl acetate",TRUE,UN1173,2
+"flammable liquids, noi, isopropanol",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol 91%",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol 91% usp grade",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol  99%",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol  99.9%",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol  99.9%, acs grade,",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol 70%",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol 70% usp grade",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol 99%",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol 99% technical grade",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol 99.9%",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol 99.9%  acs grade,",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol 99.9%  acs reagent grade",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol acs grade,",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol acs,",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol acs, reagent",TRUE,UN1219,2
+"flammable liquids, noi, isopropanol, alcohol grade",TRUE,UN1219,2
+"flammable liquids, noi, isopropryl alcohol",TRUE,UN1219,2
+"flammable liquids, noi, isopropryl alcohol 99%",TRUE,UN1219,2
+"flammable liquids, noi, isopropryl alcohol 99% technical grade",TRUE,UN1219,2
+"flammable liquids, noi, isopropyl acetate",TRUE,UN1220,2
+"flammable liquids, noi, isopropyl alcohol semiconductor",TRUE,UN1219,2
+"flammable liquids, noi, isopropyl alcohol, technical",TRUE,UN1219,2
+"flammable liquids, noi, isopropyl alcohol, technical grade",TRUE,UN1219,2
+"flammable liquids, noi, ketones, liquid, n.o.s.",TRUE,UN1224,2
+"flammable liquids, noi, methyl ethyl ketone, in bulk in drums",TRUE,UN1193,2
+"flammable liquids, noi, methanol",TRUE,UN1230,2
+"flammable liquids, noi, methanol acs regent grade",TRUE,UN1230,2
+"flammable liquids, noi, methanol technical grade",TRUE,UN1230,2
+"flammable liquids, noi, methyl  ethyl ketone,",TRUE,UN1193,2
+"flammable liquids, noi, methyl isobutyl ketone",TRUE,UN1245,2
+"flammable liquids, noi, methyl propyl ketone",TRUE,UN1249,2
+"flammable liquids, noi, methyl n-amyl ketone",TRUE,UN1110,3
+"flammable liquids, noi, octanes, isooctane reference fuel",TRUE,UN1262,2
+"flammable liquids, noi, petroleum ether",TRUE,UN1268,1
+"flammable liquids, noi, trichloroethylene",TRUE,UN1710,3
+"flammable liquids, noi, terpene hydrocarbons, n.o.s.",TRUE,UN2319,3
+"flammable liquids, noi, tert butyl acetate",TRUE,UN1123,2
+"flammable liquids, noi, toluene",TRUE,UN1298,2
+"flammable liquids, noi, toluene, 3 pg ii",TRUE,UN1294,2
+"flammable liquids, noi, xylene",TRUE,UN1307,3
+"flammable liquids, noi, xylene",TRUE,UN1307,2
+"flammable liquids, noi, xylene",TRUE,UN1307,3
+"flammable liquids, noi, xylene",TRUE,UN1307,2
+"flammable liquids, noi, xylene, xylol, dimethylbenzene",TRUE,UN1307,2
+"flammable liquids, noi, and corrosive, water-sensitive, toluene",TRUE,UN1298,2
+"flammable liquids, or cumbustible liquids, noi, paint",TRUE,UN1263,3
+glycerine,FALSE,,
+"grease, general purpose, non-dot regulated, noi, in boxes, crates or drums",FALSE,,
+"glycerin, non dot regulated (non-hazmat)",FALSE,,
+"glycerine, other than crude, in bulk in drums",FALSE,,
+"glycols, ethylene",FALSE,,
+hydrogen peroxide 35%,TRUE,UN2014,2
+"hydrogen peroxide, aqueous solutions",TRUE,UN2014,2
+"hexane acs, reagent",TRUE,UN1208,2
+hexanes,TRUE,UN1208,2
+hexanes solvent technical,TRUE,UN1208,2
+isopropyl alcohol 99.9% acs,TRUE,UN1219,2
+"labels, paper, plain, printed or lithographed in pkge",FALSE,,
+"limestone, hydrated, common lime, in pkgs",FALSE,,
+"lubricating oil, noi, in boxes, drums or pkgs",FALSE,,
+"lubricating oil, noi, in drums",FALSE,,
+"lubricating oil, noi, in metal cans in crates",FALSE,,
+"lubricating oil, non-dot regulated",FALSE,,
+methyl n-propyl ketone,TRUE,UN1224,2
+magnesium hydroxide non dot regulated item,FALSE,,
+"metabisulfite, potassium metabisulfite, in drums",FALSE,,
+"metal cans, metal articles, noi, released value exceeding $0.40 but less than $1/lb.",FALSE,,
+"methyl butyl ketone, in containers in boxes or drums",TRUE,UN1193,2
+monoethanolamine (mea),TRUE,UN2491,3
+"non-dot regulated, ferrous sulfate heptahydrate acs",FALSE,,
+"non-dot regulated, lubricating oil, p/n: mobil vacuum pump oil",FALSE,,
+"non-dot regulated, lubricating oil, gear, p/n: mobil delvac synthetic gear oil 75w90",FALSE,,
+"non-dot regulated, lubricating oil, gear, p/n: mobil delvac synthetic oil 75w90",FALSE,,
+"non-dot regulated, polyethylene glycol peg 200",FALSE,,
+"non-dot regulated, sodium carbonate anhydrous technical grade",FALSE,,
+"non-dot regulated, sodium phosphate, tribasic, anhydrous, technical",FALSE,,
+"new, empty, plastic jugs",FALSE,,
+nitric acid,TRUE,UN2031,2
+non- hazardous per dot exception 49cfr description: d- limonene,FALSE,,
+non-hazardous per dot exception 49 cfr - 173.150(f) d-limonene,,,
+non-hazardous per dot exception 49 cfr - 173.150(f) item: d-limonene,,,
+"non-hazardous per dot exception 49cfr, description: d-limonene",FALSE,,
+perchloroethylene,TRUE,UN1897,3
+"petroleum distillates, n.o.s.",TRUE,UN1268,2
+petroleum lubricants,FALSE,,
+"petroleum lubricants, non-hazmat",FALSE,,
+"polyethylene glycol (peg) 200, non-dot regulated",FALSE,,
+propylene glycol - (arctic assist),,,
+"propylene glycol techinical, non-dot regulated",FALSE,,
+propylene glycol usp grade,,,
+"propylene glycol usp grade, non-dot regulated",FALSE,,
+propylene glycol - usp grade food grade,,,
+"propylene glycol, non-dot regulated",FALSE,,
+"paint related materials, chemicals, noi, in bags, boxes, drums or pkgs",TRUE,UN1263,2
+"pallet, empty, shipping, wooden, noi, density 4 but less than 6 pcf",FALSE,,
+"personal care products, noi, density 10 but less than 15 pcf",FALSE,,
+"petroleum lubricates,  not required by the d.o.t. to bear hazmat label",FALSE,,
+"petroleum oils, greases and related products",FALSE,,
+petroluem lubricants,FALSE,,
+"phosphate, noi, in bags, boxes, drums",FALSE,,
+"plastic articles, density 2 but less than 4 pcf",FALSE,,
+"plastic articles, other than expanded, density 6 but less than 8 pcf",FALSE,,
+"plastic totes, new, plastic articles, density 12 but less than 15 pcf",FALSE,,
+"plastic totes, new, density 12 but less than 15 pcf",FALSE,,
+"poisonous materials, trichloroethylene",TRUE,UN1710,3
+polyethylene glycol,FALSE,,
+polyethylene glycol peg 200,FALSE,,
+potassium bicarbonate,FALSE,,
+"potassium bicarbonate, in inner containers in boxes or drums",FALSE,,
+potassium cyanide,TRUE,UN1680,1
+propeleye glycol- carboy,FALSE,,
+"resin, petroleum, or resin compounds, not required by the us d.o.t to bear hazard class.",FALSE,,
+sodium bisulfite,TRUE,UN2693,3
+"salt, common (sodium chloride), containing food curing or preserving ingredients.",FALSE,,
+"sodium bicarbonate, in inner containers in boxes/drums",FALSE,,
+sodium chlorate oxidizer,TRUE,UN1495,2
+"sodium chloride (common salt), in pkgs",FALSE,,
+"sodium chloride tech, non-dot regulated",FALSE,,
+"sodium chloride, non-dot regulated",FALSE,,
+sodium hydroxide 50% solution,TRUE,UN1824,2
+"sodium phosphate, noi, in bags.boxes or drums",FALSE,,
+sodium chlorohydrate 50%,FALSE,,
+"sponges, density 10 but less than 12 pcf",FALSE,,
+"sulfate (ferrous sulfate) (copperas), containing less than 40% water, in bags, or inbulk in boxes/drums",FALSE,,
+"sulfate (ferrous sulfate) (copperas), in bags, boxes or drums",FALSE,,
+tetrachloroethylene (perchloroethylene technical),TRUE,UN1897,3
+"talc technical grade, ground or pulverized, in inner containers in boxes",FALSE,,
+"talc, ground or pulverized, in inner containers in boxes",FALSE,,
+"toxic material, ferric chloride 40% copper etchant solution",TRUE,UN2582,3
+"toxic materials, bisulfite, aqueous solutions, n.o.s., liquid, in drums",TRUE,UN2693,3
+"toxic materials, bisulfite, liquid, in drums",TRUE,UN2693,3
+"toxic materials, hydrochloric acid",TRUE,UN1789,2
+"toxic materials, phosphoric acid 75%",TRUE,UN1805,3
+"toxic materials, phosphoric acid 85%",TRUE,UN1805,3
+"toxic solid, inorganic, n.o.s",TRUE,UN3290,2
+"toxic and/or corrosive (non-combustable), ammonium hydroxide 29%",TRUE,UN2672,3
+"toxic and/or corrosive (non-combustible), ammonium hydroxide 29%",TRUE,UN2672,3
+"toxic and/or corrosive (non-combustible), sulfuric acid, battery fluid acid",TRUE,UN2796,2
+"toxic and/or corrosive, (non-cumbustible), hypochlorite solutions",TRUE,UN1791,3
+"toxic, ferric chloride solution",TRUE,UN2582,3
+"toxic, nitric acid 67%",TRUE,UN2031,2
+"trisodium phosphate, chlorinated",FALSE,,
+"vegetable glycerin, non dot regulated (non-hazmat)",FALSE,,
+"vermiculite, density 15 but less than 22.5 pcf",FALSE,,
+"vermiculite, density 2 but less than 4 pcf",FALSE,,
+"vermiculite, density 6 but less than 8 pcf",FALSE,,
+"vermiculite, density 8 but less than 10 pcf",FALSE,,
+"vermiculite, in bags, density 12 but less than 15 pcf",FALSE,,
+"water, distilled deionized water , noi, in boxes",FALSE,,
+"water, noi, other than carbonated, distilled, in inner containers other than intravenous dispensing type, in boxes, drums",FALSE,,
+"water, distilled, noi, in boxes",FALSE,,
+"d-limonene food grade & kosher, cleaning compound, noi",FALSE,,
+ethanolamine-monoethanolamonie,TRUE,UN2491,3
+"petroleum distillates, oils, greases and related products",TRUE,UN1268,2
+"acetic acid solution, with more than 10 percent and less than 50 percent",,,
+"acetic acid solution, with more than 50 percent and less than 80 percent",,,
