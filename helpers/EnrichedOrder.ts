@@ -1,5 +1,4 @@
 
-import Shipstation from "shipstation-node";
 import type {
   IOrderPaginationResult,
 } from "shipstation-node/typings/models";
@@ -8,7 +7,7 @@ import { getData } from "./getData";
 export type EnrichedOrder = Awaited<ReturnType<typeof getEnrichedOrder>>;
 
 export async function getEnrichedOrder(orderData: IOrderPaginationResult) {
-    // Prepare to accumulate all enriched order data
+    // Prepare to accumulate all enriched order data (get only the first order for now)
     const order = orderData.orders[0];
   
     console.log(`Processing order: ${order.orderId}`);

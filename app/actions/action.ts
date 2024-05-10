@@ -1,6 +1,7 @@
 "use server";
 
-import type { components, paths } from "@/types/book-freight/schema";
+// import type { components, paths } from "@/types/book-freight/schema";
+import type { components, paths } from "@/types/book-freight/mycarrierSchema";
 import { optsSchema } from "@/types/optsSchema";
 import date from "date-and-time";
 import { getData, EnrichedItem } from "@/helpers/getData";
@@ -17,14 +18,6 @@ import { getEnrichedOrder, EnrichedOrder } from "@/helpers/EnrichedOrder";
 import { Dimensions, parseDimensionsAndQty  } from "@/helpers/parse-dims";
 import { parseWeight } from "@/helpers/parse-weight";
 import { getHazard, Hazard } from "@/helpers/getHazard";
-import type { 
-  LTLItem,
-  FreightClass,
-  PackagingType,
-  SaidToContainOptions,
-  LTLPackagingType,
-  ErrorResult
-} from "@/types/book-freight/action-types";
 
 
 
@@ -41,7 +34,7 @@ const shipStation = new Shipstation({
 });
 
 const client = createClient<paths>({
-  baseUrl: process.env.SANDBOX_FREIGHTVIEW_BASE_URL,
+  baseUrl: process.env.MYCARRIER_BASE_URL
 });
 
 
@@ -98,39 +91,63 @@ export async function bookFreight(
   }
 }
 
+async function getQuotes(
+  order: EnrichedOrder,
+  liftgate: boolean,
+  limitedAccess: boolean,
+) {
+    const now = new Date();
+    const todayDate = date.format(now, "YYYY-MM-DD");
+    const weight = parseWeight(order);
+    const dimensions = parseDimensionsAndQty(order);
 
-function getItems(
-  items: EnrichedOrder,
-  weight: number,
-  dimensions: Dimensions,
-): LTLItem {
-  let LTLitems: LTLItem;
+    return await client.POST("/api/Orders", {
+      body: {
+        orders: [
+          {
+            quoteReferenceID: order.orderNumber + " " + todayDate,
 
-  for (let i = 0; i < dimensions.qty; i++) {
-    LTLitems.push({
-      description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
-      weight: weight,
-      freightClass: validateFreightClass(
-        parseInt(items.enrichedItems[i].additionalData[i].freightClass.freightClass, 10),
-      ),
-      length: dimensions.length,
-      width: dimensions.width,
-      height: dimensions.height,
-      package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
-      pieces: 1,
-      nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined, 
-      hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?? undefined,
-      hazard: getHazard(items) as Hazard,
-      saidToContain: items.enrichedItems[i].additionalData[i].product.unitContainerType as SaidToContainOptions,
+          }
+        ]
+      }
+    })
 
 
-
-    });
-  }
-
-
-  return items;
 }
+
+
+// function getItems(
+//   items: EnrichedOrder,
+//   weight: number,
+//   dimensions: Dimensions,
+// ): LTLItem {
+//   let LTLitems: LTLItem;
+
+//   for (let i = 0; i < dimensions.qty; i++) {
+//     LTLitems.push({
+//       description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
+//       weight: weight,
+//       freightClass: validateFreightClass(
+//         parseInt(items.enrichedItems[i].additionalData[i].freightClass.freightClass, 10),
+//       ),
+//       length: dimensions.length,
+//       width: dimensions.width,
+//       height: dimensions.height,
+//       package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
+//       pieces: 1,
+//       nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined, 
+//       hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?? undefined,
+//       hazard: getHazard(items) as Hazard,
+//       saidToContain: items.enrichedItems[i].additionalData[i].product.unitContainerType as SaidToContainOptions,
+
+
+
+//     });
+//   }
+
+
+//   return items;
+// }
 
 //   async function rateLtlShipment(
 //     order: EnrichedOrder,
