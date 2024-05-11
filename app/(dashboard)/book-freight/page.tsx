@@ -1,15 +1,17 @@
 "use client";
 
 import { bookFreight, getOrder } from "@/app/actions/action";
+import lightLogo from "@/public/images/alliancechemical.svg";
+import darkLogo from "@/public/images/alliancechemical_dark.svg";
 import { optsSchema } from "@/types/optsSchema";
 import {
   Button,
   Card,
+  Checkbox,
   Label,
   TextInput,
   Toast,
   useThemeMode,
-  Checkbox,
 } from "flowbite-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,14 +25,11 @@ import {
   HiExclamation,
   HiMail,
   HiPhone,
-  HiX,
   HiShoppingCart,
+  HiX,
 } from "react-icons/hi";
 import { type IOrderPaginationResult } from "shipstation-node/typings/models";
 import titleize from "titleize";
-import darkLogo from "@/public/images/alliancechemical_dark.svg";
-import lightLogo from "@/public/images/alliancechemical.svg";
-
 
 export default function BookFreight() {
   const { computedMode } = useThemeMode();
@@ -49,8 +48,8 @@ export default function BookFreight() {
   const [chevronItemRight, setChevronItemRight] = useState<boolean | null>(
     true,
   );
-  const [isLiftgateRequired, setIsLiftgateRequired] = useState<boolean>(false)
-  const [isLimitedAccess, setIsLimitedAccess] = useState<boolean>(false)
+  const [isLiftgateRequired, setIsLiftgateRequired] = useState<boolean>(false);
+  const [isLimitedAccess, setIsLimitedAccess] = useState<boolean>(false);
 
   function handleChevronClick(section: string) {
     if (section === "shipment") {
@@ -64,15 +63,19 @@ export default function BookFreight() {
   const clientBookFreight = async () => {
     setShowToast(false);
     if (orderData === null) {
-      setShowToast(true)
+      setShowToast(true);
       setToastMessage("No order data available to book freight.");
       setToastStyle(
         "bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200",
       );
-      setIcon(<HiExclamation className="size-5" />)
+      setIcon(<HiExclamation className="size-5" />);
       return;
     }
-    const response = await bookFreight(orderData, isLiftgateRequired, isLimitedAccess);
+    const response = await bookFreight(
+      orderData,
+      isLiftgateRequired,
+      isLimitedAccess,
+    );
     if (response == null || response === undefined) {
       setShowToast(true);
       setToastMessage("Error booking freight. Please try again.");
@@ -91,7 +94,6 @@ export default function BookFreight() {
       return;
     }
     console.log();
-
   };
 
   const clientAction = async (formData: FormData) => {
@@ -103,7 +105,6 @@ export default function BookFreight() {
       orderNumber: formData.get("order-number"),
       orderStatus: "awaiting_shipment",
     };
-
 
     // client-side validation
     const result = optsSchema.safeParse(opts);
@@ -165,11 +166,7 @@ export default function BookFreight() {
         >
           <Image
             alt=""
-            src={
-              computedMode === "light"
-                ? lightLogo
-                : darkLogo
-            }
+            src={computedMode === "light" ? lightLogo : darkLogo}
             width={150}
             height={150}
             className="mr-4 h-11"
@@ -179,16 +176,22 @@ export default function BookFreight() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
             Book Freight
           </h2>
-          <form className="mt-8 space-y-6" >
-              <Label htmlFor="order-number">
-                Enter a Shipstation Order Number
-              </Label>
-              <div className="flex items-center gap-2">
-               <Checkbox id="liftgate" onClick={() => setIsLiftgateRequired(!isLiftgateRequired)} />
-               <Label htmlFor="liftgate">Liftgate Required</Label>
-               <Checkbox id="limitedAccess" onClick={() => setIsLimitedAccess(!isLimitedAccess)} />
-               <Label htmlFor="limitedAccess">Limited Access</Label>
-               </div>
+          <form className="mt-8 space-y-6">
+            <Label htmlFor="order-number">
+              Enter a Shipstation Order Number
+            </Label>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="liftgate"
+                onClick={() => setIsLiftgateRequired(!isLiftgateRequired)}
+              />
+              <Label htmlFor="liftgate">Liftgate Required</Label>
+              <Checkbox
+                id="limitedAccess"
+                onClick={() => setIsLimitedAccess(!isLimitedAccess)}
+              />
+              <Label htmlFor="limitedAccess">Limited Access</Label>
+            </div>
             <TextInput
               id="order-number"
               name="order-number"
@@ -198,7 +201,13 @@ export default function BookFreight() {
               required
             />
             <div className="flex flex-row gap-3">
-              <Button type="submit" size="lg" color="blue" disabled={pending} formAction={clientAction}>
+              <Button
+                type="submit"
+                size="lg"
+                color="blue"
+                disabled={pending}
+                formAction={clientAction}
+              >
                 Submit
               </Button>
               <Button
@@ -213,7 +222,7 @@ export default function BookFreight() {
             </div>
           </form>
         </Card>
-        <Card className="mt-10 w-full md:max-w-screen-lg overflow-y-scroll max-h-80">
+        <Card className="mt-10 max-h-80 w-full overflow-y-scroll md:max-w-screen-lg">
           {orderData ? (
             <ul>
               <div className="flex flex-row">
@@ -294,11 +303,13 @@ export default function BookFreight() {
                 ))}
             </ul>
           ) : (
-            <p className="text-sm  text-gray-900 dark:text-white lg:text-base">No order details available.</p>
+            <p className="text-sm  text-gray-900 dark:text-white lg:text-base">
+              No order details available.
+            </p>
           )}
         </Card>
         {orderData ? (
-          <Card className="mt-10 w-full md:max-w-screen-lg overflow-y-scroll max-h-80">
+          <Card className="mt-10 max-h-80 w-full overflow-y-scroll md:max-w-screen-lg">
             <div className="flex flex-row">
               <button
                 onClick={() => handleChevronClick("item")}

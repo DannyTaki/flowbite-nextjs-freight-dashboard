@@ -1,27 +1,15 @@
 "use server";
 
-// import type { components, paths } from "@/types/book-freight/schema";
-import type { components, paths } from "@/types/book-freight/mycarrierSchema";
+import { EnrichedOrder, getEnrichedOrder } from "@/helpers/EnrichedOrder";
+import { parseDimensionsAndQty, Dimensions } from "@/helpers/parse-dims";
+import { parseWeight } from "@/helpers/parse-weight";
+import type { paths } from "@/types/book-freight/mycarrierSchema";
 import { optsSchema } from "@/types/optsSchema";
 import date from "date-and-time";
-import { getData, EnrichedItem } from "@/helpers/getData";
-import { DevBundlerService } from "next/dist/server/lib/dev-bundler-service";
 import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
-import type {
-  IOrder,
-  IOrderPaginationResult,
-} from "shipstation-node/typings/models";
-import { validateFreightClass } from "@/helpers/validateFreight";
-import { getPackingGroup } from "@/helpers/getPackingGroup";
-import { getEnrichedOrder, EnrichedOrder } from "@/helpers/EnrichedOrder";
-import { Dimensions, parseDimensionsAndQty  } from "@/helpers/parse-dims";
-import { parseWeight } from "@/helpers/parse-weight";
-import { getHazard, Hazard } from "@/helpers/getHazard";
-
-
-
-
+import type { IOrderPaginationResult } from "shipstation-node/typings/models";
+import type { ErrorResult, Order, OrderItem, References, OriginAccessorials, DestinationAccessorials, OriginStop, DestinationStop, QuoteUnits, QuoteCommodity, Result } from "@/types/book-freight/action-types";
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,
@@ -34,9 +22,8 @@ const shipStation = new Shipstation({
 });
 
 const client = createClient<paths>({
-  baseUrl: process.env.MYCARRIER_BASE_URL
+  baseUrl: process.env.MYCARRIER_BASE_URL,
 });
-
 
 export async function getOrder(
   opts: unknown,
@@ -65,8 +52,6 @@ export async function getOrder(
   }
 }
 
-
-
 export async function bookFreight(
   orderData: IOrderPaginationResult,
   liftgate: boolean,
@@ -85,6 +70,8 @@ export async function bookFreight(
     const enrichedOrder = await getEnrichedOrder(orderData);
     console.log(enrichedOrder);
     // const shipmentResult = await rateLtlShipment(EnrichedOrder, liftgate, limitedAccess)
+    const quotes = await getQuotes(enrichedOrder, liftgate, limitedAccess);
+    return quotes;
   } catch (error) {
     console.log(error);
     return null;
@@ -98,6 +85,7 @@ async function getQuotes(
 ) {
     const now = new Date();
     const todayDate = date.format(now, "YYYY-MM-DD");
+    const formattedDate = date.format(now, "MM/DD/YYYY h:mm A");
     const weight = parseWeight(order);
     const dimensions = parseDimensionsAndQty(order);
 
@@ -106,48 +94,114 @@ async function getQuotes(
         orders: [
           {
             quoteReferenceID: order.orderNumber + " " + todayDate,
+            serviceType: "LTL",
+            pickupDate: todayDate,
+            paymentDirection: "Prepaid",
+            carrierService: "Standard",
+            emergencyContactPersonName: "Chemtel",
+            emergencyContactPhone: "800-255-3924",
+            readyToDispatch: "YES",  // What does this mean?
+            timeCreated: formattedDate,
+            isVicsBol: "YES",
+            references: {
+              referenceNumber: order.orderNumber,
+            },
+            destinationAccessorials: {
+              notifyBeforeDelivery: "NO",
+              liftgateDelivery: liftgate ? "YES" : "NO",
+              sortOrSegregateDelivery: "NO",
+              insideDelivery: "NO",
+              deliveryAppointment: "NO",
+            },
+            originStop: {
+              companyName: "Alliance Chemical",
+              streetLine1: "204 South Edmond Street",
+              city: "Taylor",
+              state: "TX",
+              zip: "76574",
+              country: "USA",
+              locationType: "Business",
+              contactFirstName: "Adnan",
+              contactLastName: "Heikal",
+              contactEmail: "adnan.heikal@alliancechemical",
+              contactPhone: "512-365-6838",
+              ext: "516",
+              readyTime: "09:00 AM",
+              closeTime: "04:00 PM",
+            },
+            destinationStop: {
+              companyName: order.shipTo.company ? order.shipTo.company : undefined,
+              streetLine1: order.shipTo.street1,
+              streetLine2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
+              city: order.shipTo.city,
+              state: order.shipTo.state,
+              zip: order.shipTo.postalCode,
+              country: "USA",
+              locationType: order.shipTo.residential ? "Residential" : "Business",   // Make a dropdown UI element for user selection of location type
+              contactFirstName: order.shipTo.name,
+              contactPhone: order.shipTo.phone,
+              contactEmail: order.customerEmail,
+              readyTime: "09:00 AM",
+              closeTime: "04:00 PM",
+            },
+            quoteUnits: getQuoteUnits(order, dimensions),
 
           }
         ]
-      }
-    })
+      },
+    });
+
+// function constructQuoteUnits(order: EnrichedOrder): QuoteUnits  {
+//   for (let i = 0; i < dimensions.qty; i++ ) {
+
+//   }
+// }
 
 
+function getQuoteUnits(
+  items: EnrichedOrder,
+  weight: number,
+  dimensions: Dimensions,
+): QuoteUnits {
+  let LTLitems: QuoteUnits;
+
+  for (let i = 0; i < dimensions.qty; i++) {
+    LTLitems.push({
+      shippingUnitType: "Pallet",
+      shippingUnitCount: dimensions.qty,
+      unitLength: dimensions.length,
+      unitWidth: dimensions.width,
+      unitHeight: dimensions.height,
+      unitStackable: "NO",
+      quoteCommodities: getQuoteCommodities(items),
+
+
+    });
+  }
+
+  return items;
 }
 
-
-// function getItems(
-//   items: EnrichedOrder,
-//   weight: number,
-//   dimensions: Dimensions,
-// ): LTLItem {
-//   let LTLitems: LTLItem;
-
-//   for (let i = 0; i < dimensions.qty; i++) {
-//     LTLitems.push({
-//       description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
-//       weight: weight,
-//       freightClass: validateFreightClass(
-//         parseInt(items.enrichedItems[i].additionalData[i].freightClass.freightClass, 10),
-//       ),
-//       length: dimensions.length,
-//       width: dimensions.width,
-//       height: dimensions.height,
-//       package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
-//       pieces: 1,
-//       nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined, 
-//       hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?? undefined,
-//       hazard: getHazard(items) as Hazard,
-//       saidToContain: items.enrichedItems[i].additionalData[i].product.unitContainerType as SaidToContainOptions,
+function getQuoteCommodities(items: EnrichedOrder): QuoteCommodity {
 
 
+  return commodities;
+}
 
-//     });
-//   }
-
-
-//   return items;
-// }
+// description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
+// weight: weight,
+// freightClass: validateFreightClass(
+//   parseInt(items.enrichedItems[i].additionalData[i].freightClass.freightClass, 10),
+// ),
+// length: dimensions.length,
+// width: dimensions.width,
+// height: dimensions.height,
+// package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
+// pieces: 1,
+// nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
+// hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?? undefined,
+// hazard: getHazard(items) as Hazard,
+// saidToContain: items.enrichedItems[i].additionalData[i].product.unitContainerType as SaidToContainOptions,
 
 //   async function rateLtlShipment(
 //     order: EnrichedOrder,
@@ -223,9 +277,6 @@ async function getQuotes(
 
 //   return;
 // }
-
-
-
 
 /* V2 API Oauth token generation */
 
