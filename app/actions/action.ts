@@ -162,8 +162,8 @@ function getQuoteUnits(
   items: EnrichedOrder,
   weight: number,
   dimensions: Dimensions,
-): QuoteUnits {
-  let LTLitems: QuoteUnits;
+): QuoteUnits[] {
+  let LTLitems: QuoteUnits[];
 
   for (let i = 0; i < dimensions.qty; i++) {
     LTLitems.push({
@@ -182,10 +182,19 @@ function getQuoteUnits(
   return items;
 }
 
-function getQuoteCommodities(items: EnrichedOrder): QuoteCommodity {
+function getQuoteCommodities(items: EnrichedOrder): QuoteCommodity[]
+{
+
+  let commodities: QuoteCommodity[];
+  for(let i = 0; i < items.enrichedItems.length; i++) {
+    commodities.push({
+      commodityDescription: "",
+      commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
+    })
+  }
 
 
-  return commodities;
+
 }
 
 // description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,

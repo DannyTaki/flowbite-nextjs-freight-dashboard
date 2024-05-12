@@ -23,6 +23,6 @@ export type DestinationStop =
 export type QuoteUnits =
   components["schemas"]["ITM.Shared.Functions.OrderProcessing.Common.Models.UploadOrder.Unit"];
 export type QuoteCommodity =
-  components["schemas"]["ITM.Shared.Functions.OrderProcessing.Common.Models.UploadOrder.QuoteCommodity"];
+  components["schemas"]["ITM.Shared.Functions.OrderProcessing.Common.Models.UploadOrder.Commodity"];
 export type Result =
   components["schemas"]["ITM.Shared.Functions.OrderProcessing.Common.Models.UploadOrder.Results"];
