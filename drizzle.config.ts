@@ -5,6 +5,6 @@ export default {
     out: "./app/db/drizzle",
     driver: "pg",
     dbCredentials: {
-        connectionString: "postgresql://neondb_owner:4QJXa9fwlHsD@ep-flat-queen-a56n27qv.us-east-2.aws.neon.tech/neondb?sslmode=require", 
+        connectionString: "postgresql://neondb_owner:4QJXa9fwlHsD@ep-flat-queen-a56n27qv.us-east-2.aws.neon.tech/neondb?sslmode=require",
     }
   } satisfies Config;
