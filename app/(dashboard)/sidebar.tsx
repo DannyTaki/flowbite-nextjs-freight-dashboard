@@ -19,6 +19,7 @@ import {
   HiSearch,
   HiShoppingBag,
   HiSupport,
+  HiTable,
   HiUsers,
   HiViewGrid,
 } from "react-icons/hi";
@@ -80,7 +81,7 @@ function DesktopSidebar() {
       aria-label="Sidebar with multi-level dropdown example"
       collapsed={isCollapsed}
       className={twMerge(
-        "fixed inset-y-0 left-0 z-20 flex h-full shrink-0 flex-col border-r border-gray-200 pt-16 duration-75 lg:flex dark:border-gray-700",
+        "fixed inset-y-0 left-0 z-20 flex h-full shrink-0 flex-col border-r border-gray-200 pt-16 duration-75 dark:border-gray-700 lg:flex",
         isCollapsed && "hidden w-16",
       )}
       id="sidebar"
@@ -117,7 +118,7 @@ function MobileSidebar() {
       <Sidebar
         aria-label="Sidebar with multi-level dropdown example"
         className={twMerge(
-          "fixed inset-y-0 left-0 z-20 hidden h-full shrink-0 flex-col border-r border-gray-200 pt-16 lg:flex dark:border-gray-700",
+          "fixed inset-y-0 left-0 z-20 hidden h-full shrink-0 flex-col border-r border-gray-200 pt-16 dark:border-gray-700 lg:flex",
           isOpen && "flex",
         )}
         id="sidebar"
@@ -428,7 +429,12 @@ function LanguageDropdown() {
 
 const pages: SidebarItem[] = [
   { href: "/", icon: HiChartPie, label: "Dashboard" },
-  { href: "/book-freight", icon: BsFillTrainFreightFrontFill, label: "Freight"},
+  {
+    href: "/book-freight",
+    icon: BsFillTrainFreightFrontFill,
+    label: "Freight",
+  },
+  { href: "/chemicals", icon: HiTable, label: "Chemicals" },
   { href: "/kanban", icon: HiViewGrid, label: "Kanban" },
   { href: "/mailing/inbox", icon: HiInboxIn, label: "Inbox", badge: "3" },
   {

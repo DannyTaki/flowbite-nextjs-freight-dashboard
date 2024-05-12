@@ -78,124 +78,118 @@ export async function bookFreight(
   }
 }
 
-async function getQuotes(
-  order: EnrichedOrder,
-  liftgate: boolean,
-  limitedAccess: boolean,
-) {
-    const now = new Date();
-    const todayDate = date.format(now, "YYYY-MM-DD");
-    const formattedDate = date.format(now, "MM/DD/YYYY h:mm A");
-    const weight = parseWeight(order);
-    const dimensions = parseDimensionsAndQty(order);
+// async function getQuotes(
+//   order: EnrichedOrder,
+//   liftgate: boolean,
+//   limitedAccess: boolean,
+// ) {
+//     const now = new Date();
+//     const todayDate = date.format(now, "YYYY-MM-DD");
+//     const formattedDate = date.format(now, "MM/DD/YYYY h:mm A");
+//     const weight = parseWeight(order);
+//     const dimensions = parseDimensionsAndQty(order);
 
-    return await client.POST("/api/Orders", {
-      body: {
-        orders: [
-          {
-            quoteReferenceID: order.orderNumber + " " + todayDate,
-            serviceType: "LTL",
-            pickupDate: todayDate,
-            paymentDirection: "Prepaid",
-            carrierService: "Standard",
-            emergencyContactPersonName: "Chemtel",
-            emergencyContactPhone: "800-255-3924",
-            readyToDispatch: "YES",  // What does this mean?
-            timeCreated: formattedDate,
-            isVicsBol: "YES",
-            references: {
-              referenceNumber: order.orderNumber,
-            },
-            destinationAccessorials: {
-              notifyBeforeDelivery: "NO",
-              liftgateDelivery: liftgate ? "YES" : "NO",
-              sortOrSegregateDelivery: "NO",
-              insideDelivery: "NO",
-              deliveryAppointment: "NO",
-            },
-            originStop: {
-              companyName: "Alliance Chemical",
-              streetLine1: "204 South Edmond Street",
-              city: "Taylor",
-              state: "TX",
-              zip: "76574",
-              country: "USA",
-              locationType: "Business",
-              contactFirstName: "Adnan",
-              contactLastName: "Heikal",
-              contactEmail: "adnan.heikal@alliancechemical",
-              contactPhone: "512-365-6838",
-              ext: "516",
-              readyTime: "09:00 AM",
-              closeTime: "04:00 PM",
-            },
-            destinationStop: {
-              companyName: order.shipTo.company ? order.shipTo.company : undefined,
-              streetLine1: order.shipTo.street1,
-              streetLine2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
-              city: order.shipTo.city,
-              state: order.shipTo.state,
-              zip: order.shipTo.postalCode,
-              country: "USA",
-              locationType: order.shipTo.residential ? "Residential" : "Business",   // Make a dropdown UI element for user selection of location type
-              contactFirstName: order.shipTo.name,
-              contactPhone: order.shipTo.phone,
-              contactEmail: order.customerEmail,
-              readyTime: "09:00 AM",
-              closeTime: "04:00 PM",
-            },
-            quoteUnits: getQuoteUnits(order, dimensions),
+//     return await client.POST("/api/Orders", {
+//       body: {
+//         orders: [
+//           {
+//             quoteReferenceID: order.orderNumber + " " + todayDate,
+//             serviceType: "LTL",
+//             pickupDate: todayDate,
+//             paymentDirection: "Prepaid",
+//             carrierService: "Standard",
+//             emergencyContactPersonName: "Chemtel",
+//             emergencyContactPhone: "800-255-3924",
+//             readyToDispatch: "YES",  // What does this mean?
+//             timeCreated: formattedDate,
+//             isVicsBol: "YES",
+//             references: {
+//               referenceNumber: order.orderNumber,
+//             },
+//             destinationAccessorials: {
+//               notifyBeforeDelivery: "NO",
+//               liftgateDelivery: liftgate ? "YES" : "NO",
+//               sortOrSegregateDelivery: "NO",
+//               insideDelivery: "NO",
+//               deliveryAppointment: "NO",
+//             },
+//             originStop: {
+//               companyName: "Alliance Chemical",
+//               streetLine1: "204 South Edmond Street",
+//               city: "Taylor",
+//               state: "TX",
+//               zip: "76574",
+//               country: "USA",
+//               locationType: "Business",
+//               contactFirstName: "Adnan",
+//               contactLastName: "Heikal",
+//               contactEmail: "adnan.heikal@alliancechemical",
+//               contactPhone: "512-365-6838",
+//               ext: "516",
+//               readyTime: "09:00 AM",
+//               closeTime: "04:00 PM",
+//             },
+//             destinationStop: {
+//               companyName: order.shipTo.company ? order.shipTo.company : undefined,
+//               streetLine1: order.shipTo.street1,
+//               streetLine2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
+//               city: order.shipTo.city,
+//               state: order.shipTo.state,
+//               zip: order.shipTo.postalCode,
+//               country: "USA",
+//               locationType: order.shipTo.residential ? "Residential" : "Business",   // Make a dropdown UI element for user selection of location type
+//               contactFirstName: order.shipTo.name,
+//               contactPhone: order.shipTo.phone,
+//               contactEmail: order.customerEmail,
+//               readyTime: "09:00 AM",
+//               closeTime: "04:00 PM",
+//             },
+//             quoteUnits: getQuoteUnits(order, dimensions),
 
-          }
-        ]
-      },
-    });
+//           }
+//         ]
+//       },
+//     });
 
-// function constructQuoteUnits(order: EnrichedOrder): QuoteUnits  {
-//   for (let i = 0; i < dimensions.qty; i++ ) {
+// function getQuoteUnits(
+//   items: EnrichedOrder,
+//   weight: number,
+//   dimensions: Dimensions,
+// ): QuoteUnits[] {
+//   let LTLitems: QuoteUnits[];
 
+//   for (let i = 0; i < dimensions.qty; i++) {
+//     LTLitems.push({
+//       shippingUnitType: "Pallet",
+//       shippingUnitCount: dimensions.qty,
+//       unitLength: dimensions.length,
+//       unitWidth: dimensions.width,
+//       unitHeight: dimensions.height,
+//       unitStackable: "NO",
+//       quoteCommodities: getQuoteCommodities(items),
+
+
+//     });
 //   }
+
+//   return items;
 // }
 
+// function getQuoteCommodities(items: EnrichedOrder): QuoteCommodity[]
+// {
 
-function getQuoteUnits(
-  items: EnrichedOrder,
-  weight: number,
-  dimensions: Dimensions,
-): QuoteUnits[] {
-  let LTLitems: QuoteUnits[];
-
-  for (let i = 0; i < dimensions.qty; i++) {
-    LTLitems.push({
-      shippingUnitType: "Pallet",
-      shippingUnitCount: dimensions.qty,
-      unitLength: dimensions.length,
-      unitWidth: dimensions.width,
-      unitHeight: dimensions.height,
-      unitStackable: "NO",
-      quoteCommodities: getQuoteCommodities(items),
-
-
-    });
-  }
-
-  return items;
-}
-
-function getQuoteCommodities(items: EnrichedOrder): QuoteCommodity[]
-{
-
-  let commodities: QuoteCommodity[];
-  for(let i = 0; i < items.enrichedItems.length; i++) {
-    commodities.push({
-      commodityDescription: "",
-      commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
-    })
-  }
+//   let commodities: QuoteCommodity[];
+//   for(let i = 0; i < items.enrichedItems.length; i++) {
+//     commodities.push({
+//       commodityDescription: "",
+//       commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
+//       commoditySub: items.enrichedItems[i].additionalData[i].
+//     })
+//   }
 
 
 
-}
+// }
 
 // description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
 // weight: weight,
