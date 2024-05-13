@@ -2,9 +2,13 @@
 
 import { getChemicalData } from "@/helpers/getData";
 import { useQuery } from "@tanstack/react-query";
-import { Checkbox, Table } from "flowbite-react";
+import { index } from "drizzle-orm/mysql-core";
+import { Checkbox, DrawerItems, TabItem, Table, Modal, Button } from "flowbite-react";
+import { useState } from "react";
 
 export default function Chemicals() {
+  const [openModal, setOpenModal] = useState(false);
+
   const { data, error } = useQuery({
     queryKey: ["chemicals"],
     queryFn: () => getChemicalData(),
@@ -16,79 +20,76 @@ export default function Chemicals() {
     console.log(error);
   }
 
+
+
   return (
     <div className="overflow-x-auto">
+      <Modal show={openModal} onClose={() => setOpenModal(false)}>
+        <Modal.Header>Terms of Service</Modal.Header>
+          <Modal.Body>
+            <div className="space-y-6">
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                With less than a month to go before the European Union enacts new consumer privacy laws for its citizens,
+                companies around the world are updating their terms of service agreements to comply.
+              </p>
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant
+                to ensure a common set of data rights in the European Union. It requires organizations to notify users as
+                soon as possible of high-risk data breaches that could personally affect them.
+              </p>
+            </div>
+          </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => setOpenModal(false)}>I accept</Button>
+          <Button color="gray" onClick={() => setOpenModal(false)}>
+            Decline
+          </Button>
+        </Modal.Footer>
+
+      </Modal>
       <Table hoverable>
         <Table.Head>
           <Table.HeadCell className="p-4">
             <Checkbox />
           </Table.HeadCell>
-          <Table.HeadCell>Product name</Table.HeadCell>
-          <Table.HeadCell>Color</Table.HeadCell>
-          <Table.HeadCell>Category</Table.HeadCell>
-          <Table.HeadCell>Price</Table.HeadCell>
+          <Table.HeadCell>Classification ID</Table.HeadCell>
+          <Table.HeadCell>Description</Table.HeadCell>
+          <Table.HeadCell>NMFC</Table.HeadCell>
+          <Table.HeadCell>Sub</Table.HeadCell>
+          <Table.HeadCell>Freight Class</Table.HeadCell>
+          <Table.HeadCell>Hazardous</Table.HeadCell>
+          <Table.HeadCell>Hazard ID</Table.HeadCell>
+          <Table.HeadCell>Packing Group</Table.HeadCell>  
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+          {data?.map((item, index) => (
+            <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
             <Table.Cell className="p-4">
               <Checkbox />
             </Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-              {'Apple MacBook Pro 17"'}
+              {item.classificationId}
             </Table.Cell>
-            <Table.Cell>Sliver</Table.Cell>
-            <Table.Cell>Laptop</Table.Cell>
-            <Table.Cell>$2999</Table.Cell>
+            <Table.Cell>{item.description}</Table.Cell>
+            <Table.Cell>{item.nmfc}</Table.Cell>
+            <Table.Cell>{item.sub || ''}</Table.Cell>
+            <Table.Cell>{item.freightClass}</Table.Cell>
+            <Table.Cell>{item.hazardous ? 'Yes' : 'No'}</Table.Cell>
+            <Table.Cell>{item.hazardId || ''}</Table.Cell>
+            <Table.Cell>{item.packingGroup || ''}</Table.Cell>
             <Table.Cell>
-              <a
-                href="#"
-                className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-              >
+              <button onClick={() => setOpenModal(true)}>
+              <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
                 Edit
               </a>
+              </button>
             </Table.Cell>
           </Table.Row>
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-            <Table.Cell className="p-4">
-              <Checkbox />
-            </Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-              Microsoft Surface Pro
-            </Table.Cell>
-            <Table.Cell>White</Table.Cell>
-            <Table.Cell>Laptop PC</Table.Cell>
-            <Table.Cell>$1999</Table.Cell>
-            <Table.Cell>
-              <a
-                href="#"
-                className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-              >
-                Edit
-              </a>
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-            <Table.Cell className="p-4">
-              <Checkbox />
-            </Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-              Magic Mouse 2
-            </Table.Cell>
-            <Table.Cell>Black</Table.Cell>
-            <Table.Cell>Accessories</Table.Cell>
-            <Table.Cell>$99</Table.Cell>
-            <Table.Cell>
-              <a
-                href="#"
-                className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-              >
-                Edit
-              </a>
-            </Table.Cell>
-          </Table.Row>
+            )
+          )};
         </Table.Body>
       </Table>
     </div>
