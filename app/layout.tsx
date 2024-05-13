@@ -1,12 +1,11 @@
+import { Providers } from "@/utils/providers";
 import { Flowbite, ThemeModeScript } from "flowbite-react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
-import { customTheme } from "./theme";
-// import { ClerkProvider } from "@clerk/nextjs";
-
 import "./globals.css";
+import { customTheme } from "./theme";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -18,10 +17,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
-    // <ClerkProvider>
-    <html lang="en">  
+    <html lang="en">
       <head>
-    
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
@@ -30,9 +27,10 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <ThemeModeScript />
       </head>
       <body className={twMerge("bg-gray-50 dark:bg-gray-900", inter.className)}>
-        <Flowbite theme={{ theme: customTheme }}>{children}</Flowbite>
+        <Providers>
+          <Flowbite theme={{ theme: customTheme }}>{children}</Flowbite>
+        </Providers>
       </body>
     </html>
-    // </ClerkProvider>
   );
 }

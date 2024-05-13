@@ -38,9 +38,22 @@ export async function getData(sku: string) {
 }
 
 export async function getChemicalData() {
-  const chemicals = await db
-    .select()
-    .from(schema.freightClassifications)
-    .execute();
-  return chemicals;
+  try {
+    const classifications = await db
+      .select({
+        classificationId: schema.freightClassifications.classificationId,
+        description: schema.freightClassifications.description,
+        nmfc: schema.freightClassifications.nmfc,
+        freightClass: schema.freightClassifications.freightClass,
+        hazardous: schema.freightClassifications.hazardous,
+        hazardId: schema.freightClassifications.hazardId,
+        packingGroup: schema.freightClassifications.packingGroup,
+        sub: schema.freightClassifications.sub,
+      })
+      .from(schema.freightClassifications)
+      .execute();
+    return classifications;
+  } catch (error) {
+    console.error(error);
+  }
 }

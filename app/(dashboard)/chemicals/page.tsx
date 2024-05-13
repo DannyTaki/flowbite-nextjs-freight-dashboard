@@ -1,13 +1,20 @@
 "use client";
 
-import { Checkbox, Table } from "flowbite-react";
 import { getChemicalData } from "@/helpers/getData";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Checkbox, Table } from "flowbite-react";
 
 export default function Chemicals() {
-  const data = await getChemicalData();
-
-
+  const { data, error } = useQuery({
+    queryKey: ["chemicals"],
+    queryFn: () => getChemicalData(),
+  });
+  if (data !== undefined && data !== null) {
+    console.log(data);
+  }
+  if (error) {
+    console.log(error);
+  }
 
   return (
     <div className="overflow-x-auto">
