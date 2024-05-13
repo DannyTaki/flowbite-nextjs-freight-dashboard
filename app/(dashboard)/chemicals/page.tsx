@@ -1,3 +1,5 @@
+"use client";
+
 import type { SingleChemicalData } from "@/helpers/getData";
 import { getChemicalData, updateChemicalEntry } from "@/helpers/getData"; // adjust the import path as necessary
 import { useQuery } from "@tanstack/react-query";
