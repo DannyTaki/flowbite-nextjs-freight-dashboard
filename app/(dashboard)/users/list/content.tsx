@@ -32,7 +32,7 @@ import type { UsersListPageData } from "./page";
 const UsersListPageContent: FC<UsersListPageData> = function ({ usersList }) {
   return (
     <>
-      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 sm:flex dark:border-gray-700 dark:bg-gray-800">
+      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
         <div className="mb-1 w-full">
           <div className="mb-4">
             <Breadcrumb className="mb-5">
@@ -45,12 +45,12 @@ const UsersListPageContent: FC<UsersListPageData> = function ({ usersList }) {
               <Breadcrumb.Item href="/users/list">Users</Breadcrumb.Item>
               <Breadcrumb.Item>List</Breadcrumb.Item>
             </Breadcrumb>
-            <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
               All users
             </h1>
           </div>
           <div className="sm:flex">
-            <div className="mb-3 hidden items-center sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100 dark:divide-gray-700">
+            <div className="mb-3 hidden items-center dark:divide-gray-700 sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
               <form className="lg:pr-3">
                 <Label htmlFor="users-search" className="sr-only">
                   Search
@@ -459,7 +459,7 @@ const Pagination: FC<UsersListPageData> = function ({ usersList }) {
   };
 
   return (
-    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 sm:flex sm:justify-between dark:border-gray-700 dark:bg-gray-800">
+    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex sm:justify-between">
       <div className="mb-4 flex items-center sm:mb-0">
         <button
           onClick={previousPage}

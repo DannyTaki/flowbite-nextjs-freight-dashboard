@@ -93,7 +93,7 @@ const SECTIONS: Section[] = [
 
 export function FooterMain() {
   return (
-    <footer className="bg-white py-12 xl:py-24 dark:bg-gray-800">
+    <footer className="bg-white py-12 dark:bg-gray-800 xl:py-24">
       <div className="container mx-auto px-4 lg:px-0">
         <div className="grid gap-12 xl:grid-cols-6 xl:gap-24">
           <Brand />
@@ -101,7 +101,7 @@ export function FooterMain() {
             <Section key={section.title} {...section} />
           ))}
         </div>
-        <hr className="my-8 border-gray-200 lg:my-12 dark:border-gray-700" />
+        <hr className="my-8 border-gray-200 dark:border-gray-700 lg:my-12" />
         <Copyright />
       </div>
     </footer>

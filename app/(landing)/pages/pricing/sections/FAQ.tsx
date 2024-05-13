@@ -5,14 +5,14 @@ import Link from "next/link";
 export function FAQ() {
   return (
     <section className="pt-20">
-      <h2 className="mb-3 text-3xl font-bold text-gray-900 sm:text-5xl sm:leading-none sm:tracking-tight dark:text-white">
+      <h2 className="mb-3 text-3xl font-bold text-gray-900 dark:text-white sm:text-5xl sm:leading-none sm:tracking-tight">
         Frequently asked questions
       </h2>
-      <p className="mb-6 text-lg font-normal text-gray-500 sm:text-xl dark:text-gray-400">
+      <p className="mb-6 text-lg font-normal text-gray-500 dark:text-gray-400 sm:text-xl">
         All types of businesses need access to development resources, so we give
         you the option to decide how much you need to use.
       </p>
-      <hr className="my-6 border-gray-200 md:my-12 dark:border-gray-800" />
+      <hr className="my-6 border-gray-200 dark:border-gray-800 md:my-12" />
       <div className="grid gap-8 lg:grid-cols-3">
         <div>
           <div className="mb-10">

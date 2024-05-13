@@ -7,7 +7,7 @@ export default function ForgotPasswordPage() {
     <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
       <Link
         href="/"
-        className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
+        className="mb-8 flex items-center justify-center text-2xl font-semibold dark:text-white lg:mb-10"
       >
         <Image
           alt=""
@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
         className="sm:max-w-screen-sm md:max-w-screen-sm"
         theme={{ root: { children: "w-full p-6 sm:p-8 md:p-16" } }}
       >
-        <h2 className="mb-3 text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+        <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
           Forgot your password?
         </h2>
         <p className="text-base font-normal text-gray-500 dark:text-gray-400">

@@ -13,13 +13,13 @@ const DashboardFooter: FC = function () {
           <Footer.LinkGroup>
             <Footer.Link
               href="#"
-              className="mb-3 mr-3 text-gray-500 lg:mb-0 dark:text-gray-400"
+              className="mb-3 mr-3 text-gray-500 dark:text-gray-400 lg:mb-0"
             >
               Terms and conditions
             </Footer.Link>
             <Footer.Link
               href="#"
-              className="mb-3 mr-3 text-gray-500 lg:mb-0 dark:text-gray-400"
+              className="mb-3 mr-3 text-gray-500 dark:text-gray-400 lg:mb-0"
             >
               Privacy Policy
             </Footer.Link>
@@ -42,31 +42,31 @@ const DashboardFooter: FC = function () {
           <Footer.LinkGroup className="flex-nowrap gap-6 sm:justify-center">
             <Footer.Link
               href="#"
-              className="m-0 text-gray-500 hover:text-gray-900 md:m-0 dark:text-gray-400 dark:hover:text-white"
+              className="m-0 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white md:m-0"
             >
               <MdFacebook className="h-5 w-5" />
             </Footer.Link>
             <Footer.Link
               href="#"
-              className="m-0 text-gray-500 hover:text-gray-900 md:m-0 dark:text-gray-400 dark:hover:text-white"
+              className="m-0 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white md:m-0"
             >
               <FaInstagram className="h-5 w-5" />
             </Footer.Link>
             <Footer.Link
               href="#"
-              className="m-0 text-gray-500 hover:text-gray-900 md:m-0 dark:text-gray-400 dark:hover:text-white"
+              className="m-0 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white md:m-0"
             >
               <FaTwitter className="h-5 w-5" />
             </Footer.Link>
             <Footer.Link
               href="#"
-              className="m-0 text-gray-500 hover:text-gray-900 md:m-0 dark:text-gray-400 dark:hover:text-white"
+              className="m-0 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white md:m-0"
             >
               <FaGithub className="h-5 w-5" />
             </Footer.Link>
             <Footer.Link
               href="#"
-              className="m-0 text-gray-500 hover:text-gray-900 md:m-0 dark:text-gray-400 dark:hover:text-white"
+              className="m-0 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white md:m-0"
             >
               <FaDribbble className="h-5 w-5" />
             </Footer.Link>

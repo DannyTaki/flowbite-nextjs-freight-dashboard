@@ -48,7 +48,7 @@ const Menu: FC<MailingInboxPageData> = function ({ inboxMessages }) {
   };
 
   return (
-    <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 sm:flex dark:border-gray-700 dark:bg-gray-800">
+    <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
       <div className="flex items-center divide-x divide-gray-100 dark:divide-gray-700">
         <div className="pr-3">
           <Label htmlFor="checkbox-all" className="sr-only">
@@ -118,7 +118,7 @@ const Menu: FC<MailingInboxPageData> = function ({ inboxMessages }) {
           <span className="sr-only">Next</span>
           <HiChevronRight className="h-7 w-7" />
         </button>
-        <span className="font-normal text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
+        <span className="font-normal text-gray-500 dark:text-gray-400 sm:text-xs md:text-sm">
           Show&nbsp;
           <span className="font-semibold text-gray-900 dark:text-white">
             {page * inboxMessages.length + 1}-
@@ -198,7 +198,7 @@ const Inbox: FC<MailingInboxPageData> = function ({ inboxMessages }) {
                       </Table.Cell>
                       <Table.Cell
                         className={twMerge(
-                          "max-w-sm overflow-hidden truncate p-4 text-base text-gray-700 xl:max-w-screen-md 2xl:max-w-screen-lg dark:text-gray-400",
+                          "max-w-sm overflow-hidden truncate p-4 text-base text-gray-700 dark:text-gray-400 xl:max-w-screen-md 2xl:max-w-screen-lg",
                           !read &&
                             "font-semibold text-gray-900 dark:text-white",
                         )}
@@ -227,7 +227,7 @@ const Inbox: FC<MailingInboxPageData> = function ({ inboxMessages }) {
 
 const Footer: FC = function () {
   return (
-    <div className="w-full items-center space-y-4 border-t border-gray-200 bg-white p-4 sm:sticky sm:flex sm:justify-between sm:space-y-0 dark:border-gray-700 dark:bg-gray-800">
+    <div className="w-full items-center space-y-4 border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:sticky sm:flex sm:justify-between sm:space-y-0">
       <div className="flex flex-col gap-1">
         <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
           3.24 GB of 15 GB used
@@ -238,7 +238,7 @@ const Footer: FC = function () {
           className="w-full sm:w-52 md:w-96"
         />
       </div>
-      <div className="hidden items-center gap-x-2 text-sm font-medium text-gray-500 sm:flex dark:text-gray-400">
+      <div className="hidden items-center gap-x-2 text-sm font-medium text-gray-500 dark:text-gray-400 sm:flex">
         Last account activity: 2 hours ago
         <HiEye className="h-4 w-4" />
       </div>

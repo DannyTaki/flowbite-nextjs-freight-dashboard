@@ -1,6 +1,4 @@
-import type {
-    IOrder,
-  } from "shipstation-node/typings/models";
+import type { IOrder } from "shipstation-node/typings/models";
 
 export function parseWeight(order: IOrder): number {
   const weightRegex = /(\d+)\s*(LBS|pound|pounds)/i;

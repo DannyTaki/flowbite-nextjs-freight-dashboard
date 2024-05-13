@@ -7,7 +7,7 @@ export default function SignInPage() {
     <div className="mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
       <Link
         href="/"
-        className="mb-8 flex items-center justify-center text-2xl font-semibold lg:mb-10 dark:text-white"
+        className="mb-8 flex items-center justify-center text-2xl font-semibold dark:text-white lg:mb-10"
       >
         <Image
           alt=""
@@ -36,7 +36,7 @@ export default function SignInPage() {
           },
         }}
       >
-        <h2 className="text-2xl font-bold text-gray-900 lg:text-3xl dark:text-white">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white lg:text-3xl">
           Sign in to platform
         </h2>
         <form className="mt-8 space-y-6">

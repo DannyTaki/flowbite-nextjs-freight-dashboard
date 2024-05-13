@@ -34,7 +34,7 @@ const ECommerceProductsPageContent: FC<ECommerceProductsPageData> = function ({
 }) {
   return (
     <>
-      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 sm:flex dark:border-gray-700 dark:bg-gray-800">
+      <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
         <div className="mb-1 w-full">
           <div className="mb-4">
             <Breadcrumb className="mb-5">
@@ -49,13 +49,13 @@ const ECommerceProductsPageContent: FC<ECommerceProductsPageData> = function ({
               </Breadcrumb.Item>
               <Breadcrumb.Item>Products</Breadcrumb.Item>
             </Breadcrumb>
-            <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
               All products
             </h1>
           </div>
           <div className="block items-center sm:flex">
             <SearchForProducts />
-            <div className="hidden space-x-1 border-l border-gray-100 pl-2 md:flex dark:border-gray-700">
+            <div className="hidden space-x-1 border-l border-gray-100 pl-2 dark:border-gray-700 md:flex">
               <Link
                 href="#"
                 className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -442,7 +442,7 @@ const ProductsTable: FC<ECommerceProductsPageData> = function ({ products }) {
 
 function TableNavigation() {
   return (
-    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 sm:flex sm:justify-between dark:border-gray-700 dark:bg-gray-800">
+    <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex sm:justify-between">
       <div className="mb-4 flex items-center sm:mb-0">
         <a
           href="#"

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function NavbarMain() {
   return (
-    <nav className="fixed z-50 w-full border-b border-gray-200 bg-white sm:py-2 dark:border-gray-700 dark:bg-gray-800">
+    <nav className="fixed z-50 w-full border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:py-2">
       <div className="px-4 py-3 lg:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start">
@@ -87,7 +87,7 @@ export function NavbarMain() {
             <button
               data-collapse-toggle="mobile-menu"
               type="button"
-              className="ml-3 inline-flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-300 sm:hidden dark:hover:bg-gray-700 dark:hover:text-white"
+              className="ml-3 inline-flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:hover:bg-gray-700 dark:hover:text-white sm:hidden"
               aria-controls="mobile-menu-2"
               aria-expanded="false"
             >

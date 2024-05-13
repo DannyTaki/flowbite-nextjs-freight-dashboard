@@ -8,6 +8,16 @@ import { alias } from "drizzle-orm/pg-core";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
+export type SingleChemicalData = {
+  classificationId: number;
+  description: string | null;
+  nmfc: string | null;
+  freightClass: string;
+  hazardous: boolean | null;
+  hazardId: string | null;
+  packingGroup: string | null;
+  sub: string | null;
+};
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
@@ -60,7 +70,7 @@ export async function getChemicalData() {
 }
 
 // Add this to your server action code
-export async function updateChemicalEntry(chemical: ChemicalData) {
+export async function updateChemicalEntry(chemical: SingleChemicalData) {
   try {
     await db
       .update(schema.freightClassifications)
@@ -73,7 +83,12 @@ export async function updateChemicalEntry(chemical: ChemicalData) {
         packingGroup: chemical.packingGroup,
         sub: chemical.sub,
       })
-      .where(eq(schema.freightClassifications.classificationId, chemical.classificationId))
+      .where(
+        eq(
+          schema.freightClassifications.classificationId,
+          chemical.classificationId,
+        ),
+      )
       .execute();
   } catch (error) {
     console.error("Error updating chemical entry:", error);

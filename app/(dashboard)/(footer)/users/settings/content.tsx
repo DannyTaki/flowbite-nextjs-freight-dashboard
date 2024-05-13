@@ -29,7 +29,7 @@ const UserSettingsPageContent: FC<UserSettingsPageData> = function ({
 }) {
   return (
     <>
-      <div className="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900">
+      <div className="grid grid-cols-1 px-4 pt-6 dark:bg-gray-900 xl:grid-cols-3 xl:gap-4">
         <div className="col-span-full mb-4 xl:mb-2">
           <Breadcrumb className="mb-5">
             <Breadcrumb.Item href="#">
@@ -41,7 +41,7 @@ const UserSettingsPageContent: FC<UserSettingsPageData> = function ({
             <Breadcrumb.Item href="/users/list">Users</Breadcrumb.Item>
             <Breadcrumb.Item>Settings</Breadcrumb.Item>
           </Breadcrumb>
-          <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
             User settings
           </h1>
         </div>
