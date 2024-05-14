@@ -2,7 +2,7 @@
 
 import type { SingleChemicalData } from "@/helpers/getData";
 import { getChemicalData, updateChemicalEntry } from "@/helpers/getData"; // adjust the import path as necessary
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Checkbox, Modal, Spinner, Table } from "flowbite-react";
 import React, { useState } from "react";
 
@@ -10,6 +10,8 @@ export default function Chemicals() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedChemical, setSelectedChemical] =
     useState<SingleChemicalData | null>(null);
+
+  const queryClient = useQueryClient();
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["chemicals"],
@@ -33,6 +35,7 @@ export default function Chemicals() {
     if (selectedChemical) {
       await updateChemicalEntry(selectedChemical);
       setOpenModal(false);
+      queryClient.invalidateQueries({ queryKey: ["chemicals"] });
       // Optionally, you can refetch the data or update the local state to reflect the changes
     }
   };
@@ -87,7 +90,7 @@ export default function Chemicals() {
                   id="nmfc"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type NMFC"
-                  required={true}
+                  required={false}
                   value={selectedChemical?.nmfc || ""}
                 />
               </div>
@@ -105,7 +108,7 @@ export default function Chemicals() {
                   id="sub"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type SUB"
-                  required={true}
+                  required={false}
                   value={selectedChemical?.sub || ""}
                 />
               </div>
@@ -125,7 +128,7 @@ export default function Chemicals() {
                   id="freight-class"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type Freight Class"
-                  required={true}
+                  required={false}
                   value={selectedChemical?.freightClass || ""}
                 />
               </div>
@@ -166,7 +169,7 @@ export default function Chemicals() {
                   id="hazard-id"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type Hazard ID"
-                  required={true}
+                  required={false}
                   value={selectedChemical?.hazardId || ""}
                 />
               </div>
@@ -186,16 +189,16 @@ export default function Chemicals() {
                   id="packing-group"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type Packing Group"
-                  required={true}
+                  required={false}
                   value={selectedChemical?.packingGroup || ""}
                 />
               </div>
             </div>
-          </form>
-        </Modal.Body>
-        <Modal.Footer>
+            <Modal.Footer>
           <Button type="submit">Update Entry</Button>
         </Modal.Footer>
+          </form>
+        </Modal.Body>
       </Modal>
       <Table hoverable>
         <Table.Head>
