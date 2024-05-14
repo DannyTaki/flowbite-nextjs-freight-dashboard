@@ -20,7 +20,7 @@ const chemicalSchema = z.object({
     invalid_type_error: "Description must be a string"
   }).min(1, "Description is required").nullable(),
   nmfc: z.string().nullable(),
-  freightClass: z.number({
+  freightClass: z.string({
     required_error: "Freight Class is required",
     invalid_type_error: "Freight Class must be a numnber"
   }),

@@ -19,6 +19,7 @@ export type SingleChemicalData = {
   packingGroup: string | null;
   sub: string | null;
 };
+export type Products = Awaited<ReturnType<typeof getProducts>>;
 
 
 const sql = neon(process.env.DATABASE_URL!);
@@ -141,7 +142,7 @@ export async function getProducts() {
         unitContainerType: schema.products.unitContainerType,       
       })
       .from(schema.products)
-      .execute()
+      .execute();
       return products;
   } catch (error) {
     console.error("Error returning product data:", error);
