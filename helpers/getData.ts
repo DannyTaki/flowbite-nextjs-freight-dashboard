@@ -12,7 +12,7 @@ export type SingleChemicalData = {
   classificationId: number;
   description: string | null;
   nmfc: string | null;
-  freightClass: string;
+  freightClass: number | string;
   hazardous: boolean | null;
   hazardId: string | null;
   packingGroup: string | null;
@@ -95,7 +95,9 @@ export async function updateChemicalEntry(chemical: SingleChemicalData) {
   }
 }
 
-export async function addChemicalEntry(chemical: Omit<SingleChemicalData, "classificationId">) {
+export async function addChemicalEntry(
+  chemical: Omit<SingleChemicalData, "classificationId">,
+) {
   try {
     await db
       .insert(schema.freightClassifications)

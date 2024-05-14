@@ -1,16 +1,40 @@
 "use client";
 
 import type { SingleChemicalData } from "@/helpers/getData";
-import { getChemicalData, updateChemicalEntry } from "@/helpers/getData"; // adjust the import path as necessary
+import {
+  addChemicalEntry,
+  getChemicalData,
+  updateChemicalEntry,
+} from "@/helpers/getData"; // adjust the import path as necessary
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Checkbox, Modal, Spinner, Table } from "flowbite-react";
+import { Button, Checkbox, Modal, Spinner, Table, Toast } from "flowbite-react";
 import React, { useState } from "react";
+import { HiExclamation } from "react-icons/hi";
+import { z } from "zod";
+
+const chemicalSchema = z.object({
+  classificationId: z.number().optional(),
+  description: z.string().min(1, "Description is required"),
+  nmfc: z.string().nullable(),
+  freightClass: z.coerce
+    .number()
+    .min(0, "Freight Class must be a positive number"),
+  hazardous: z.boolean().nullable(),
+  hazardId: z.string().nullable(),
+  packingGroup: z.string().nullable(),
+  sub: z.string().nullable(),
+});
+
+type ChemicalInput = z.infer<typeof chemicalSchema>;
 
 export default function Chemicals() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedChemical, setSelectedChemical] =
-    useState<SingleChemicalData | null>(null);
+    useState<Partial<ChemicalInput | null>>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -33,15 +57,42 @@ export default function Chemicals() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setShowToast(false);
     if (selectedChemical) {
-      if (isEditMode) {
-        await updateChemicalEntry(selectedChemical);
-      } else {
-        await addChemicalEntry(selectedChemical);
+      try {
+        const validatedData = chemicalSchema.parse({
+          classificationId: selectedChemical.classificationId,
+          description: selectedChemical.description || "",
+          nmfc: selectedChemical.nmfc || null,
+          freightClass: selectedChemical.freightClass,
+          hazardous: selectedChemical.hazardous || null,
+          hazardId: selectedChemical.hazardId || null,
+          packingGroup: selectedChemical.packingGroup || null,
+          sub: selectedChemical.sub || null,
+        });
+
+        if (isEditMode) {
+          await updateChemicalEntry(validatedData as SingleChemicalData);
+        } else {
+          await addChemicalEntry(
+            validatedData as Omit<SingleChemicalData, "classificationId">,
+          );
+        }
+        setOpenModal(false);
+        queryClient.invalidateQueries({ queryKey: ["chemicals"] });
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          const newErrors: Record<string, string> = {};
+          e.errors.forEach((error) => {
+            if (error.path && error.path[0]) {
+              newErrors[error.path[0] as string] = error.message;
+              setToastMessage(error.message);
+              setShowToast(true);
+            }
+          });
+          setErrors(newErrors);
+        }
       }
-      setOpenModal(false);
-      queryClient.invalidateQueries({ queryKey: ["chemicals"] });
-      // Optionally, you can refetch the data or update the local state to reflect the changes
     }
   };
 
@@ -53,7 +104,15 @@ export default function Chemicals() {
   };
 
   const openAddModal = () => {
-    setSelectedChemical(null);
+    setSelectedChemical({
+      description: "",
+      nmfc: "",
+      freightClass: "",
+      hazardous: false,
+      hazardId: "",
+      packingGroup: "",
+      sub: "",
+    });
     setIsEditMode(false);
     setOpenModal(true);
   };
@@ -279,6 +338,15 @@ export default function Chemicals() {
           ))}
         </Table.Body>
       </Table>
+      {showToast && (
+        <Toast>
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200">
+            <HiExclamation className="h-5 w-5" />
+          </div>
+          <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+          <Toast.Toggle onDismiss={() => setShowToast(false)} />
+        </Toast>
+      )}
     </div>
   );
 }
