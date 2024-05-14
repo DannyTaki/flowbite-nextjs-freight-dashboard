@@ -3,6 +3,7 @@
 import type { SingleChemicalData } from "@/helpers/getData";
 import {
   addChemicalEntry,
+  deleteChemicalEntries,
   getChemicalData,
   updateChemicalEntry,
 } from "@/helpers/getData"; // adjust the import path as necessary
@@ -38,7 +39,7 @@ export default function Chemicals() {
   const [errors, setErrors] = useState<Record<string, string | null>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<number[]>([]);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -60,10 +61,28 @@ export default function Chemicals() {
   }
 
   const handleRowSelect = (classificationId: number) => {
-    setSelectedRow((prevSelected) => 
+    setSelectedRows((prevSelected) => 
       prevSelected.includes(classificationId) ? prevSelected.filter((id) => id !== classificationId)
       : [...prevSelected, classificationId]
     );
+  };
+
+  const handleDelete = async () => {
+    setToastMessage(null);
+    setShowToast(false);
+    if (selectedRows.length === 0 ) {
+      setToastMessage("No rows selected for deletion");
+      setShowToast(true);
+      return;
+    }
+
+    try { 
+      await deleteChemicalEntries(selectedRows);
+      setSelectedRows([]);
+      queryClient.invalidateQueries({ queryKey: ["chemicals"] });
+    } catch (error) {
+      console.error("Error deleting entries:", error);
+    }
   };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -324,7 +343,7 @@ export default function Chemicals() {
             </Button>
           </Table.HeadCell>
           <Table.HeadCell>
-            <Button color="failure" size="sm">
+            <Button color="failure" size="sm" onClick={handleDelete}>
               Delete
             </Button>
           </Table.HeadCell>
@@ -336,7 +355,10 @@ export default function Chemicals() {
               className="bg-white dark:border-gray-700 dark:bg-gray-800"
             >
               <Table.Cell className="p-4">
-                <Checkbox />
+                <Checkbox 
+                  checked={selectedRows.includes(item.classificationId)}
+                  onChange={() => handleRowSelect(item.classificationId)}
+                />
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                 {item.classificationId}
