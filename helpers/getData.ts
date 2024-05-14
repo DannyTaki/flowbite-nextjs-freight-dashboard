@@ -94,3 +94,5 @@ export async function updateChemicalEntry(chemical: SingleChemicalData) {
     console.error("Error updating chemical entry:", error);
   }
 }
+
+export async function addChemicalEntry(chemical: SingleChemicalData) {}

@@ -10,6 +10,7 @@ export default function Chemicals() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedChemical, setSelectedChemical] =
     useState<SingleChemicalData | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -33,7 +34,11 @@ export default function Chemicals() {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedChemical) {
-      await updateChemicalEntry(selectedChemical);
+      if (isEditMode) {
+        await updateChemicalEntry(selectedChemical);
+      } else {
+        await addChemicalEntry(selectedChemical);
+      }
       setOpenModal(false);
       queryClient.invalidateQueries({ queryKey: ["chemicals"] });
       // Optionally, you can refetch the data or update the local state to reflect the changes
@@ -47,10 +52,24 @@ export default function Chemicals() {
     setSelectedChemical((prev) => (prev ? { ...prev, [field]: value } : null));
   };
 
+  const openAddModal = () => {
+    setSelectedChemical(null);
+    setIsEditMode(false);
+    setOpenModal(true);
+  };
+
+  const openEditModal = (item: SingleChemicalData) => {
+    setSelectedChemical(item);
+    setIsEditMode(true);
+    setOpenModal(true);
+  };
+
   return (
     <div className="overflow-x-auto">
       <Modal show={openModal} onClose={() => setOpenModal(false)}>
-        <Modal.Header>Update Chemical Entry</Modal.Header>
+        <Modal.Header>
+          {isEditMode ? "Update Chemical Entry" : "Add Chemical Entry"}
+        </Modal.Header>
         <Modal.Body>
           <form className="p-4 md:p-5" onSubmit={handleFormSubmit}>
             <div className="mb-4 grid grid-cols-2 gap-4">
@@ -195,8 +214,8 @@ export default function Chemicals() {
               </div>
             </div>
             <Modal.Footer>
-          <Button type="submit">Update Entry</Button>
-        </Modal.Footer>
+              <Button type="submit">{isEditMode ? "Update" : "Add"}</Button>
+            </Modal.Footer>
           </form>
         </Modal.Body>
       </Modal>
@@ -215,6 +234,16 @@ export default function Chemicals() {
           <Table.HeadCell>Packing Group</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
+          </Table.HeadCell>
+          <Table.HeadCell>
+            <Button color="success" onClick={openAddModal}>
+              Add
+            </Button>
+          </Table.HeadCell>
+          <Table.HeadCell>
+            <Button color="failure" size="sm">
+              Delete
+            </Button>
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
@@ -237,12 +266,7 @@ export default function Chemicals() {
               <Table.Cell>{item.hazardId || ""}</Table.Cell>
               <Table.Cell>{item.packingGroup || ""}</Table.Cell>
               <Table.Cell>
-                <button
-                  onClick={() => {
-                    setOpenModal(true);
-                    setSelectedChemical(item);
-                  }}
-                >
+                <button onClick={() => openEditModal(item)}>
                   <a
                     href="#"
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
