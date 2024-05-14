@@ -14,17 +14,20 @@ import { z } from "zod";
 
 const chemicalSchema = z.object({
   classificationId: z.number().optional(),
-  description: z.string().min(1, "Description is required"),
+  description: z.string({
+    required_error: "Description is required",
+    invalid_type_error: "Description must be a string"
+  }).min(1, "Description is required").nullable(),
   nmfc: z.string().nullable(),
-  freightClass: z.coerce
-    .number()
-    .min(0, "Freight Class must be a positive number"),
+  freightClass: z.string({
+    required_error: "Freight Class is required",
+    invalid_type_error: "Freight Class must be a string"
+  }),
   hazardous: z.boolean().nullable(),
   hazardId: z.string().nullable(),
   packingGroup: z.string().nullable(),
   sub: z.string().nullable(),
 });
-
 type ChemicalInput = z.infer<typeof chemicalSchema>;
 
 export default function Chemicals() {
@@ -86,8 +89,10 @@ export default function Chemicals() {
           e.errors.forEach((error) => {
             if (error.path && error.path[0]) {
               newErrors[error.path[0] as string] = error.message;
+              console.log(error.message);
               setToastMessage(error.message);
               setShowToast(true);
+              setOpenModal(false);
             }
           });
           setErrors(newErrors);
@@ -107,7 +112,7 @@ export default function Chemicals() {
     setSelectedChemical({
       description: "",
       nmfc: "",
-      freightClass: "",
+      freightClass: undefined,
       hazardous: false,
       hazardId: "",
       packingGroup: "",
@@ -125,6 +130,17 @@ export default function Chemicals() {
 
   return (
     <div className="overflow-x-auto">
+      {showToast && (
+        <div className="fixed inset-0 flex flex-col items-center mt-24 z-50">
+          <Toast>
+            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200">
+              <HiExclamation className="h-5 w-5" />
+            </div>
+            <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+            <Toast.Toggle onDismiss={() => setShowToast(false)} />
+          </Toast>
+        </div>
+      )}
       <Modal show={openModal} onClose={() => setOpenModal(false)}>
         <Modal.Header>
           {isEditMode ? "Update Chemical Entry" : "Add Chemical Entry"}
@@ -338,15 +354,6 @@ export default function Chemicals() {
           ))}
         </Table.Body>
       </Table>
-      {showToast && (
-        <Toast>
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200">
-            <HiExclamation className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">{toastMessage}</div>
-          <Toast.Toggle onDismiss={() => setShowToast(false)} />
-        </Toast>
-      )}
     </div>
   );
 }
