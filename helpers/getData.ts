@@ -5,6 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import { eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
+import Shipstation from "shipstation-node";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
@@ -127,4 +128,23 @@ export async function deleteChemicalEntries(classificationIds: number[]) {
   } catch (error) {
     console.error("Error deleting chemical entries:", error);
   }
+}
+
+export async function getProducts() {
+  try {
+    const products = await db
+      .select({
+        productId: schema.products.productId,
+        sku: schema.products.sku,
+        name: schema.products.name,
+        packagingType: schema.products.packagingType,
+        unitContainerType: schema.products.unitContainerType,       
+      })
+      .from(schema.products)
+      .execute()
+      return products;
+  } catch (error) {
+    console.error("Error returning product data:", error);
+  }
+
 }

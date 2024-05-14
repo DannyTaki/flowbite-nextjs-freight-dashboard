@@ -22,6 +22,7 @@ import {
   HiTable,
   HiUsers,
   HiViewGrid,
+  HiShoppingCart,
 } from "react-icons/hi";
 import { twMerge } from "tailwind-merge";
 
@@ -435,6 +436,7 @@ const pages: SidebarItem[] = [
     label: "Freight",
   },
   { href: "/chemicals", icon: HiTable, label: "Chemicals" },
+  {href: "/products", icon: HiShoppingCart, label: "Products"},
   { href: "/kanban", icon: HiViewGrid, label: "Kanban" },
   { href: "/mailing/inbox", icon: HiInboxIn, label: "Inbox", badge: "3" },
   {
