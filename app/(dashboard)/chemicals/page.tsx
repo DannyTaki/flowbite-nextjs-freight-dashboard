@@ -38,6 +38,7 @@ export default function Chemicals() {
   const [errors, setErrors] = useState<Record<string, string | null>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<number[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -57,6 +58,13 @@ export default function Chemicals() {
       </div>
     );
   }
+
+  const handleRowSelect = (classificationId: number) => {
+    setSelectedRow((prevSelected) => 
+      prevSelected.includes(classificationId) ? prevSelected.filter((id) => id !== classificationId)
+      : [...prevSelected, classificationId]
+    );
+  };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

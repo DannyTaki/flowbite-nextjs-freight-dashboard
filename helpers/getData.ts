@@ -2,7 +2,7 @@
 
 import * as schema from "@/app/db/drizzle/schema";
 import { neon } from "@neondatabase/serverless";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -115,5 +115,16 @@ export async function addChemicalEntry(
       .execute();
   } catch (error) {
     console.error("Error adding chemical entry:", error);
+  }
+}
+
+export async function deleteChemicalEntries(classificationIds: number[]) {
+  try {
+    await db
+      .delete(schema.freightClassifications)
+      .where(inArray(schema.freightClassifications.classificationId, classificationIds))
+      .execute();
+  } catch (error) {
+    console.error("Error deleting chemical entries:", error);
   }
 }
