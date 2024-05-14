@@ -95,4 +95,22 @@ export async function updateChemicalEntry(chemical: SingleChemicalData) {
   }
 }
 
-export async function addChemicalEntry(chemical: SingleChemicalData) {}
+export async function addChemicalEntry(chemical: Omit<SingleChemicalData, "classificationId">) {
+  try {
+    await db
+      .insert(schema.freightClassifications)
+      .values({
+        description: chemical.description,
+        nmfc: chemical.nmfc,
+        freightClass: chemical.freightClass,
+        hazardous: chemical.hazardous,
+        hazardId: chemical.hazardId,
+        packingGroup: chemical.packingGroup,
+        sub: chemical.sub,
+      })
+      .onConflictDoNothing()
+      .execute();
+  } catch (error) {
+    console.error("Error adding chemical entry:", error);
+  }
+}
