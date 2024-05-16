@@ -77,7 +77,7 @@ export async function getOrder(
       };
     }
 
-    const orderList = await customShipstationAPI.orders.getAll(result.data);
+    const orderList = await shipStation.orders.getAll(result.data);
     console.log("Order List: " + JSON.stringify(orderList));
     return orderList;
   } catch (err) {
