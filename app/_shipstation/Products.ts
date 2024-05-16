@@ -1,6 +1,7 @@
 import { RequestMethod } from "shipstation-node"; 
 import ShipStation  from "shipstation-node/src/shipstation";
 import { BaseResource } from "shipstation-node/src/resources/Base";
+import { updateChemicalEntry } from "@/helpers/getData";
 
 
 
@@ -61,4 +62,9 @@ export class Product extends BaseResource<IProduct> {
         });
         return response.data as IProduct[];
     }
+
+    public async update() {
+
+    }
 }
+    

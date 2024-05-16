@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getProducts } from "@/helpers/getData";
 import { Table, Button } from "flowbite-react";
 import type { Products } from "@/helpers/getData";
-import { startBackgroundJob } from "@/app/actions/action";
+import { getShipstationProducts, startBackgroundJob } from "@/app/actions/action";
 
 export default function Products() {
   const queryClient = useQueryClient();
@@ -14,6 +14,7 @@ export default function Products() {
   
   async function handleClick() {
     await startBackgroundJob();
+    await getShipstationProducts();
   }
 
   return (

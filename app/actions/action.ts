@@ -9,6 +9,7 @@ import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
 import { Client } from "@upstash/qstash";
 import CustomShipStationAPI from "../_shipstation/CustomShipstationAPI";
+import { get } from "http";
 
 const qstashClient = new Client({
   token: process.env.QSTASH_TOKEN!,
@@ -25,31 +26,38 @@ const shipStation = new Shipstation({
   apiSecret: credentials.secret,
 });
 
+
+
 const client = createClient<paths>({
   baseUrl: process.env.MYCARRIER_BASE_URL,
 });
 
-const options = {
-  apiKey: process.env.SHIPSTATION_API_KEY!,
-  apiSecret: process.env.SHIPSTATION_API_SECRET!,
+const products = shipStation.request({
+  url: "/products",
+})
+
+
+
+export async function getShipstationProducts() {
+  const products = await shipStation.request({
+    url: "/products",
+  });
+  console.log(products.data);
 }
 
-const shipstation = new CustomShipStationAPI(options);
+// await schedules.create({
+//   destination: "example.com",
+//   cron: "0 0 * * *", // Run every day at midnight
 
-// export async function startBackgroundJob() {
-//   await qstashClient.publishJSON({
-//     url: "https://firstqstashmessage.requestcatcher.com/test",
-//     body: {
-//       hello: "world",
-//     }
-//   });
-// }
-
-await schedules.create({
-  destination: "example.com",
-  cron: "0 0 * * *", // Run every day at midnight
-
-});
+// });
+export async function startBackgroundJob() {
+  await qstashClient.publishJSON({
+    "url": "https://firstqstashmessage.requestcatcher.com/test",
+    body: {
+      "hello": "world"
+    }
+  });
+}
 
 export async function getOrder(
   opts: unknown,
@@ -69,7 +77,7 @@ export async function getOrder(
       };
     }
 
-    const orderList = await shipStation.orders.getAll(result.data);
+    const orderList = await customShipstationAPI.orders.getAll(result.data);
     console.log("Order List: " + JSON.stringify(orderList));
     return orderList;
   } catch (err) {
