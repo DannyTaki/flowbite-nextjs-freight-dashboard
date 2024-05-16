@@ -7,6 +7,13 @@ import { optsSchema } from "@/types/optsSchema";
 import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
+import { Client } from "@upstash/qstash";
+import CustomShipStationAPI from "../_shipstation/CustomShipstationAPI";
+
+const qstashClient = new Client({
+  token: process.env.QSTASH_TOKEN!,
+})
+const schedules = qstashClient.schedules;
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,
@@ -20,6 +27,28 @@ const shipStation = new Shipstation({
 
 const client = createClient<paths>({
   baseUrl: process.env.MYCARRIER_BASE_URL,
+});
+
+const options = {
+  apiKey: process.env.SHIPSTATION_API_KEY!,
+  apiSecret: process.env.SHIPSTATION_API_SECRET!,
+}
+
+const shipstation = new CustomShipStationAPI(options);
+
+// export async function startBackgroundJob() {
+//   await qstashClient.publishJSON({
+//     url: "https://firstqstashmessage.requestcatcher.com/test",
+//     body: {
+//       hello: "world",
+//     }
+//   });
+// }
+
+await schedules.create({
+  destination: "example.com",
+  cron: "0 0 * * *", // Run every day at midnight
+
 });
 
 export async function getOrder(
