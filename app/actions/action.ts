@@ -8,7 +8,6 @@ import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
 import { Client } from "@upstash/qstash";
-import CustomShipStationAPI from "../_shipstation/CustomShipstationAPI";
 import { get } from "http";
 
 const qstashClient = new Client({
