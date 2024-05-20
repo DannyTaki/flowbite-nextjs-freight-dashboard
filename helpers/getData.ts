@@ -139,41 +139,43 @@ export async function getProducts() {
         sku: schema.products.sku,
         name: schema.products.name,
         packagingType: schema.products.packagingType,
-        unitContainerType: schema.products.unitContainerType,       
+        unitContainerType: schema.products.unitContainerType,
       })
       .from(schema.products)
       .execute();
-      return products;
+    return products;
   } catch (error) {
     console.error("Error returning product data:", error);
   }
 }
 
-export async function addProduct(product: { sku: string, name: string }) {
+export async function addProduct(products: { sku: string, name: string }[]) {
   try {
-    // Check if a product with the given SKU exists
-    const existingProduct = await db
-      .select({
-        sku: schema.products.sku,
-        name: schema.products.name,
-      })
-      .from(schema.products)
-      .where(eq(schema.products.sku,product.sku))
-      .execute();
-
-    if (existingProduct.length === 0) {
-      // If the product does not exist, insert the new product
-      await db
-        .insert(schema.products)
-        .values({
-          sku: product.sku,
-          name: product.name,
-          // Add other fields if necessary
+    for (const product of products) {
+      // Check if a product with the given SKU exists
+      const existingProduct = await db
+        .select({
+          sku: schema.products.sku,
+          name: schema.products.name,
         })
+        .from(schema.products)
+        .where(eq(schema.products.sku, product.sku))
         .execute();
-      console.log(`Product with SKU ${product.sku} added successfully.`);
-    } else {
-      console.log(`Product with SKU ${product.sku} already exists.`);
+
+      if (existingProduct.length === 0) {
+        // If the product does not exist, insert the new product
+        await db
+          .insert(schema.products)
+          .values({
+            sku: product.sku,
+            name: product.name,
+            // Add other fields if necessary
+          })
+          .execute();
+        console.log(`Product with SKU ${product.sku} added successfully.`);
+      } else {
+        console.log(`Product with SKU ${product.sku} already exists.`);
+      }
     }
   } catch (error) {
     console.error("Error adding product:", error);

@@ -1,6 +1,6 @@
 import { getMissingSKUs } from "@/app/actions/action"
 import { NextRequest, NextResponse } from "next/server";
-import { addProduct } from "@/app/actions/action";
+import { addProduct } from "@/helpers/getData";
 
 export async function POST() {
     try { 
