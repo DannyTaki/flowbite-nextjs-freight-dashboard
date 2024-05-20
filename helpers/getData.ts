@@ -5,7 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import { eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
-import Shipstation from "shipstation-node";
+
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
@@ -147,5 +147,35 @@ export async function getProducts() {
   } catch (error) {
     console.error("Error returning product data:", error);
   }
+}
 
+export async function addProduct(product: { sku: string, name: string }) {
+  try {
+    // Check if a product with the given SKU exists
+    const existingProduct = await db
+      .select({
+        sku: schema.products.sku,
+        name: schema.products.name,
+      })
+      .from(schema.products)
+      .where(eq(schema.products.sku,product.sku))
+      .execute();
+
+    if (existingProduct.length === 0) {
+      // If the product does not exist, insert the new product
+      await db
+        .insert(schema.products)
+        .values({
+          sku: product.sku,
+          name: product.name,
+          // Add other fields if necessary
+        })
+        .execute();
+      console.log(`Product with SKU ${product.sku} added successfully.`);
+    } else {
+      console.log(`Product with SKU ${product.sku} already exists.`);
+    }
+  } catch (error) {
+    console.error("Error adding product:", error);
+  }
 }
