@@ -8,7 +8,8 @@ import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
 import { Client } from "@upstash/qstash";
-import { get } from "http";
+import { getProducts } from "@/helpers/getData";
+import type { Product } from "@/types/shiptation/product";
 
 const qstashClient = new Client({
   token: process.env.QSTASH_TOKEN!,
@@ -31,24 +32,31 @@ const client = createClient<paths>({
   baseUrl: process.env.MYCARRIER_BASE_URL,
 });
 
-const products = shipStation.request({
-  url: "/products",
-})
 
-
-
-export async function getShipstationProducts() {
-  const products = await shipStation.request({
+export async function getMissingSKUs() {
+  const response: any = await shipStation.request({
     url: "/products",
   });
-  console.log(products.data);
+
+  const shipstationProducts: Product[] = response.data.products : [];
+  console.log(shipstationProducts);
+  const databaseProducts = await getProducts();
+  const shipstationSKUs = shipstationProducts.map((product) => ({ sku: product.sku, name: product.name}));
+  const databaseSKUs = databaseProducts?.map((product) => ({ sku: product.sku, name: product.name }));
+  const missingProducts = shipstationSKUs.filter(shipstationProduct => 
+    !databaseSKUs?.some(databaseProduct => databaseProduct.sku === shipstationProduct.sku)
+  );
+  console.log("Missing Products:", missingProducts, "Name:",  "Count:", missingProducts.length);
+  return missingProducts; 
+  }
+
+export async function createSchedule() {
+  await schedules.create({
+  destination: "products",
+  cron: "*/20 * * * * *", // Run every day at midnight
+  });
 }
 
-// await schedules.create({
-//   destination: "example.com",
-//   cron: "0 0 * * *", // Run every day at midnight
-
-// });
 export async function startBackgroundJob() {
   await qstashClient.publishJSON({
     "url": "https://firstqstashmessage.requestcatcher.com/test",

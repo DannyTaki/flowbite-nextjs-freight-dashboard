@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getProducts } from "@/helpers/getData";
 import { Table, Button } from "flowbite-react";
 import type { Products } from "@/helpers/getData";
-import { getShipstationProducts, startBackgroundJob } from "@/app/actions/action";
+import { getMissingSKUs, startBackgroundJob, createSchedule  } from "@/app/actions/action";
 
 export default function Products() {
   const queryClient = useQueryClient();
@@ -13,8 +13,7 @@ export default function Products() {
   const { data, error, isLoading } = useQuery({ queryKey: ["products"], queryFn: () => getProducts() })
   
   async function handleClick() {
-    await startBackgroundJob();
-    await getShipstationProducts();
+    await getMissingSKUs();
   }
 
   return (
