@@ -6,12 +6,12 @@ import type { components } from "@/types/book-freight/schema";
 export type Hazard = components["schemas"]["HazardousMaterial"];
 
 export function getHazard(items: EnrichedOrder): Hazard | undefined {
-  const packingGroup =
-    items.enrichedItems[0].additionalData[0].freightClass.packingGroup;
-  if (items.enrichedItems[0].additionalData[0].freightClass.hazardId) {
+  const packing_group =
+    items.enrichedItems[0].additionalData[0].freightClass.packing_group;
+  if (items.enrichedItems[0].additionalData[0].freightClass.hazard_id) {
     return {
-      hazmatId: items.enrichedItems[0].additionalData[0].freightClass.hazardId,
-      packingGroup: getPackingGroup(packingGroup) as PackingGroup,
+      hazmatId: items.enrichedItems[0].additionalData[0].freightClass.hazard_id,
+      packingGroup: getPackingGroup(packing_group) as PackingGroup,
     };
   } else {
     return undefined;
