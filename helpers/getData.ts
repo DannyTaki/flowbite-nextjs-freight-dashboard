@@ -7,6 +7,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
 
 
+
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
 export type SingleChemicalData = {
@@ -22,14 +23,27 @@ export type SingleChemicalData = {
 export type Products = Awaited<ReturnType<typeof getProducts>>;
 
 
+
+
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
+// const classificationQuery = db.select({
+// classification_id: schema.freight_classifications.classification_id,
+// description: schema.freight_classifications.description,
+// nmfc: schema.freight_classifications.nmfc,
+// freight_class: schema.freight_classifications.freight_class,
+// hazardous: schema.freight_classifications.hazardous,
+// hazard_id: schema.freight_classifications.hazard_id,
+// packing_group: schema.freight_classifications.packing_group,
+// sub: schema.freight_classifications.sub,
+// }).from(schema.freight_classifications).execute();
+
 
 export async function getData(sku: string) {
   const hardCodedSku = "M1G-9XQ-Q4C";
   console.log("Getting data: " + sku);
-  const freightLinks = alias(schema.productFreightLinks, "freightLinks");
-  const freightClass = alias(schema.freightClassifications, "freightClass");
+  const freightLinks = alias(schema.product_freight_links, "freightLinks");
+  const freightClass = alias(schema.freight_classifications, "freightClass");
   const product = await db
     .select({
       product: schema.products,
@@ -39,11 +53,11 @@ export async function getData(sku: string) {
     .from(schema.products)
     .innerJoin(
       freightLinks,
-      eq(schema.products.productId, freightLinks.productId),
+      eq(schema.products.product_id, freightLinks.product_id),
     )
     .innerJoin(
       freightClass,
-      eq(freightLinks.classificationId, freightClass.classificationId),
+      eq(freightLinks.classification_id, freightClass.classification_id),
     )
     .where(eq(schema.products.sku, sku))
     .execute();
@@ -55,16 +69,16 @@ export async function getChemicalData() {
   try {
     const classifications = await db
       .select({
-        classificationId: schema.freightClassifications.classificationId,
-        description: schema.freightClassifications.description,
-        nmfc: schema.freightClassifications.nmfc,
-        freightClass: schema.freightClassifications.freightClass,
-        hazardous: schema.freightClassifications.hazardous,
-        hazardId: schema.freightClassifications.hazardId,
-        packingGroup: schema.freightClassifications.packingGroup,
-        sub: schema.freightClassifications.sub,
+        classificationId: schema.freight_classifications.classification_id,
+        description: schema.freight_classifications.description,
+        nmfc: schema.freight_classifications.nmfc,
+        freightClass: schema.freight_classifications.freight_class,
+        hazardous: schema.freight_classifications.hazardous,
+        hazardId: schema.freight_classifications.hazard_id,
+        packingGroup: schema.freight_classifications.packing_group,
+        sub: schema.freight_classifications.sub,
       })
-      .from(schema.freightClassifications)
+      .from(schema.freight_classifications)
       .execute();
     return classifications;
   } catch (error) {
@@ -76,11 +90,11 @@ export async function getChemicalData() {
 export async function updateChemicalEntry(chemical: SingleChemicalData) {
   try {
     await db
-      .update(schema.freightClassifications)
+      .update(schema.freight_classifications)
       .set({
         description: chemical.description,
         nmfc: chemical.nmfc,
-        freightClass: chemical.freightClass,
+        freight_class: chemical.freightClass,
         hazardous: chemical.hazardous,
         hazardId: chemical.hazardId,
         packingGroup: chemical.packingGroup,
@@ -88,7 +102,7 @@ export async function updateChemicalEntry(chemical: SingleChemicalData) {
       })
       .where(
         eq(
-          schema.freightClassifications.classificationId,
+          schema.freight_classifications.classification_id,
           chemical.classificationId,
         ),
       )
@@ -103,14 +117,14 @@ export async function addChemicalEntry(
 ) {
   try {
     await db
-      .insert(schema.freightClassifications)
+      .insert(schema.freight_classifications)
       .values({
         description: chemical.description,
         nmfc: chemical.nmfc,
-        freightClass: chemical.freightClass,
+        freight_class: chemical.freightClass,
         hazardous: chemical.hazardous,
-        hazardId: chemical.hazardId,
-        packingGroup: chemical.packingGroup,
+        hazard_id: chemical.hazardId,
+        packing_group: chemical.packingGroup,
         sub: chemical.sub,
       })
       .onConflictDoNothing()
@@ -123,8 +137,8 @@ export async function addChemicalEntry(
 export async function deleteChemicalEntries(classificationIds: number[]) {
   try {
     await db
-      .delete(schema.freightClassifications)
-      .where(inArray(schema.freightClassifications.classificationId, classificationIds))
+      .delete(schema.freight_classifications)
+      .where(inArray(schema.freight_classifications.classification_id, classificationIds))
       .execute();
   } catch (error) {
     console.error("Error deleting chemical entries:", error);
@@ -135,11 +149,11 @@ export async function getProducts() {
   try {
     const products = await db
       .select({
-        productId: schema.products.productId,
+        productId: schema.products.product_id,
         sku: schema.products.sku,
         name: schema.products.name,
-        packagingType: schema.products.packagingType,
-        unitContainerType: schema.products.unitContainerType,
+        packagingType: schema.products.packaging_type,
+        unitContainerType: schema.products.unit_container_type,
       })
       .from(schema.products)
       .execute();

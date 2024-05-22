@@ -1,11 +1,13 @@
 import type { Config } from "drizzle-kit";
+import {  config } from "dotenv";
+
+config();
 
 export default {
-  schema: "./app/db/schema.ts",
+  schema: "./app/db/drizzle/schema.ts",
   out: "./app/db/drizzle",
-  driver: "pg",
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString:
-      "postgresql://neondb_owner:4QJXa9fwlHsD@ep-flat-queen-a56n27qv.us-east-2.aws.neon.tech/neondb?sslmode=require",
+    url: "postgresql://neondb_owner:4QJXa9fwlHsD@ep-flat-queen-a56n27qv.us-east-2.aws.neon.tech/neondb?sslmode=require",
   },
 } satisfies Config;

@@ -80,22 +80,6 @@ export async function getMissingSKUs() {
   return missingProducts; 
   }
 
-// export async function createSchedule() {
-//   await schedules.create({
-//   destination: "products",
-//   cron: "*/20 * * * * *", // Run every day at midnight
-//   });
-// }
-
-// export async function startBackgroundJob() {
-//   await qstashClient.publishJSON({
-//     "url": "https://firstqstashmessage.requestcatcher.com/test",
-//     body: {
-//       "hello": "world"
-//     }
-//   });
-// }
-
 export async function getOrder(
   opts: unknown,
 ): Promise<IOrderPaginationResult | null | ErrorResult> {
@@ -141,8 +125,8 @@ export async function bookFreight(
     const enrichedOrder = await getEnrichedOrder(orderData);
     console.log(enrichedOrder);
     // const shipmentResult = await rateLtlShipment(EnrichedOrder, liftgate, limitedAccess)
-    const quotes = await getQuotes(enrichedOrder, liftgate, limitedAccess);
-    return quotes;
+    // const quotes = await getQuotes(enrichedOrder, liftgate, limitedAccess);
+    // return quotes;
   } catch (error) {
     console.log(error);
     return null;
@@ -348,139 +332,3 @@ export async function bookFreight(
 
 //   return;
 // }
-
-/* V2 API Oauth token generation */
-
-// async function generateToken() {
-//   const token = await client.POST("/v2.0/auth/token", {
-//     body: {
-//       client_id: process.env.VERCEL_FREIGHTVIEW_CLIENT_ID || '',
-//       client_secret: process.env.VERCEL_FREIGHTVIEW_CLIENT_SECRET || '',
-//       grant_type: "client_credentials",
-//     }
-//   });
-//   if (token.error) {
-//     return {
-//       error: {
-//         message: token.error.message,
-//       }
-//     }
-//   }
-//   const validatedToken = authSchema.safeParse(token);
-//   console.log(validatedToken);
-//   if (!validatedToken.success) {
-//     let errorMessage = "";
-//     validatedToken.error.issues.forEach((issue) => {
-//       errorMessage = issue.message + ". ";
-//     });
-//     return {
-//       error: {
-//         message: errorMessage,
-//       }
-//     };
-//   }
-//   const access_token = validatedToken.data.data.access_token;
-//   return access_token;
-// };
-
-// async function createShipment(access_token: string, orderData: IOrderPaginationResult, liftgate: boolean, freightProduct: FreightProductData) {
-
-//   const now = new Date();
-//   const todayDate  = date.format(now, 'YYYY-MM-DD');
-//   const liftgateRequired = liftgate ? "liftgate" : "";
-//   let weight: number;
-//   let handlingUnit: string;
-//   if (orderData.orders[0] !== undefined) {
-//       weight = parseWeight(orderData.orders[0]);
-//   } else {
-//     throw new Error('No order data found');
-//   }
-//   return await client.POST("/v2.0/shipments/truckload", {
-//     body: {
-//       locations: [{
-//         company: "Alliance Chemical",
-//         address: "204 South Edmond Street",
-//         postalCode: "76574",
-//         city: "Taylor",
-//         state: "Texas",
-//         country: "us",
-//         stopDate: todayDate,
-//         stopDateType: "on",
-//         stopType: "pickup",
-//         sequence: 0,
-//         opensAt: "09:00",
-//         closesAt: "16:00",
-//         contactName: "Adnan Heikal",
-//         contactPhone: "512-365-6838",
-//         contactPhoneExt: "516",
-//         contactEmail: "adnan.heikal@alliancechemical.com",
-//       },
-//       {
-//         company: orderData.orders[0]?.shipTo.company,
-//         address: orderData.orders[0]?.shipTo.street1,
-//         address2: orderData.orders[0]?.shipTo.street2,
-//         postalCode: orderData.orders[0]?.shipTo.postalCode ?? '',
-//         city: orderData.orders[0]?.shipTo.city,
-//         state: orderData.orders[0]?.shipTo.state,
-//         country: "us",
-//         stopDateType: "by",
-//         stopType: "delivery",
-//         sequence: 1,
-//         opensAt: "09:00",
-//         closesAt: "16:00",
-//         contactName: orderData.orders[0]?.shipTo.name,
-//         contactPhone: orderData.orders[0]?.shipTo.phone,
-//         contactEmail: orderData.orders[0]?.customerEmail,
-//       },
-//   ],
-//   billTo: {
-//     company: "Alliance Chemical",
-//     address: "P.O. Box 445",
-//     city: "Hutto",
-//     state: "Texas",
-//     postalCode: "78634",
-//     country: "us",
-//     contactName: "Adnan Heikal",
-//     contactPhone: "512-365-6838",
-//     contactPhoneExt: "516",
-//     contactEmail: "adnan.heikal@alliancechemical.com"
-//   },
-//   equipment: {
-//     type: "ltl",
-//     accessorials: [
-//       {
-//         key: "liftgate"
-//       }
-//     ],
-//     description: "Chemical",
-//     declaredValue: orderData.orders[0]?.orderTotal,
-//     declaredValueCurrency: "usd",
-//     weight: weight,
-//     weightUOM: "lbs",
-//     isHazardous: true,
-//   },
-//   emergencyContact: {
-//     name: "Chemtel",
-//     phone: "800-255-3924",
-//   },
-//   isLiveLoad: true,
-//   items: {
-//     itemId: '',
-//     dimensionsUOM: "in",
-//     freightClass: 50,
-//     height: 0,
-//     length: 0,
-//     nmfcNumber: 0,
-//     nmfcSubNumber: 0,
-//     quantity: 1,
-//     width: 0,
-//     pickupLocationSequence: 0,
-//     dropLocationSequence: 1,
-//     stackable: false,
-//     weight: 0,
-//     weightUOM: "lbs",
-//     description: handlingUnit,
-//     contains: {},
-//     hazardous: {}
-
-//   }

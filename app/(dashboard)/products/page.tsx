@@ -3,9 +3,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { getProducts } from "@/helpers/getData";
-import { Table, Button } from "flowbite-react";
+import { Table } from "flowbite-react";
 import type { Products } from "@/helpers/getData";
-import { getMissingSKUs, startBackgroundJob, createSchedule  } from "@/app/actions/action";
+import { getMissingSKUs  } from "@/app/actions/action";
 
 export default function Products() {
   const queryClient = useQueryClient();
@@ -27,9 +27,6 @@ export default function Products() {
           <Table.HeadCell>Unit Container Type</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
-          </Table.HeadCell>
-          <Table.HeadCell>
-            <Button onClick={handleClick} color="purple">Start Background Job</Button>
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
