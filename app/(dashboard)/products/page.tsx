@@ -1,15 +1,28 @@
-'use client';
+"use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
 import { getProducts } from "@/helpers/getData";
-import { Table } from "flowbite-react";
-import { getMissingSKUs  } from "@/app/actions/action";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Table, Spinner } from "flowbite-react";
 
 export default function Products() {
   const queryClient = useQueryClient();
 
-  const { data, error, isLoading } = useQuery({ queryKey: ["products"], queryFn: () => getProducts() })
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: () => getProducts(),
+  });
+
+  if (error) {
+    console.log(error);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner className="h-36 w-36" />
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -44,4 +57,3 @@ export default function Products() {
     </div>
   );
 }
-

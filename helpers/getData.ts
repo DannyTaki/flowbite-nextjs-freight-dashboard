@@ -6,8 +6,6 @@ import { eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
 
-
-
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
 // export type SingleChemicalData = {
@@ -22,10 +20,8 @@ export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
 // };
 export type Products = Awaited<ReturnType<typeof getProducts>>;
 
-
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
-
 
 export async function getData(sku: string) {
   const freightLinks = alias(schema.product_freight_links, "freightLinks");
@@ -72,10 +68,14 @@ export async function getChemicalData() {
 }
 
 // Add this to your server action code
-export async function updateChemicalEntry(chemical: schema.InsertFreightClassification) {
+export async function updateChemicalEntry(
+  chemical: schema.InsertFreightClassification,
+) {
   try {
     if (chemical.classification_id === undefined) {
-      throw new Error("classification_id is required to update a chemical entry.");
+      throw new Error(
+        "classification_id is required to update a chemical entry.",
+      );
     }
     await db
       .update(schema.freight_classifications)
@@ -126,7 +126,12 @@ export async function deleteChemicalEntries(classification_ids: number[]) {
   try {
     await db
       .delete(schema.freight_classifications)
-      .where(inArray(schema.freight_classifications.classification_id, classification_ids))
+      .where(
+        inArray(
+          schema.freight_classifications.classification_id,
+          classification_ids,
+        ),
+      )
       .execute();
   } catch (error) {
     console.error("Error deleting chemical entries:", error);

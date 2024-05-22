@@ -1,5 +1,6 @@
 "use client";
 
+import type * as schema from "@/app/db/drizzle/schema";
 import {
   addChemicalEntry,
   deleteChemicalEntries,
@@ -11,18 +12,22 @@ import { Button, Checkbox, Modal, Spinner, Table, Toast } from "flowbite-react";
 import React, { useState } from "react";
 import { HiExclamation } from "react-icons/hi";
 import { z } from "zod";
-import * as schema from "@/app/db/drizzle/schema";
 
 const chemicalSchema = z.object({
   classificationId: z.number().optional(),
-  description: z.string({
-    required_error: "Description is required",
-    invalid_type_error: "Description must be a string"
-  }).min(1, "Description is required").nullable(),
+  description: z
+    .string({
+      required_error: "Description is required",
+      invalid_type_error: "Description must be a string",
+    })
+    .min(1, "Description is required")
+    .nullable(),
   nmfc: z.string().nullable(),
-  freightClass: z.string({
-    invalid_type_error: "Freight Class must be a numnber"
-  }).nullable(),
+  freightClass: z
+    .string({
+      invalid_type_error: "Freight Class must be a numnber",
+    })
+    .nullable(),
   hazardous: z.boolean().nullable(),
   hazardId: z.string().nullable(),
   packingGroup: z.string().nullable(),
@@ -35,7 +40,6 @@ export default function Chemicals() {
   const [selectedChemical, setSelectedChemical] =
     useState<Partial<ChemicalInput | null>>(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string | null>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
@@ -60,22 +64,23 @@ export default function Chemicals() {
   }
 
   const handleRowSelect = (classificationId: number) => {
-    setSelectedRows((prevSelected) => 
-      prevSelected.includes(classificationId) ? prevSelected.filter((id) => id !== classificationId)
-      : [...prevSelected, classificationId]
+    setSelectedRows((prevSelected) =>
+      prevSelected.includes(classificationId)
+        ? prevSelected.filter((id) => id !== classificationId)
+        : [...prevSelected, classificationId],
     );
   };
 
   const handleDelete = async () => {
     setToastMessage(null);
     setShowToast(false);
-    if (selectedRows.length === 0 ) {
+    if (selectedRows.length === 0) {
       setToastMessage("No rows selected for deletion");
       setShowToast(true);
       return;
     }
 
-    try { 
+    try {
       await deleteChemicalEntries(selectedRows);
       setSelectedRows([]);
       queryClient.invalidateQueries({ queryKey: ["chemicals"] });
@@ -101,10 +106,12 @@ export default function Chemicals() {
         });
 
         if (isEditMode) {
-          await updateChemicalEntry(validatedData as schema.InsertFreightClassification);
+          await updateChemicalEntry(
+            validatedData as schema.InsertFreightClassification,
+          );
         } else {
           await addChemicalEntry(
-            validatedData as schema.InsertFreightClassification
+            validatedData as schema.InsertFreightClassification,
           );
         }
         setOpenModal(false);
@@ -121,7 +128,6 @@ export default function Chemicals() {
               setOpenModal(false);
             }
           });
-          setErrors(newErrors);
         }
       }
     }
@@ -157,7 +163,7 @@ export default function Chemicals() {
   return (
     <div className="overflow-x-auto">
       {showToast && (
-        <div className="fixed inset-0 flex flex-col items-center mt-24 z-50">
+        <div className="fixed inset-0 z-50 mt-24 flex flex-col items-center">
           <Toast>
             <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200">
               <HiExclamation className="h-5 w-5" />
@@ -354,7 +360,7 @@ export default function Chemicals() {
               className="bg-white dark:border-gray-700 dark:bg-gray-800"
             >
               <Table.Cell className="p-4">
-                <Checkbox 
+                <Checkbox
                   checked={selectedRows.includes(item.classification_id)}
                   onChange={() => handleRowSelect(item.classification_id)}
                 />

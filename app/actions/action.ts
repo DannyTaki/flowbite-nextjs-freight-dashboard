@@ -1,19 +1,19 @@
 "use server";
 
 import { getEnrichedOrder } from "@/helpers/EnrichedOrder";
+import { getProducts } from "@/helpers/getData";
 import type { ErrorResult } from "@/types/book-freight/action-types";
 import type { paths } from "@/types/book-freight/mycarrierSchema";
 import { optsSchema } from "@/types/optsSchema";
+import type { Product } from "@/types/shiptation/product";
+import { Client } from "@upstash/qstash";
 import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
-import { Client } from "@upstash/qstash";
-import { getProducts } from "@/helpers/getData";
-import type { Product } from "@/types/shiptation/product";
 
 const qstashClient = new Client({
   token: process.env.QSTASH_TOKEN!,
-})
+});
 const schedules = qstashClient.schedules;
 
 const credentials = {
@@ -26,12 +26,9 @@ const shipStation = new Shipstation({
   apiSecret: credentials.secret,
 });
 
-
-
 const client = createClient<paths>({
   baseUrl: process.env.MYCARRIER_BASE_URL,
 });
-
 
 export async function getMissingSKUs() {
   let shipstationProducts: Product[] = [];
@@ -49,19 +46,18 @@ export async function getMissingSKUs() {
       pageSize: pageSize.toString(),
     });
     return `${baseUrl}?${params.toString()}`;
-    }
-  
+  }
 
   async function fetchPage(page: number): Promise<Product[]> {
     const response: any = await shipStation.request({
       url: buildUrl(page),
-  });
-   return response.data.products; 
+    });
+    return response.data.products;
   }
 
   while (hasMorePages) {
     const products: Product[] = await fetchPage(page);
-    if (products.length > 0 ) {
+    if (products.length > 0) {
       shipstationProducts = shipstationProducts.concat(products);
       page++;
     } else {
@@ -69,16 +65,31 @@ export async function getMissingSKUs() {
     }
   }
 
-  console.log(`Number of Products:" ${shipstationProducts.length}`)
+  console.log(`Number of Products:" ${shipstationProducts.length}`);
   const databaseProducts = await getProducts();
-  const shipstationSKUs = shipstationProducts.map((product) => ({ sku: product.sku, name: product.name}));
-  const databaseSKUs = databaseProducts?.map((product) => ({ sku: product.sku, name: product.name }));
-  const missingProducts = shipstationSKUs.filter(shipstationProduct => 
-    !databaseSKUs?.some(databaseProduct => databaseProduct.sku === shipstationProduct.sku)
+  const shipstationSKUs = shipstationProducts.map((product) => ({
+    sku: product.sku,
+    name: product.name,
+  }));
+  const databaseSKUs = databaseProducts?.map((product) => ({
+    sku: product.sku,
+    name: product.name,
+  }));
+  const missingProducts = shipstationSKUs.filter(
+    (shipstationProduct) =>
+      !databaseSKUs?.some(
+        (databaseProduct) => databaseProduct.sku === shipstationProduct.sku,
+      ),
   );
-  console.log("Missing Products:", missingProducts, "Name:",  "Count:", missingProducts.length);
-  return missingProducts; 
-  }
+  console.log(
+    "Missing Products:",
+    missingProducts,
+    "Name:",
+    "Count:",
+    missingProducts.length,
+  );
+  return missingProducts;
+}
 
 export async function getOrder(
   opts: unknown,
