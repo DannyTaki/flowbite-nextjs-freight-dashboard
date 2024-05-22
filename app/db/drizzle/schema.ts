@@ -40,4 +40,4 @@ export const freight_classifications = pgTable("freight_classifications", {
 });
 
 export type SelectFreightClassification = typeof freight_classifications.$inferSelect;
-export type InsertFreightClassificatoin = typeof freight_classifications.$inferInsert;
+export type InsertFreightClassification = typeof freight_classifications.$inferInsert;

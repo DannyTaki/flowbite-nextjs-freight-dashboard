@@ -1,6 +1,5 @@
 "use client";
 
-import type { SingleChemicalData } from "@/helpers/getData";
 import {
   addChemicalEntry,
   deleteChemicalEntries,
@@ -12,6 +11,7 @@ import { Button, Checkbox, Modal, Spinner, Table, Toast } from "flowbite-react";
 import React, { useState } from "react";
 import { HiExclamation } from "react-icons/hi";
 import { z } from "zod";
+import * as schema from "@/app/db/drizzle/schema";
 
 const chemicalSchema = z.object({
   classificationId: z.number().optional(),
@@ -22,7 +22,7 @@ const chemicalSchema = z.object({
   nmfc: z.string().nullable(),
   freightClass: z.string({
     invalid_type_error: "Freight Class must be a numnber"
-  }),
+  }).nullable(),
   hazardous: z.boolean().nullable(),
   hazardId: z.string().nullable(),
   packingGroup: z.string().nullable(),
@@ -101,10 +101,10 @@ export default function Chemicals() {
         });
 
         if (isEditMode) {
-          await updateChemicalEntry(validatedData as SingleChemicalData);
+          await updateChemicalEntry(validatedData as schema.InsertFreightClassification);
         } else {
           await addChemicalEntry(
-            validatedData as Omit<SingleChemicalData, "classificationId">,
+            validatedData as schema.InsertFreightClassification
           );
         }
         setOpenModal(false);
@@ -128,7 +128,7 @@ export default function Chemicals() {
   };
 
   const handleInputChange = (
-    field: keyof SingleChemicalData,
+    field: keyof schema.SelectFreightClassification,
     value: string | boolean | null,
   ) => {
     setSelectedChemical((prev) => (prev ? { ...prev, [field]: value } : null));
@@ -148,7 +148,7 @@ export default function Chemicals() {
     setOpenModal(true);
   };
 
-  const openEditModal = (item: SingleChemicalData) => {
+  const openEditModal = (item: schema.SelectFreightClassification) => {
     setSelectedChemical(item);
     setIsEditMode(true);
     setOpenModal(true);
@@ -241,7 +241,7 @@ export default function Chemicals() {
                 </label>
                 <input
                   onChange={(e) =>
-                    handleInputChange("freightClass", e.target.value)
+                    handleInputChange("freight_class", e.target.value)
                   }
                   type="text"
                   name="freight-class"
@@ -282,7 +282,7 @@ export default function Chemicals() {
                 </label>
                 <input
                   onChange={(e) =>
-                    handleInputChange("hazardId", e.target.value)
+                    handleInputChange("hazard_id", e.target.value)
                   }
                   type="text"
                   name="hazard-id"
@@ -302,7 +302,7 @@ export default function Chemicals() {
                 </label>
                 <input
                   onChange={(e) =>
-                    handleInputChange("packingGroup", e.target.value)
+                    handleInputChange("packing_group", e.target.value)
                   }
                   type="text"
                   name="packing-group"
@@ -355,20 +355,20 @@ export default function Chemicals() {
             >
               <Table.Cell className="p-4">
                 <Checkbox 
-                  checked={selectedRows.includes(item.classificationId)}
-                  onChange={() => handleRowSelect(item.classificationId)}
+                  checked={selectedRows.includes(item.classification_id)}
+                  onChange={() => handleRowSelect(item.classification_id)}
                 />
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                {item.classificationId}
+                {item.classification_id}
               </Table.Cell>
               <Table.Cell>{item.description}</Table.Cell>
               <Table.Cell>{item.nmfc}</Table.Cell>
               <Table.Cell>{item.sub || ""}</Table.Cell>
-              <Table.Cell>{item.freightClass}</Table.Cell>
+              <Table.Cell>{item.freight_class}</Table.Cell>
               <Table.Cell>{item.hazardous ? "Yes" : "No"}</Table.Cell>
-              <Table.Cell>{item.hazardId || ""}</Table.Cell>
-              <Table.Cell>{item.packingGroup || ""}</Table.Cell>
+              <Table.Cell>{item.hazard_id || ""}</Table.Cell>
+              <Table.Cell>{item.packing_group || ""}</Table.Cell>
               <Table.Cell>
                 <button onClick={() => openEditModal(item)}>
                   <a

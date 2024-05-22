@@ -4,17 +4,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { getProducts } from "@/helpers/getData";
 import { Table } from "flowbite-react";
-import type { Products } from "@/helpers/getData";
 import { getMissingSKUs  } from "@/app/actions/action";
 
 export default function Products() {
   const queryClient = useQueryClient();
 
   const { data, error, isLoading } = useQuery({ queryKey: ["products"], queryFn: () => getProducts() })
-  
-  async function handleClick() {
-    await getMissingSKUs();
-  }
 
   return (
     <div className="overflow-x-auto">
