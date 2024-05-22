@@ -31,4 +31,20 @@ export interface Product {
     noCustoms: boolean; // If true, this product will not be included on international customs forms.
     tags: object; // The ProductTag helps to organize and visually identify products.
   }
+
+export interface ProductFilter {
+    sku: string; // Returns products that match the specified SKU.
+    name?: string; // Optional: Returns products that match the specified product name.
+    productCategoryId?: string; // Optional: Returns products that match the specified productCategoryId.
+    productTypeId?: string; // Optional: Returns products that match the specified productTypeId.
+    tagId?: string; // Optional: Returns products that match the specified tagId.
+    startDate?: string; // Optional: Returns products that were created after the specified date.
+    endDate?: string; // Optional: Returns products that were created before the specified date.
+    sortBy?: 'SKU' | 'ModifyDate' | 'CreateDate'; // Optional: Sorts the order of the response based on the specified value.
+    sortDir?: 'ASC' | 'DESC'; // Optional: Sets the direction of the sort order.
+    page?: string; // Optional: Page number.
+    pageSize?: string; // Optional: Requested page size. Max value is 500.
+    showInactive?: string; // Optional: Specifies whether the list should include inactive products.
+  }
+  
   

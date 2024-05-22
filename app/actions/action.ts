@@ -34,12 +34,42 @@ const client = createClient<paths>({
 
 
 export async function getMissingSKUs() {
+  let shipstationProducts: Product[] = [];
+  let page = 1;
+  const pageSize = 500;
+  let hasMorePages = true;
   const response: any = await shipStation.request({
     url: "/products",
   });
 
-  const shipstationProducts: Product[] = response.data.products : [];
-  console.log(shipstationProducts);
+  function buildUrl(page: number): string {
+    const baseUrl = "/products";
+    const params = new URLSearchParams({
+      page: page.toString(),
+      pageSize: pageSize.toString(),
+    });
+    return `${baseUrl}?${params.toString()}`;
+    }
+  
+
+  async function fetchPage(page: number): Promise<Product[]> {
+    const response: any = await shipStation.request({
+      url: buildUrl(page),
+  });
+   return response.data.products; 
+  }
+
+  while (hasMorePages) {
+    const products: Product[] = await fetchPage(page);
+    if (products.length > 0 ) {
+      shipstationProducts = shipstationProducts.concat(products);
+      page++;
+    } else {
+      hasMorePages = false;
+    }
+  }
+
+  console.log(`Number of Products:" ${shipstationProducts.length}`)
   const databaseProducts = await getProducts();
   const shipstationSKUs = shipstationProducts.map((product) => ({ sku: product.sku, name: product.name}));
   const databaseSKUs = databaseProducts?.map((product) => ({ sku: product.sku, name: product.name }));
@@ -50,21 +80,21 @@ export async function getMissingSKUs() {
   return missingProducts; 
   }
 
-export async function createSchedule() {
-  await schedules.create({
-  destination: "products",
-  cron: "*/20 * * * * *", // Run every day at midnight
-  });
-}
+// export async function createSchedule() {
+//   await schedules.create({
+//   destination: "products",
+//   cron: "*/20 * * * * *", // Run every day at midnight
+//   });
+// }
 
-export async function startBackgroundJob() {
-  await qstashClient.publishJSON({
-    "url": "https://firstqstashmessage.requestcatcher.com/test",
-    body: {
-      "hello": "world"
-    }
-  });
-}
+// export async function startBackgroundJob() {
+//   await qstashClient.publishJSON({
+//     "url": "https://firstqstashmessage.requestcatcher.com/test",
+//     body: {
+//       "hello": "world"
+//     }
+//   });
+// }
 
 export async function getOrder(
   opts: unknown,
