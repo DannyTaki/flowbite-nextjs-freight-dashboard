@@ -73,8 +73,8 @@ export default function BookFreight() {
     }
     const response = await bookFreight(
       orderData,
-      isLiftgateRequired,
-      isLimitedAccess,
+      // isLiftgateRequired,
+      // isLimitedAccess,
     );
     if (response == null || response === undefined) {
       setShowToast(true);
