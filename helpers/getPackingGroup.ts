@@ -1,8 +1,6 @@
 import type { components } from "@/types/book-freight/mycarrierSchema";
 
-type PackingGroup = components["schemas"]["ITM.Shared.Functions.OrderProcessing.Common.Models.UploadOrder.Commodity"]["hazmatPackingGroup"];
-
-
+export type PackingGroup = components["schemas"]["ITM.Shared.Functions.OrderProcessing.Common.Models.UploadOrder.Commodity"]["hazmatPackingGroup"];
 
 export function getPackingGroup(
   packingGroup: string | undefined,
