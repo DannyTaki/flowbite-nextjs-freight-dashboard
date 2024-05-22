@@ -14,7 +14,7 @@ import { HiExclamation } from "react-icons/hi";
 import { z } from "zod";
 
 const chemicalSchema = z.object({
-  classificationId: z.number().optional(),
+  classification_id: z.number().optional(),
   description: z
     .string({
       required_error: "Description is required",
@@ -23,14 +23,14 @@ const chemicalSchema = z.object({
     .min(1, "Description is required")
     .nullable(),
   nmfc: z.string().nullable(),
-  freightClass: z
+  freight_class: z
     .string({
       invalid_type_error: "Freight Class must be a numnber",
     })
     .nullable(),
   hazardous: z.boolean().nullable(),
-  hazardId: z.string().nullable(),
-  packingGroup: z.string().nullable(),
+  hazard_id: z.string().nullable(),
+  packing_group: z.string().nullable(),
   sub: z.string().nullable(),
 });
 type ChemicalInput = z.infer<typeof chemicalSchema>;
@@ -95,13 +95,13 @@ export default function Chemicals() {
     if (selectedChemical) {
       try {
         const validatedData = chemicalSchema.parse({
-          classificationId: selectedChemical.classificationId,
+          classification_id: selectedChemical.classification_id,
           description: selectedChemical.description || "",
           nmfc: selectedChemical.nmfc || null,
-          freightClass: selectedChemical.freightClass,
+          freight_class: selectedChemical.freight_class || null,
           hazardous: selectedChemical.hazardous || null,
-          hazardId: selectedChemical.hazardId || null,
-          packingGroup: selectedChemical.packingGroup || null,
+          hazard_id: selectedChemical.hazard_id || null,
+          packing_group: selectedChemical.packing_group || null,
           sub: selectedChemical.sub || null,
         });
 
@@ -142,13 +142,13 @@ export default function Chemicals() {
 
   const openAddModal = () => {
     setSelectedChemical({
-      description: "",
-      nmfc: "",
-      freightClass: undefined,
+      description: undefined,
+      nmfc: undefined,
+      freight_class: undefined,
       hazardous: false,
-      hazardId: "",
-      packingGroup: "",
-      sub: "",
+      hazard_id: undefined,
+      packing_group: undefined,
+      sub: undefined,
     });
     setIsEditMode(false);
     setOpenModal(true);
@@ -255,7 +255,7 @@ export default function Chemicals() {
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type Freight Class"
                   required={false}
-                  value={selectedChemical?.freightClass || ""}
+                  value={selectedChemical?.freight_class || ""}
                 />
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function Chemicals() {
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type Hazard ID"
                   required={false}
-                  value={selectedChemical?.hazardId || ""}
+                  value={selectedChemical?.hazard_id || ""}
                 />
               </div>
               <div className="col-span-3 sm:col-span-1">
@@ -316,7 +316,7 @@ export default function Chemicals() {
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                   placeholder="Type Packing Group"
                   required={false}
-                  value={selectedChemical?.packingGroup || ""}
+                  value={selectedChemical?.packing_group || ""}
                 />
               </div>
             </div>

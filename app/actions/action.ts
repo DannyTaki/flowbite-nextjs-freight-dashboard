@@ -3,10 +3,8 @@
 import { getEnrichedOrder } from "@/helpers/EnrichedOrder";
 import { getProducts } from "@/helpers/getData";
 import type { ErrorResult } from "@/types/book-freight/action-types";
-import type { paths } from "@/types/book-freight/mycarrierSchema";
 import { optsSchema } from "@/types/optsSchema";
 import type { Product } from "@/types/shiptation/product";
-import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
 
@@ -20,9 +18,9 @@ const shipStation = new Shipstation({
   apiSecret: credentials.secret,
 });
 
-const client = createClient<paths>({
-  baseUrl: process.env.MYCARRIER_BASE_URL,
-});
+// const client = createClient<paths>({
+//   baseUrl: process.env.MYCARRIER_BASE_URL,
+// });
 
 export async function getMissingSKUs() {
   let shipstationProducts: Product[] = [];

@@ -1,11 +1,11 @@
 "use client";
 
 import { getProducts } from "@/helpers/getData";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Table, Spinner } from "flowbite-react";
+import { useQuery } from "@tanstack/react-query";
+import { Spinner, Table } from "flowbite-react";
 
 export default function Products() {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["products"],

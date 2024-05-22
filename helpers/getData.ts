@@ -8,16 +8,7 @@ import { alias } from "drizzle-orm/pg-core";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
-// export type SingleChemicalData = {
-//   classificationId: number;
-//   description: string | null;
-//   nmfc: string | null;
-//   freightClass: number | string;
-//   hazardous: boolean | null;
-//   hazardId: string | null;
-//   packingGroup: string | null;
-//   sub: string | null;
-// };
+
 export type Products = Awaited<ReturnType<typeof getProducts>>;
 
 const sql = neon(process.env.DATABASE_URL!);
