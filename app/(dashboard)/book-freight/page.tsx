@@ -84,9 +84,9 @@ export default function BookFreight() {
       );
       setIcon(<HiX className="size-5" />);
       return;
-    } else if (response !== null && "error" in response) {
+    } else if (response === "No orders available" || "Only one order can be processed at a time") {
       setShowToast(true);
-      setToastMessage(response.error.message);
+      setToastMessage(response);
       setToastStyle(
         "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200",
       );
