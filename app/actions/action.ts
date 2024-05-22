@@ -6,15 +6,9 @@ import type { ErrorResult } from "@/types/book-freight/action-types";
 import type { paths } from "@/types/book-freight/mycarrierSchema";
 import { optsSchema } from "@/types/optsSchema";
 import type { Product } from "@/types/shiptation/product";
-import { Client } from "@upstash/qstash";
 import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
-
-const qstashClient = new Client({
-  token: process.env.QSTASH_TOKEN!,
-});
-const schedules = qstashClient.schedules;
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,
@@ -35,9 +29,6 @@ export async function getMissingSKUs() {
   let page = 1;
   const pageSize = 500;
   let hasMorePages = true;
-  const response: any = await shipStation.request({
-    url: "/products",
-  });
 
   function buildUrl(page: number): string {
     const baseUrl = "/products";
