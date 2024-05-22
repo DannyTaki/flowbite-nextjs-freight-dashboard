@@ -37,8 +37,17 @@ export async function getMissingSKUs() {
     return `${baseUrl}?${params.toString()}`;
   }
 
+  interface ShipstationResponse {
+    data: {
+      products: Product[];
+      total: number;
+      page: number;
+      pages: number;
+    };
+  }
+
   async function fetchPage(page: number): Promise<Product[]> {
-    const response: any = await shipStation.request({
+    const response: ShipstationResponse = await shipStation.request({
       url: buildUrl(page),
     });
     return response.data.products;
@@ -109,8 +118,8 @@ export async function getOrder(
 
 export async function bookFreight(
   orderData: IOrderPaginationResult,
-  liftgate: boolean,
-  limitedAccess: boolean,
+  // liftgate: boolean,
+  // limitedAccess: boolean,
 ) {
   try {
     if (!orderData || orderData.orders.length === 0) {
