@@ -12,6 +12,7 @@ import { Button, Checkbox, Modal, Spinner, Table, Toast } from "flowbite-react";
 import React, { useState } from "react";
 import { HiExclamation } from "react-icons/hi";
 import { z } from "zod";
+import type { InsertFreightClassification, SelectFreightClassification } from "@/types/db/types";
 
 const chemicalSchema = z.object({
   classification_id: z.number().optional(),
@@ -107,11 +108,11 @@ export default function Chemicals() {
 
         if (isEditMode) {
           await updateChemicalEntry(
-            validatedData as schema.InsertFreightClassification,
+            validatedData as InsertFreightClassification,
           );
         } else {
           await addChemicalEntry(
-            validatedData as schema.InsertFreightClassification,
+            validatedData as InsertFreightClassification,
           );
         }
         setOpenModal(false);
@@ -134,7 +135,7 @@ export default function Chemicals() {
   };
 
   const handleInputChange = (
-    field: keyof schema.SelectFreightClassification,
+    field: keyof SelectFreightClassification,
     value: string | boolean | null,
   ) => {
     setSelectedChemical((prev) => (prev ? { ...prev, [field]: value } : null));
@@ -154,7 +155,7 @@ export default function Chemicals() {
     setOpenModal(true);
   };
 
-  const openEditModal = (item: schema.SelectFreightClassification) => {
+  const openEditModal = (item: SelectFreightClassification) => {
     setSelectedChemical(item);
     setIsEditMode(true);
     setOpenModal(true);

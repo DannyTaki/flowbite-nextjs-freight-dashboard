@@ -5,6 +5,8 @@ import { neon } from "@neondatabase/serverless";
 import { eq, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
+import { Schema } from "inspector";
+import type { SelectProduct, InsertProduct, SelectProductFreightLink, InsertProductFreightLink, SelectFreightClassification, InsertFreightClassification } from "@/types/db/types";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
@@ -58,9 +60,10 @@ export async function getChemicalData() {
   }
 }
 
+
 // Add this to your server action code
 export async function updateChemicalEntry(
-  chemical: schema.InsertFreightClassification,
+  chemical: InsertFreightClassification
 ) {
   try {
     if (chemical.classification_id === undefined) {
@@ -92,7 +95,7 @@ export async function updateChemicalEntry(
 }
 
 export async function addChemicalEntry(
-  chemical: schema.InsertFreightClassification,
+  chemical: InsertFreightClassification,
 ) {
   try {
     await db
@@ -147,7 +150,7 @@ export async function getProducts() {
   }
 }
 
-export async function addProduct(products: schema.InsertProduct[]) {
+export async function addProduct(products: InsertProduct[]) {
   try {
     for (const product of products) {
       // Check if a product with the given SKU exists
