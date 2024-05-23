@@ -2,7 +2,7 @@
 
 import * as schema from "@/app/db/drizzle/schema";
 import { neon } from "@neondatabase/serverless";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -177,5 +177,19 @@ export async function addProduct(products: schema.InsertProduct[]) {
     }
   } catch (error) {
     console.error("Error adding product:", error);
+  }
+}
+
+export async function getUnlinkedProducts() {
+  try { 
+    const unlinkedProducts = await db 
+    .select()
+    .from(schema.product_freight_linkages)
+    .where(isNull(schema.product_freight_linkages.classification_id))
+    .execute();
+
+  return unlinkedProducts; 
+  } catch (error) {
+    console.error("Error returning unlinked products:", error);
   }
 }
