@@ -1,6 +1,6 @@
 "use client";
 
-import { getUnlinkedProducts } from "@/helpers/getData";
+import { getUnlinkedProducts, updateProductFreightLink } from "@/helpers/getData";
 import { useQuery } from "@tanstack/react-query";
 import { Table, TextInput, Button, Checkbox } from "flowbite-react";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { map } from "zod";
 
 export default function UnlinkedProducts() {
     const [selectedRows, setSelectedRows]  = useState<number[]>([]);
-    const [classificationIds, setClassifications] = useState<{[key: number]: string}>({});
+    const [classificationIds, setClassifications] = useState<{[key: number]: number}>({});
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
     
 
@@ -30,7 +30,7 @@ export default function UnlinkedProducts() {
       }
     }
 
-    function handleClassificationIdChange(product_id: number, value: string) {
+    function handleClassificationIdChange(product_id: number, value: number) {
       setClassifications((prev) => ({
         ...prev,
         [product_id]: value,
@@ -42,31 +42,16 @@ export default function UnlinkedProducts() {
       
       const updates = selectedData?.map(item => ({
         link_id: item.link_id,
-        classification_id: classificationIds[item.product_id as number] || ""
+        classification_id: classificationIds[item.product_id as number]
       }));
 
       try {
-        await Promise.all(updates.map(update => updateProductFreightLink(update.link_id as number, update.classification_id)));
-        // Optionally refetch data or provide feedback
+        const response = await updateProductFreightLink(updates as {link_id: number, classification_id: number}[]);
       } catch (error) {
-        console.error("Error updating product freight links:", error);
+        console.error("Error adding classification:", error); 
       }
     }
 
-    async function updateProductFreightLink(link_id: number, classification_id: string) {
-      // Replace with your actual update logic, e.g., an API call
-      const response = await fetch('/api/updateProductFreightLink', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ link_id, classification_id }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to update product freight link');
-      }
-    }
 
     const allSelected = selectedRows.length === data?.length;
 
