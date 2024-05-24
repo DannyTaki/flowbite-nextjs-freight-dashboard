@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentProps, FC, HTMLAttributeAnchorTarget } from "react";
 import { useEffect, useState } from "react";
-import { BsFillTrainFreightFrontFill } from "react-icons/bs";
+import { BsFillTrainFreightFrontFill, BsLink45Deg } from "react-icons/bs";
 import {
   HiAdjustments,
   HiChartPie,
@@ -437,6 +437,7 @@ const pages: SidebarItem[] = [
   },
   { href: "/chemicals", icon: HiTable, label: "Chemicals" },
   { href: "/products", icon: HiShoppingCart, label: "Products" },
+  {href: "/link", icon: BsLink45Deg, label: "Link"},
   { href: "/kanban", icon: HiViewGrid, label: "Kanban" },
   { href: "/mailing/inbox", icon: HiInboxIn, label: "Inbox", badge: "3" },
   {

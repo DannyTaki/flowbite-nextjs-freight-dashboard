@@ -40,4 +40,5 @@ export const product_freight_linkages = pgTable("product_freight_linkages", {
 	packaging_type: varchar("packaging_type", { length: 255 }),
 	unit_container_type: varchar("unit_container_type", { length: 255 }),
 	classification_id: integer("classification_id"),
+	link_id: integer("link_id"),
 });

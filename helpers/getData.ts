@@ -190,9 +190,27 @@ export async function getUnlinkedProducts() {
     .from(schema.product_freight_linkages)
     .where(isNull(schema.product_freight_linkages.classification_id))
     .execute();
-
   return unlinkedProducts; 
   } catch (error) {
     console.error("Error returning unlinked products:", error);
   }
 }
+
+export async function updateProductFreightLink(updates: { link_id: number, classification_id: number }[]) {
+  try {
+    const updatePromises = updates.map(update => 
+      db
+        .update(schema.product_freight_links)
+        .set({
+          classification_id: update.classification_id,
+        })
+        .where(eq(schema.product_freight_links.link_id, update.link_id))
+        .execute()
+    );
+
+    await Promise.all(updatePromises);
+  } catch (error) {
+    console.error("Error updating product freight links:", error);
+  }
+}
+   
