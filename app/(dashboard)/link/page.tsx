@@ -8,7 +8,7 @@ import { map } from "zod";
 
 export default function UnlinkedProducts() {
     const [selectedRows, setSelectedRows]  = useState<number[]>([]);
-    const [classificationIds, setClassifications] = useState<{[key: number]: number}>({});
+    const [classificationIds, setClassifications] = useState<{[key: number]: string}>({});
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
     
 
@@ -30,7 +30,7 @@ export default function UnlinkedProducts() {
       }
     }
 
-    function handleClassificationIdChange(product_id: number, value: number) {
+    function handleClassificationIdChange(product_id: number, value: string) {
       setClassifications((prev) => ({
         ...prev,
         [product_id]: value,
@@ -41,8 +41,8 @@ export default function UnlinkedProducts() {
       const selectedData = data?.filter(item => selectedRows.includes(item.product_id as number));
       
       const updates = selectedData?.map(item => ({
-        link_id: item.link_id,
-        classification_id: classificationIds[item.product_id as number]
+        link_id: Number(item.link_id),
+        classification_id: Number(classificationIds[item.product_id as number])
       }));
 
       try {
@@ -66,7 +66,7 @@ export default function UnlinkedProducts() {
             <Table.HeadCell>SKU</Table.HeadCell>
             <Table.HeadCell>Name</Table.HeadCell>
             <Table.HeadCell>Classification ID</Table.HeadCell>
-            <Table.HeadCell><Button color="success">Add</Button></Table.HeadCell>
+            <Table.HeadCell><Button color="success" onClick={handleAdd}>Add</Button></Table.HeadCell>
             <Table.HeadCell>
               <span className="sr-only">Edit</span>
             </Table.HeadCell>
@@ -85,7 +85,10 @@ export default function UnlinkedProducts() {
                 </Table.Cell>
                 <Table.Cell>{item.sku}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
-                <Table.Cell><TextInput /></Table.Cell>        
+                <Table.Cell>    <TextInput
+                  value={classificationIds[item.product_id as number]}
+                  onChange={(e) => handleClassificationIdChange(item.product_id as number,e.target.value)}
+                /></Table.Cell>        
               </Table.Row>
             ))}
           </Table.Body>
