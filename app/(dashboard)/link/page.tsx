@@ -1,17 +1,19 @@
 "use client";
 
 import { getUnlinkedProducts, updateProductFreightLink } from "@/helpers/getData";
-import { useQuery } from "@tanstack/react-query";
-import { Table, TextInput, Button, Checkbox } from "flowbite-react";
-import { useState } from "react";
+import { keepPreviousData, useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { Table, TextInput, Button, Checkbox, Pagination } from "flowbite-react";
+import React, { useState } from "react";
 import { map } from "zod";
 
 export default function UnlinkedProducts() {
     const [selectedRows, setSelectedRows]  = useState<number[]>([]);
     const [classificationIds, setClassifications] = useState<{[key: number]: string}>({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 9;
+  
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
     
-
 
     function handleRowSelect(product_id: number) {
       setSelectedRows((prevSelected) => 
@@ -55,44 +57,56 @@ export default function UnlinkedProducts() {
 
     const allSelected = selectedRows.length === data?.length;
 
+    const totalItems = data?.length || 0;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentPageData = data?.slice(startIndex, startIndex + itemsPerPage) || [];
+
+    const onPageChange = (page: number) => setCurrentPage(page);
+
     return (
         <div className="overflow-x-auto">
-        <Table>
-          <Table.Head>
-            <Table.HeadCell className="p-4">
-                <Checkbox checked={allSelected} onChange={handleSelectAll} />
-            </Table.HeadCell>
-            <Table.HeadCell>Product ID</Table.HeadCell>
-            <Table.HeadCell>SKU</Table.HeadCell>
-            <Table.HeadCell>Name</Table.HeadCell>
-            <Table.HeadCell>Classification ID</Table.HeadCell>
-            <Table.HeadCell><Button color="success" onClick={handleAdd}>Add</Button></Table.HeadCell>
-            <Table.HeadCell>
-              <span className="sr-only">Edit</span>
-            </Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">
-            {data?.map((item, index) => (
-              <Table.Row
-                key={index}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800"
-              >
-                  <Table.Cell className="p-4">
-                  <Checkbox checked={selectedRows.includes(item.product_id as number)} onChange={() => handleRowSelect(item.product_id as number)} />
-              </Table.Cell>
-                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                    {item.product_id}
-                </Table.Cell>
-                <Table.Cell>{item.sku}</Table.Cell>
-                <Table.Cell>{item.name}</Table.Cell>
-                <Table.Cell>    <TextInput
-                  value={classificationIds[item.product_id as number]}
-                  onChange={(e) => handleClassificationIdChange(item.product_id as number,e.target.value)}
-                /></Table.Cell>        
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </div>
+            <Table>
+                <Table.Head>
+                    <Table.HeadCell className="p-4">
+                        <Checkbox checked={allSelected} onChange={handleSelectAll} />
+                    </Table.HeadCell>
+                    <Table.HeadCell>Product ID</Table.HeadCell>
+                    <Table.HeadCell>SKU</Table.HeadCell>
+                    <Table.HeadCell>Name</Table.HeadCell>
+                    <Table.HeadCell>Classification ID</Table.HeadCell>
+                    <Table.HeadCell><Button color="success" onClick={handleAdd}>Add</Button></Table.HeadCell>
+                    <Table.HeadCell>
+                        <span className="sr-only">Edit</span>
+                    </Table.HeadCell>
+                </Table.Head>
+                <Table.Body className="divide-y">
+                    {currentPageData.map((item, index) => (
+                        <Table.Row
+                            key={index}
+                            className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                        >
+                            <Table.Cell className="p-4">
+                                <Checkbox checked={selectedRows.includes(item.product_id as number)} onChange={() => handleRowSelect(item.product_id as number)} />
+                            </Table.Cell>
+                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                {item.product_id}
+                            </Table.Cell>
+                            <Table.Cell>{item.sku}</Table.Cell>
+                            <Table.Cell>{item.name}</Table.Cell>
+                            <Table.Cell>
+                                <TextInput
+                                    value={classificationIds[item.product_id as number] || ""}
+                                    onChange={(e) => handleClassificationIdChange(item.product_id as number, e.target.value)}
+                                />
+                            </Table.Cell>        
+                        </Table.Row>
+                    ))}
+                </Table.Body>
+            </Table>
+            <div className="flex overflow-x-auto sm:justify-center mt-4">
+                <Pagination layout="table" currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
+            </div>
+        </div>
     )
 }
