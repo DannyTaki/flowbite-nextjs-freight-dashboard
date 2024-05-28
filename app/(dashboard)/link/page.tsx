@@ -1,16 +1,17 @@
 "use client";
 
 import { getUnlinkedProducts, updateProductFreightLink } from "@/helpers/getData";
-import { keepPreviousData, useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Table, TextInput, Button, Checkbox, Pagination } from "flowbite-react";
 import React, { useState } from "react";
-import { map } from "zod";
+
 
 export default function UnlinkedProducts() {
     const [selectedRows, setSelectedRows]  = useState<number[]>([]);
     const [classificationIds, setClassifications] = useState<{[key: number]: string}>({});
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 9;
+    const queryClient = useQueryClient();
   
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
     
@@ -41,7 +42,7 @@ export default function UnlinkedProducts() {
 
     async function handleAdd() {
       const selectedData = data?.filter(item => selectedRows.includes(item.product_id as number));
-      
+      console.log(selectedData);
       const updates = selectedData?.map(item => ({
         link_id: Number(item.link_id),
         classification_id: Number(classificationIds[item.product_id as number])
@@ -49,6 +50,9 @@ export default function UnlinkedProducts() {
 
       try {
         const response = await updateProductFreightLink(updates as {link_id: number, classification_id: number}[]);
+        console.log(response);
+        queryClient.invalidateQueries({ queryKey: ['unlinkedProducts']});
+        
       } catch (error) {
         console.error("Error adding classification:", error); 
       }
