@@ -55,7 +55,7 @@ const SECTIONS: Section[] = [
     title: "Follow us",
     items: [
       {
-        title: "Github",
+        title: "GitHub",
         href: "https://github.com/themesberg",
       },
       {

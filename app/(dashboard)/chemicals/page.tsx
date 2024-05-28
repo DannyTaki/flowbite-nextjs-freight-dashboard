@@ -26,7 +26,7 @@ const chemicalSchema = z.object({
   nmfc: z.string().nullable(),
   freight_class: z
     .string({
-      invalid_type_error: "Freight Class must be a numnber",
+      invalid_type_error: "Freight Class must be a number",
     })
     .nullable(),
   hazardous: z.boolean().nullable(),

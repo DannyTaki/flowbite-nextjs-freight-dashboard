@@ -33,7 +33,7 @@ export function Benefits() {
               <tbody className="bg-white dark:bg-gray-800">
                 <tr>
                   <td className="whitespace-nowrap rounded-l-lg p-4 text-base font-normal text-gray-500 dark:text-gray-400">
-                    Seperate business/personal
+                    Separate business/personal
                   </td>
                   <td className="p-4">
                     <svg

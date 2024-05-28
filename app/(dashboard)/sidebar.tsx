@@ -464,7 +464,7 @@ const pages: SidebarItem[] = [
     label: "Pages",
     items: [
       { href: "/pages/pricing", label: "Pricing" },
-      { href: "/pages/maintenance", label: "Maintenace" },
+      { href: "/pages/maintenance", label: "Maintenance" },
       { href: "/pages/404", label: "404 not found" },
       { href: "/pages/500", label: "500 server error" },
     ],
