@@ -69,7 +69,7 @@ As long as your remote server provides JSON that looks identical to our schema, 
 ### Assumptions
 
 - You can open a shell/terminal/command prompt
-- You have Git instaslled and can run `git` in the shell
+- You have Git installed and can run `git` in the shell
 - You have Node.js installed and can run `node`, `npm` in the shell
 
 Clone this repository
