@@ -2,7 +2,7 @@ import type { EnrichedOrder } from "./EnrichedOrder";
 
 export type Dimensions = Awaited<ReturnType<typeof parseDimensionsAndQty>>;
 export function parseDimensionsAndQty(order: EnrichedOrder): {
-  qty: number | null;
+  qty: number;
   length: number;
   width: number;
   height: number;
