@@ -162,7 +162,7 @@ export default function BookFreight() {
           <Toast.Toggle onClick={() => setShowToast(false)} />
         </Toast>
       )}
-      <div className="flex flex-col flex-grow items-center justify-center px-6 pt-8 md:h-full">
+      <div className="flex flex-col flex-grow items-center justify-center px-6 pt-8 pb-10 md:h-full">
         <Link
           href="/"
           className="mb-8 flex items-center justify-center text-2xl font-semibold dark:text-white lg:mb-10"
