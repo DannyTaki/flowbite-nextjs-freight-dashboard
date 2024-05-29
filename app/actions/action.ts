@@ -159,6 +159,8 @@ async function getQuotes(
   const formattedDate = date.format(now, "MM/DD/YYYY h:mm A");
   const weight = parseWeight(order);
   const dimensions = parseDimensionsAndQty(order);
+  console.log("Weight: " + weight);
+  console.log("Dimensions: " + JSON.stringify(dimensions));
 
   return await client.POST("/api/Orders", {
     body: {
