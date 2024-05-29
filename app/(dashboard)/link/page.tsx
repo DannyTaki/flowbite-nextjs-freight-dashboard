@@ -37,7 +37,16 @@ export default function UnlinkedProducts() {
       setClassifications((prev) => ({
         ...prev,
         [product_id]: value,
-      }))
+      }));
+      setSelectedRows((prevSelected) => {
+        if (value && !prevSelected.includes(product_id)) {
+            return [...prevSelected, product_id];
+        } else if (!value && prevSelected.includes(product_id)) {
+            return prevSelected.filter((id) => id !== product_id);
+        } else {
+            return prevSelected;
+        }
+    });
     }
 
     async function handleAdd() {
