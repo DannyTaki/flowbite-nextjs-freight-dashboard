@@ -227,7 +227,7 @@ function getQuoteUnits(
   weight: number,
   dimensions: Dimensions,
 ): QuoteUnits[] {
-  let LTLitems: QuoteUnits[];
+  let LTLitems: QuoteUnits[] = [];
 
   for (let i = 0; i < dimensions.qty; i++) {
     LTLitems.push({
@@ -242,7 +242,7 @@ function getQuoteUnits(
     });
   }
 
-  return items;
+  return LTLitems;
 }
 
   function getQuoteCommodities(items: EnrichedOrder, weight: number): QuoteCommodity[]
