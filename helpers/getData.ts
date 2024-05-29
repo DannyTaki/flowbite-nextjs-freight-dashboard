@@ -80,6 +80,7 @@ export async function updateChemicalEntry(
         freight_class: chemical.freight_class,
         hazardous: chemical.hazardous,
         hazard_id: chemical.hazard_id,
+        hazard_class: chemical.hazard_class,
         packing_group: chemical.packing_group,
         sub: chemical.sub,
       })

@@ -17,17 +17,12 @@ import type { InsertFreightClassification, SelectFreightClassification } from "@
 const chemicalSchema = z.object({
   classification_id: z.number().optional(),
   description: z
-    .string({
-      required_error: "Description is required",
-      invalid_type_error: "Description must be a string",
-    })
+    .string()
     .min(1, "Description is required")
     .nullable(),
   nmfc: z.string().nullable(),
   freight_class: z
-    .string({
-      invalid_type_error: "Freight Class must be a number",
-    })
+    .string()
     .nullable(),
   hazardous: z.boolean().nullable(),
   hazard_id: z.string().nullable(),
@@ -94,15 +89,17 @@ export default function Chemicals() {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShowToast(false);
+    console.log(selectedChemical);
     if (selectedChemical) {
       try {
         const validatedData = chemicalSchema.parse({
-          classification_id: selectedChemical.classification_id,
-          description: selectedChemical.description || "",
+          classification_id: selectedChemical.classification_id ?? undefined,
+          description: selectedChemical.description || null,
           nmfc: selectedChemical.nmfc || null,
           freight_class: selectedChemical.freight_class || null,
           hazardous: selectedChemical.hazardous || null,
           hazard_id: selectedChemical.hazard_id || null,
+          hazard_class: selectedChemical.hazard_class || null,
           packing_group: selectedChemical.packing_group || null,
           sub: selectedChemical.sub || null,
         });
@@ -120,6 +117,7 @@ export default function Chemicals() {
         queryClient.invalidateQueries({ queryKey: ["chemicals"] });
       } catch (e) {
         if (e instanceof z.ZodError) {
+          console.log(e.issues);
           const newErrors: Record<string, string> = {};
           e.errors.forEach((error) => {
             if (error.path && error.path[0]) {
