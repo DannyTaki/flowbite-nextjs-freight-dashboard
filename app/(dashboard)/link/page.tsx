@@ -91,7 +91,7 @@ export default function UnlinkedProducts() {
                             className="bg-white dark:border-gray-700 dark:bg-gray-800"
                         >
                             <Table.Cell className="p-4">
-                                <Checkbox checked={selectedRows.includes(item.product_id as number)} onChange={() => handleRowSelect(item.product_id as number)} />
+                                <Checkbox checked={selectedRows.includes(item.product_id as number) || !!classificationIds[item.product_id as number]} onChange={() => handleRowSelect(item.product_id as number)} />
                             </Table.Cell>
                             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                                 {item.product_id}
