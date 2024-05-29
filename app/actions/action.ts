@@ -248,10 +248,11 @@ function getQuoteUnits(
   function getQuoteCommodities(items: EnrichedOrder, weight: number): QuoteCommodity[]
   {
 
-    let commodities: QuoteCommodity[];
+    let commodities: QuoteCommodity[] = [];
     for(let i = 0; i < items.enrichedItems.length; i++) {
       const freightClass = items.enrichedItems[i].additionalData[i].freightClass.freight_class as QuoteCommodity["commodityClass"];
       const unitContainerType = items.enrichedItems[i].additionalData[i].product.unit_container_type as QuoteCommodity["commodityPackingType"];
+      const packingGroup = convertToRomainNumeral(items.enrichedItems[i].additionalData[i].freightClass.packing_group);
 
       commodities.push({
         commodityDescription: items.enrichedItems[i].name ?? undefined,
@@ -263,12 +264,34 @@ function getQuoteUnits(
         commodityPackingType: unitContainerType ? unitContainerType : undefined,
         commodityHazMat: items.enrichedItems[i].additionalData[i].freightClass.hazardous ? "YES" : "NO",
         hazmatIDNumber: items.enrichedItems[i].additionalData[i].freightClass.hazard_id ?? undefined,
-
+        hazmatProperShippingName: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
+        hazmatHazardClass: items.enrichedItems[i].additionalData[i].freightClass.hazard_class ?? undefined,
+        hazmatPackingGroup: packingGroup ? packingGroup : undefined,
+        customerOrderNumber: items.orderNumber,
       })
     }
+    return commodities;
+  }
+  function convertToRomainNumeral(packingGroup: string | number | null): QuoteCommodity["hazmatPackingGroup"] {
+    switch (packingGroup) {
+      case "1":
+      case 1:
+        return "I";
+      case "2":
+      case 2:
+        return "II";
+      case "3":
+      case 3:
+        return "III";
+      default:
+        return "NONE";
+    }
+  }
   }
 
 }
+
+
 
 
 // description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,

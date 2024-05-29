@@ -49,6 +49,7 @@ export async function getChemicalData() {
         freight_class: schema.freight_classifications.freight_class,
         hazardous: schema.freight_classifications.hazardous,
         hazard_id: schema.freight_classifications.hazard_id,
+        hazard_class: schema.freight_classifications.hazard_class,
         packing_group: schema.freight_classifications.packing_group,
         sub: schema.freight_classifications.sub,
       })

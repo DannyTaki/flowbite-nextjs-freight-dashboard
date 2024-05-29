@@ -31,6 +31,7 @@ const chemicalSchema = z.object({
     .nullable(),
   hazardous: z.boolean().nullable(),
   hazard_id: z.string().nullable(),
+  hazard_class: z.string().nullable(),
   packing_group: z.string().nullable(),
   sub: z.string().nullable(),
 });
@@ -260,8 +261,8 @@ export default function Chemicals() {
                 />
               </div>
             </div>
-            <div className="mb-4 grid grid-cols-3 gap-3">
-              <div className="col-span-3 sm:col-span-1">
+            <div className="mb-4 grid grid-cols-4 gap-3">
+              <div className="col-span-4 sm:col-span-1">
                 <label
                   htmlFor="hazardous"
                   className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
@@ -280,7 +281,7 @@ export default function Chemicals() {
                   <option value="No">No</option>
                 </select>
               </div>
-              <div className="col-span-3 sm:col-span-1">
+              <div className="col-span-4 sm:col-span-1">
                 <label
                   htmlFor="hazard-id"
                   className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
@@ -300,7 +301,27 @@ export default function Chemicals() {
                   value={selectedChemical?.hazard_id || ""}
                 />
               </div>
-              <div className="col-span-3 sm:col-span-1">
+              <div className="col-span-4 sm:col-span-1">
+                <label
+                  htmlFor="hazard-class"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Hazard Class
+                </label>
+                <input
+                  onChange={(e) =>
+                    handleInputChange("hazard_class", e.target.value)
+                  }
+                  type="text"
+                  name="hazard-class"
+                  id="hazard-class"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                  placeholder="Type Hazard Class"
+                  required={false}
+                  value={selectedChemical?.hazard_class || ""}
+                />
+              </div>
+              <div className="col-span-4 sm:col-span-1">
                 <label
                   htmlFor="packing-group"
                   className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
@@ -321,7 +342,7 @@ export default function Chemicals() {
                 />
               </div>
             </div>
-            <Modal.Footer>
+            <Modal.Footer className="flex justify-center">
               <Button type="submit">{isEditMode ? "Update" : "Add"}</Button>
             </Modal.Footer>
           </form>
@@ -339,6 +360,7 @@ export default function Chemicals() {
           <Table.HeadCell>Freight Class</Table.HeadCell>
           <Table.HeadCell>Hazardous</Table.HeadCell>
           <Table.HeadCell>Hazard ID</Table.HeadCell>
+          <Table.HeadCell>Hazard Class</Table.HeadCell>
           <Table.HeadCell>Packing Group</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
@@ -375,6 +397,7 @@ export default function Chemicals() {
               <Table.Cell>{item.freight_class}</Table.Cell>
               <Table.Cell>{item.hazardous ? "Yes" : "No"}</Table.Cell>
               <Table.Cell>{item.hazard_id || ""}</Table.Cell>
+              <Table.Cell>{item.hazard_class}</Table.Cell>
               <Table.Cell>{item.packing_group || ""}</Table.Cell>
               <Table.Cell>
                 <button onClick={() => openEditModal(item)}>
