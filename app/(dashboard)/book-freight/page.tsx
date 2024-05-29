@@ -76,6 +76,7 @@ export default function BookFreight() {
       isLiftgateRequired,
       isLimitedAccess,
     );
+    console.log(response);
     if (response == null || response === undefined) {
       setShowToast(true);
       setToastMessage("Error booking freight. Please try again.");

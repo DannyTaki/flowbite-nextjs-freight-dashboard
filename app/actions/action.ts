@@ -129,20 +129,22 @@ export async function bookFreight(
   limitedAccess: boolean,
 ) {
   try {
+    console.log("Order Data: " + JSON.stringify(orderData));  
     if (!orderData || orderData.orders.length === 0) {
       console.log("No orders found");
       return "No orders available";
-    }
-    if (orderData.orders.length > 1) {
+    } else if (orderData.orders.length > 1) {
       console.log("Only one order can be processed at a time");
       return "Only one order can be processed at a time";
-    }
+    } else {
+    console.log("Booking Freight...");
 
     const enrichedOrder = await getEnrichedOrder(orderData);
     console.log(enrichedOrder);
     // const shipmentResult = await rateLtlShipment(EnrichedOrder, liftgate, limitedAccess)
     const quotes = await getQuotes(enrichedOrder, liftgate, limitedAccess);
-    // return quotes;
+     return quotes;
+    }
   } catch (error) {
     console.log(error);
     return null;
