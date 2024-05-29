@@ -7,6 +7,8 @@ import { optsSchema } from "@/types/optsSchema";
 import type { Product } from "@/types/shiptation/product";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
+import createClient from "openapi-fetch";
+import { paths } from "@/types/book-freight/mycarrierSchema";
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,
@@ -18,9 +20,9 @@ const shipStation = new Shipstation({
   apiSecret: credentials.secret,
 });
 
-// const client = createClient<paths>({
-//   baseUrl: process.env.MYCARRIER_BASE_URL,
-// });
+const client = createClient<paths>({
+  baseUrl: process.env.MYCARRIER_BASE_URL,
+});
 
 export async function getMissingSKUs() {
   let shipstationProducts: Product[] = [];
