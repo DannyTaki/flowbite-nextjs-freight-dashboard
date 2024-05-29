@@ -233,11 +233,11 @@ function getQuoteUnits(
     LTLitems.push({
       shippingUnitType: "Pallet",
       shippingUnitCount: dimensions.qty.toString(),
-      unitLength: dimensions.length,
-      unitWidth: dimensions.width,
-      unitHeight: dimensions.height,
+      unitLength: dimensions.length.toString(),
+      unitWidth: dimensions.width.toString(),
+      unitHeight: dimensions.height.toString(),
       unitStackable: "NO",
-      quoteCommodities: getQuoteCommodities(items),
+      quoteCommodities: getQuoteCommodities(items, weight),
 
     });
   }
@@ -245,106 +245,118 @@ function getQuoteUnits(
   return items;
 }
 
-function getQuoteCommodities(items: EnrichedOrder): QuoteCommodity[]
-{
+  function getQuoteCommodities(items: EnrichedOrder, weight: number): QuoteCommodity[]
+  {
 
-  let commodities: QuoteCommodity[];
-  for(let i = 0; i < items.enrichedItems.length; i++) {
-    commodities.push({
-      commodityDescription: "",
-      commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
-      commoditySub: items.enrichedItems[i].additionalData[i].
-    })
-  }
+    let commodities: QuoteCommodity[];
+    for(let i = 0; i < items.enrichedItems.length; i++) {
+      const freightClass = items.enrichedItems[i].additionalData[i].freightClass.freight_class as QuoteCommodity["commodityClass"];
+      const unitContainerType = items.enrichedItems[i].additionalData[i].product.unit_container_type as QuoteCommodity["commodityPackingType"];
 
-}
+      commodities.push({
+        commodityDescription: items.enrichedItems[i].name ?? undefined,
+        commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
+        commoditySub: items.enrichedItems[i].additionalData[i].freightClass.sub ?? undefined,
+        commodityClass: freightClass ? freightClass : undefined,
+        commodityPieces: items.enrichedItems[i].quantity.toString(),
+        commodityWeight: (weight / items.enrichedItems.length).toString(),
+        commodityPackingType: unitContainerType ? unitContainerType : undefined,
+        commodityHazMat: items.enrichedItems[i].additionalData[i].freightClass.hazardous ? "YES" : "NO",
+        hazmatIDNumber: items.enrichedItems[i].additionalData[i].freightClass.hazard_id ?? undefined,
 
-description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
-weight: weight,
-freightClass: validateFreightClass(
-  parseInt(items.enrichedItems[i].additionalData[i].freightClass.freightClass, 10),
-),
-length: dimensions.length,
-width: dimensions.width,
-height: dimensions.height,
-package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
-pieces: 1,
-nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
-hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?? undefined,
-hazard: getHazard(items) as Hazard,
-saidToContain: items.enrichedItems[i].additionalData[i].product.unitContainerType as SaidToContainOptions,
-
-  async function rateLtlShipment(
-    order: EnrichedOrder,
-    liftgate: boolean,
-    limitedAccess: boolean,
-  ) {
-    const now = new Date();
-    const todayDate = date.format(now, "YYYY-MM-DD");
-    const weight = parseWeight(order);
-    const dimensions = parseDimensionsAndQty(order);
-    let destType:
-      | "business dock"
-      | "business no dock"
-      | "residential"
-      | "limited access"
-      | "trade show"
-      | "construction"
-      | "farm"
-      | "military"
-      | "airport"
-      | "place of worship"
-      | "school"
-      | "mine"
-      | "pier"
-      | undefined;
-    const items: LTLItem = getItems(order, weight, dimensions);
-    if (liftgate && !order.shipTo.residential) {
-      destType = "business no dock";
-    } else if (order.shipTo.residential) {
-      destType = "residential";
-    } else if (limitedAccess) {
-      destType = "limited access";
-    } else {
-      destType = "business dock";
+      })
     }
-    return await client.POST("/rates", {
-      body: {
-        pickupDate: todayDate,
-        charges: liftgate ? ["liftgate delivery"] : undefined,
-        originCompany: "Alliance Chemical",
-        originAddress: "204 South Edmond Street",
-        originCity: "Taylor",
-        originState: "TX",
-        originPostalCode: "76574",
-        originCountry: "USA",
-        originType: "business dock",
-        originContactName: "Adnan Heikal",
-        originContactPhone: "512-365-6838",
-        originContactEmail: "adnan.heikal@alliancechemical.com",
-        originReferenceNumber: order.orderNumber,
-        originDockHoursOpen: "09:00 AM",
-        originDockHoursClose: "04:00 PM",
-        destCompany: order.shipTo.company ? order.shipTo.company : undefined,
-        destAddress: order.shipTo.street1,
-        destAddress2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
-        destCity: order.shipTo.city,
-        destState: order.shipTo.state,
-        destPostalCode: order.shipTo.postalCode,
-        destCountry: "USA",
-        destType: destType,
-        destContactName: order.shipTo.name,
-        destContactPhone: order.shipTo.phone,
-        destContactEmail: order.customerEmail,
-        destReferenceNumber: order.orderNumber,
-        destDockHoursOpen: "09:00 AM",
-        destDockHoursClose: "04:00 PM",
-        billPostalCode: order.shipTo.postalCode,
-        billCountry: "USA",
-        items: [],
-      },
-    });
   }
 
-  return;
 }
+
+
+// description: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
+// weight: weight,
+// freightClass: validateFreightClass(
+//   parseInt(items.enrichedItems[i].additionalData[i].freightClass.freightClass, 10),
+// ),
+// length: dimensions.length,
+// width: dimensions.width,
+// height: dimensions.height,
+// package: items.enrichedItems[i].additionalData[i].product.packagingType as LTLPackagingType,
+// pieces: 1,
+// nmfc: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
+// hazardous: items.enrichedItems[i].additionalData[i].freightClass.hazardous ?? undefined,
+// hazard: getHazard(items) as Hazard,
+// saidToContain: items.enrichedItems[i].additionalData[i].product.unitContainerType as SaidToContainOptions,
+
+//   async function rateLtlShipment(
+//     order: EnrichedOrder,
+//     liftgate: boolean,
+//     limitedAccess: boolean,
+//   ) {
+//     const now = new Date();
+//     const todayDate = date.format(now, "YYYY-MM-DD");
+//     const weight = parseWeight(order);
+//     const dimensions = parseDimensionsAndQty(order);
+//     let destType:
+//       | "business dock"
+//       | "business no dock"
+//       | "residential"
+//       | "limited access"
+//       | "trade show"
+//       | "construction"
+//       | "farm"
+//       | "military"
+//       | "airport"
+//       | "place of worship"
+//       | "school"
+//       | "mine"
+//       | "pier"
+//       | undefined;
+//     const items: LTLItem = getItems(order, weight, dimensions);
+//     if (liftgate && !order.shipTo.residential) {
+//       destType = "business no dock";
+//     } else if (order.shipTo.residential) {
+//       destType = "residential";
+//     } else if (limitedAccess) {
+//       destType = "limited access";
+//     } else {
+//       destType = "business dock";
+//     }
+//     return await client.POST("/rates", {
+//       body: {
+//         pickupDate: todayDate,
+//         charges: liftgate ? ["liftgate delivery"] : undefined,
+//         originCompany: "Alliance Chemical",
+//         originAddress: "204 South Edmond Street",
+//         originCity: "Taylor",
+//         originState: "TX",
+//         originPostalCode: "76574",
+//         originCountry: "USA",
+//         originType: "business dock",
+//         originContactName: "Adnan Heikal",
+//         originContactPhone: "512-365-6838",
+//         originContactEmail: "adnan.heikal@alliancechemical.com",
+//         originReferenceNumber: order.orderNumber,
+//         originDockHoursOpen: "09:00 AM",
+//         originDockHoursClose: "04:00 PM",
+//         destCompany: order.shipTo.company ? order.shipTo.company : undefined,
+//         destAddress: order.shipTo.street1,
+//         destAddress2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
+//         destCity: order.shipTo.city,
+//         destState: order.shipTo.state,
+//         destPostalCode: order.shipTo.postalCode,
+//         destCountry: "USA",
+//         destType: destType,
+//         destContactName: order.shipTo.name,
+//         destContactPhone: order.shipTo.phone,
+//         destContactEmail: order.customerEmail,
+//         destReferenceNumber: order.orderNumber,
+//         destDockHoursOpen: "09:00 AM",
+//         destDockHoursClose: "04:00 PM",
+//         billPostalCode: order.shipTo.postalCode,
+//         billCountry: "USA",
+//         items: [],
+//       },
+//     });
+//   }
+
+//   return;
+// }
