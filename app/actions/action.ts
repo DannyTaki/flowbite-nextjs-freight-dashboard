@@ -150,12 +150,7 @@ export async function bookFreight(
     return null;
   }
 }
-
-async function getQuotes(
-  order: EnrichedOrder,
-  liftgate: boolean,
-  limitedAccess: boolean,
-) {
+function constructPayload(order: EnrichedOrder, liftgate: boolean, limitedAccess: boolean) {
   const now = new Date();
   const todayDate = date.format(now, "YYYY-MM-DD");
   const formattedDate = date.format(now, "MM/DD/YYYY h:mm A");
@@ -164,7 +159,7 @@ async function getQuotes(
   console.log("Weight: " + weight);
   console.log("Dimensions: " + JSON.stringify(dimensions));
 
-  return await client.POST("/api/Orders", {
+  return {
     body: {
       orders: [
         {
@@ -220,11 +215,10 @@ async function getQuotes(
             closeTime: "04:00 PM",
           },
           quoteUnits: getQuoteUnits(order, weight, dimensions),
-
         }
       ]
     },
-  });
+  };
 
   function getQuoteUnits(
     items: EnrichedOrder,
@@ -245,52 +239,90 @@ async function getQuotes(
 
       });
     }
-
     return LTLitems;
   }
+}
 
-  function getQuoteCommodities(items: EnrichedOrder, weight: number): QuoteCommodity[] {
+function getQuoteCommodities(items: EnrichedOrder, weight: number): QuoteCommodity[] {
 
-    let commodities: QuoteCommodity[] = [];
-    for (let i = 0; i < items.enrichedItems.length; i++) {
-      const freightClass = items.enrichedItems[i].additionalData[i].freightClass.freight_class as QuoteCommodity["commodityClass"];
-      const unitContainerType = items.enrichedItems[i].additionalData[i].product.unit_container_type as QuoteCommodity["commodityPackingType"];
-      const packingGroup = convertToRomainNumeral(items.enrichedItems[i].additionalData[i].freightClass.packing_group);
+  let commodities: QuoteCommodity[] = [];
+  for (let i = 0; i < items.enrichedItems.length; i++) {
+    const freightClass = items.enrichedItems[i].additionalData[i].freightClass.freight_class as QuoteCommodity["commodityClass"];
+    const unitContainerType = items.enrichedItems[i].additionalData[i].product.unit_container_type as QuoteCommodity["commodityPackingType"];
+    const packingGroup = convertToRomainNumeral(items.enrichedItems[i].additionalData[i].freightClass.packing_group);
 
-      commodities.push({
-        commodityDescription: items.enrichedItems[i].name ?? undefined,
-        commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
-        commoditySub: items.enrichedItems[i].additionalData[i].freightClass.sub ?? undefined,
-        commodityClass: freightClass ? freightClass : undefined,
-        commodityPieces: items.enrichedItems[i].quantity.toString(),
-        commodityWeight: (weight / items.enrichedItems.length).toString(),
-        commodityPackingType: unitContainerType ? unitContainerType : undefined,
-        commodityHazMat: items.enrichedItems[i].additionalData[i].freightClass.hazardous ? "YES" : "NO",
-        hazmatIDNumber: items.enrichedItems[i].additionalData[i].freightClass.hazard_id ?? undefined,
-        hazmatProperShippingName: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
-        hazmatHazardClass: items.enrichedItems[i].additionalData[i].freightClass.hazard_class ?? undefined,
-        hazmatPackingGroup: packingGroup ? packingGroup : undefined,
-        customerOrderNumber: items.orderNumber,
-      })
-    }
-    return commodities;
+    commodities.push({
+      commodityDescription: items.enrichedItems[i].name ?? undefined,
+      commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
+      commoditySub: items.enrichedItems[i].additionalData[i].freightClass.sub ?? undefined,
+      commodityClass: freightClass ? freightClass : undefined,
+      commodityPieces: items.enrichedItems[i].quantity.toString(),
+      commodityWeight: (weight / items.enrichedItems.length).toString(),
+      commodityPackingType: unitContainerType ? unitContainerType : undefined,
+      commodityHazMat: items.enrichedItems[i].additionalData[i].freightClass.hazardous ? "YES" : "NO",
+      hazmatIDNumber: items.enrichedItems[i].additionalData[i].freightClass.hazard_id ?? undefined,
+      hazmatProperShippingName: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
+      hazmatHazardClass: items.enrichedItems[i].additionalData[i].freightClass.hazard_class ?? undefined,
+      hazmatPackingGroup: packingGroup ? packingGroup : undefined,
+      customerOrderNumber: items.orderNumber,
+    })
   }
-  function convertToRomainNumeral(packingGroup: string | number | null): QuoteCommodity["hazmatPackingGroup"] {
-    switch (packingGroup) {
-      case "1":
-      case 1:
-        return "I";
-      case "2":
-      case 2:
-        return "II";
-      case "3":
-      case 3:
-        return "III";
-      default:
-        return "NONE";
-    }
+  return commodities;
+}
+function convertToRomainNumeral(packingGroup: string | number | null): QuoteCommodity["hazmatPackingGroup"] {
+  switch (packingGroup) {
+    case "1":
+    case 1:
+      return "I";
+    case "2":
+    case 2:
+      return "II";
+    case "3":
+    case 3:
+      return "III";
+    default:
+      return "NONE";
   }
 }
+
+function getQuoteUnits(
+  items: EnrichedOrder,
+  weight: number,
+  dimensions: Dimensions,
+): QuoteUnits[] {
+  let LTLitems: QuoteUnits[] = [];
+
+  for (let i = 0; i < dimensions.qty; i++) {
+    LTLitems.push({
+      shippingUnitType: "Pallet",
+      shippingUnitCount: dimensions.qty.toString(),
+      unitLength: dimensions.length.toString(),
+      unitWidth: dimensions.width.toString(),
+      unitHeight: dimensions.height.toString(),
+      unitStackable: "NO",
+      quoteCommodities: getQuoteCommodities(items, weight),
+
+    });
+  }
+
+  return LTLitems;
+}
+
+
+async function getQuotes(
+  order: EnrichedOrder,
+  liftgate: boolean,
+  limitedAccess: boolean,
+) {
+  
+  const payload = constructPayload(order, liftgate, limitedAccess);
+
+  return await client.POST("/api/Orders", payload);
+}
+
+ 
+  
+
 
 
 
