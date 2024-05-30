@@ -31,6 +31,11 @@ import {
   HiViewGrid,
   HiX,
 } from "react-icons/hi";
+import { useQuery } from "@tanstack/react-query";
+import alogiliasearch from "algoliasearch/lite";
+import { MultipleQueriesQuery } from '@algolia/client-search';
+
+const searchClient = alogiliasearch('PRRV6UCPXG','3c47055a99693c67accdbba674a35f16')
 
 export function DashboardNavbar() {
   const sidebar = useSidebarContext();
@@ -43,6 +48,29 @@ export function DashboardNavbar() {
     } else {
       sidebar.mobile.toggle();
     }
+  }
+
+  function search(formData: FormData) {
+    const query = formData.get("search");
+    console.log("Searching for:", query);
+
+    if (typeof query !== 'string' || query === null) {
+      console.error("Invalid search query");
+      return;
+    }
+
+    const queries: MultipleQueriesQuery[] = [
+      {
+        indexName: "products",
+        params: {
+          query: query,
+        },
+      },
+    ]
+   
+    const { data, isLoading, error } = useQuery({queryKey: ["searchResults", query], queryFn: () => searchClient.search(queries)})
+   
+
   }
 
   return (
@@ -84,7 +112,7 @@ export function DashboardNavbar() {
                 height={200}
               />
             </Navbar.Brand>
-            <form className="hidden lg:block lg:pl-2">
+            <form className="hidden lg:block lg:pl-2" action={search}>
               <Label htmlFor="search" className="sr-only">
                 Search
               </Label>

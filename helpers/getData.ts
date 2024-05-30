@@ -215,4 +215,8 @@ export async function updateProductFreightLink(updates: { link_id: number, class
     console.error("Error updating product freight links:", error);
   }
 }
+
+export async function earchQuery() {
+
+}
    
