@@ -27,13 +27,17 @@ import {
   HiSearch,
   HiShoppingBag,
   HiUserCircle,
-  HiUsers,
+  HiUsers,  
   HiViewGrid,
   HiX,
 } from "react-icons/hi";
 import { useQuery } from "@tanstack/react-query";
 import alogiliasearch from "algoliasearch/lite";
 import { MultipleQueriesQuery } from '@algolia/client-search';
+import { SearchComponent } from "@/components/search";
+import { usePathname } from "next/navigation";
+
+
 
 const searchClient = alogiliasearch('PRRV6UCPXG','3c47055a99693c67accdbba674a35f16')
 
@@ -50,28 +54,6 @@ export function DashboardNavbar() {
     }
   }
 
-  function search(formData: FormData) {
-    const query = formData.get("search");
-    console.log("Searching for:", query);
-
-    if (typeof query !== 'string' || query === null) {
-      console.error("Invalid search query");
-      return;
-    }
-
-    const queries: MultipleQueriesQuery[] = [
-      {
-        indexName: "products",
-        params: {
-          query: query,
-        },
-      },
-    ]
-   
-    const { data, isLoading, error } = useQuery({queryKey: ["searchResults", query], queryFn: () => searchClient.search(queries)})
-   
-
-  }
 
   return (
     <Navbar
@@ -112,20 +94,7 @@ export function DashboardNavbar() {
                 height={200}
               />
             </Navbar.Brand>
-            <form className="hidden lg:block lg:pl-2" action={search}>
-              <Label htmlFor="search" className="sr-only">
-                Search
-              </Label>
-              <TextInput
-                className="w-full lg:w-96"
-                icon={HiSearch}
-                id="search"
-                name="search"
-                placeholder="Search"
-                required
-                type="search"
-              />
-            </form>
+            {usePathname() === '/link' && <SearchComponent />}
           </div>
           <div className="flex items-center lg:gap-3">
             <div className="flex items-center">

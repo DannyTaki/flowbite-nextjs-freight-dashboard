@@ -6,21 +6,29 @@ import { Label, TextInput } from "flowbite-react";
 import { HiSearch } from "react-icons/hi";
 
 
+
 const searchClient = alogiliasearch('PRRV6UCPXG','3c47055a99693c67accdbba674a35f16')
 
-function SearchComponent() {
+export function SearchComponent() {
     const [query, setQuery] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     const queries: MultipleQueriesQuery[] = [
         {
           indexName: "products",
           params: {
-            query: query,
+            query: searchTerm,
           },
         },
       ]
-    const { data, isLoading, error } = useQuery({queryKey: ["searchResults", query], queryFn: () => searchClient.search(queries)})
+    const { data, isLoading, error } = useQuery({queryKey: ["searchResults", searchTerm], queryFn: () => searchClient.search(queries)})
+
+    function handleSubmit(formData: FormData) {
+        setSearchTerm(formData.get("search") as string)
+    }
+
     return (
+        <form action={handleSubmit}>
         <div className="hidden lg:block lg:pl-2">
               <Label htmlFor="search" className="sr-only">
                 Search
@@ -37,6 +45,7 @@ function SearchComponent() {
                 onChange={(e) => setQuery(e.target.value)}
               />
             </div>
+            </form>
     )
 }
 
