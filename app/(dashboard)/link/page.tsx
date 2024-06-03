@@ -4,6 +4,7 @@ import { getUnlinkedProducts, updateProductFreightLink } from "@/helpers/getData
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Table, TextInput, Button, Checkbox, Pagination } from "flowbite-react";
 import React, { useState } from "react";
+import { useSearch} from "@/hooks/use-search";
 
 
 export default function UnlinkedProducts() {
@@ -13,6 +14,7 @@ export default function UnlinkedProducts() {
     const itemsPerPage = 9;
     const queryClient = useQueryClient();
   
+    const { data: searchData, isLoading: searchLoading, error: searchError } = useSearch();
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
     
 
@@ -67,13 +69,13 @@ export default function UnlinkedProducts() {
       }
     }
 
-
+    const currentData = searchData;
     const allSelected = selectedRows.length === data?.length;
 
     const totalItems = data?.length || 0;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentPageData = data?.slice(startIndex, startIndex + itemsPerPage) || [];
+    const currentPageData = currentData?.slice(startIndex, startIndex + itemsPerPage) || [];
 
     const onPageChange = (page: number) => setCurrentPage(page);
 

@@ -38,13 +38,11 @@ import { SearchComponent } from "@/components/search";
 import { usePathname } from "next/navigation";
 
 
-
-const searchClient = alogiliasearch('PRRV6UCPXG','3c47055a99693c67accdbba674a35f16')
-
 export function DashboardNavbar() {
   const sidebar = useSidebarContext();
   const { computedMode } = useThemeMode();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+
 
   function handleToggleSidebar() {
     if (isDesktop) {
