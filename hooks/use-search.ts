@@ -8,16 +8,7 @@ const searchClient = algoliasearch('PRRV6UCPXG', '3c47055a99693c67accdbba674a35f
 
 export function useSearch(query: string) {
   const queryClient = useQueryClient();
-
-  // const queries = [
-  //   {
-  //     indexName: "product_freight_linkages",
-  //     params: {
-  //       query: query,
-  //     },
-  //   },
-  // ];
-
+  
   const index = searchClient.initIndex('product_freight_linkages');
 
   const { data, isLoading, error } = useQuery({

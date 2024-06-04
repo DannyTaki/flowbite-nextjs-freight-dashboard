@@ -5,6 +5,7 @@ import { Label, TextInput } from "flowbite-react";
 import { HiSearch } from "react-icons/hi";
 import { useSearch } from "@/hooks/use-search";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useDebouncedCallback } from 'use-debounce';
 
 
 
@@ -14,7 +15,9 @@ export function SearchComponent() {
     const pathname = usePathname();
     const { replace } = useRouter();
 
-    function handleSearch(term: string) {
+    const handleSearch = useDebouncedCallback((term: string) => {
+      console.log(`Searching...${term}`);
+
       const params = new URLSearchParams(searchParams);
       if (term) {
         params.set("query", term);
@@ -22,8 +25,8 @@ export function SearchComponent() {
         params.delete("query");
       }
       replace(`${pathname}?${params.toString()}`);
-      console.log(term);
-    }
+    }, 300);
+    
 
     return (
         <div className="hidden lg:block lg:pl-2">
