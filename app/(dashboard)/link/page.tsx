@@ -3,20 +3,32 @@
 import { getUnlinkedProducts, updateProductFreightLink } from "@/helpers/getData";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Table, TextInput, Button, Checkbox, Pagination } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearch} from "@/hooks/use-search";
 
 
-export default function UnlinkedProducts() {
+export default function UnlinkedProducts({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  }
+}) {
+    const query = searchParams?.query || '';
+    const currentSearchPage = Number(searchParams?.page) || 1;
     const [selectedRows, setSelectedRows]  = useState<number[]>([]);
     const [classificationIds, setClassifications] = useState<{[key: number]: string}>({});
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 9;
     const queryClient = useQueryClient();
   
-    const { data: searchData, isLoading: searchLoading, error: searchError } = useSearch();
+    const { data: searchData, searchTerm} = useSearch();
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
     
+    useEffect(() => {
+      console.log("The Search Term is:", searchTerm);
+    }, [searchTerm]);
 
     function handleRowSelect(product_id: number) {
       setSelectedRows((prevSelected) => 
@@ -69,7 +81,7 @@ export default function UnlinkedProducts() {
       }
     }
 
-    const currentData = searchData;
+    const currentData = searchData || data;
     const allSelected = selectedRows.length === data?.length;
 
     const totalItems = data?.length || 0;

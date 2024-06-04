@@ -43,6 +43,8 @@ export function DashboardNavbar() {
   const { computedMode } = useThemeMode();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
+  const linkPage = usePathname() === '/link';
+
 
   function handleToggleSidebar() {
     if (isDesktop) {
@@ -51,6 +53,8 @@ export function DashboardNavbar() {
       sidebar.mobile.toggle();
     }
   }
+
+
 
 
   return (
@@ -92,7 +96,7 @@ export function DashboardNavbar() {
                 height={200}
               />
             </Navbar.Brand>
-            {usePathname() === '/link' && <SearchComponent />}
+            {linkPage && <SearchComponent />}
           </div>
           <div className="flex items-center lg:gap-3">
             <div className="flex items-center">

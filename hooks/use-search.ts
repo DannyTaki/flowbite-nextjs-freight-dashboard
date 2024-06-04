@@ -7,7 +7,7 @@ import { Product } from '@/types/links/product';
 const searchClient = algoliasearch('PRRV6UCPXG', '3c47055a99693c67accdbba674a35f16');
 
 export function useSearch() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("Isopropyl Alcohol");
   const queryClient = useQueryClient();
 
   const queries = [
@@ -22,9 +22,6 @@ export function useSearch() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["searchResults", searchTerm],
     queryFn: async (): Promise<Product[]> => {
-        if (!searchTerm) {
-            return [];
-        }
         const response: MultipleQueriesResponse<unknown>  = await searchClient.search(queries);
         const searchResults = response.results[0] as SearchResponse<Product>;
 
@@ -37,5 +34,5 @@ export function useSearch() {
     },
   });
 
-  return { data, isLoading, error, setSearchTerm };
+  return { data, isLoading, error, setSearchTerm, searchTerm };
 }
