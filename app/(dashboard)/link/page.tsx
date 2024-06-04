@@ -25,15 +25,11 @@ export default function UnlinkedProducts({
   
     const { data: searchData, isLoading: searchIsLoading, error: searchError } = useSearch(query);
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
-    
-    useEffect(() => {
-      console.log("The Search Term is:", query);
-      console.log("Search Page:", currentSearchPage);
-    }, [query]);
 
     useEffect(() => {
-      console.log("Loading initial database data");
-    }, [data]);
+      setCurrentPage(1);
+    }, [query]);
+
 
     function handleRowSelect(product_id: number) {
       setSelectedRows((prevSelected) => 
