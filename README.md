@@ -75,8 +75,8 @@ As long as your remote server provides JSON that looks identical to our schema, 
 Clone this repository
 
 ```sh
-git clone https://github.com/themesberg/flowbite-react-admin-dashboard.git
-cd flowbite-pro-nextjs-admin-dashboard
+git clone https://github.com/DannyTaki/flowbite-nextjs-freight-dashboard.git
+cd flowbite-nextjs-freight-dashboard
 ```
 
 Install dependencies for this project
