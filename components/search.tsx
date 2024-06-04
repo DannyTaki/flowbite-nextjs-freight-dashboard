@@ -9,15 +9,10 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 
 export function SearchComponent() {
-    const {setSearchTerm} = useSearch();  
+ 
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
-
-
-    function handleSubmit(formData: FormData) {
-        setSearchTerm(formData.get("search") as string)
-    }
 
     function handleSearch(term: string) {
       const params = new URLSearchParams(searchParams);
@@ -46,8 +41,7 @@ export function SearchComponent() {
                 defaultValue={searchParams.get("query")?.toString()}
                 onChange={(e) => handleSearch(e.target.value)}
               />
-            </div>
-            
+            </div>        
     )
 }
 

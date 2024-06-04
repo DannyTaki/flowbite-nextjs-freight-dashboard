@@ -31,6 +31,10 @@ export default function UnlinkedProducts({
       console.log("Search Page:", currentSearchPage);
     }, [query]);
 
+    useEffect(() => {
+      console.log("Loading initial database data");
+    }, [data]);
+
     function handleRowSelect(product_id: number) {
       setSelectedRows((prevSelected) => 
         prevSelected.includes(product_id)
