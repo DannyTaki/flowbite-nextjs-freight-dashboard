@@ -14,7 +14,7 @@ export async function POST() {
       })) || [];
       
       
-      addToProductFreightLinks(productsForFreightLinks);
+      await addToProductFreightLinks(productsForFreightLinks);
 
     }
 
