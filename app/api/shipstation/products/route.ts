@@ -6,7 +6,9 @@ export async function POST() {
   try {
     const missingProducts = await getMissingSKUs();
     if (missingProducts) {
-      addProduct(missingProducts);
+      const newProducts = addProduct(missingProducts);
+      addToProductFreightLinks(newProducts);
+
     }
 
     return NextResponse.json(missingProducts);

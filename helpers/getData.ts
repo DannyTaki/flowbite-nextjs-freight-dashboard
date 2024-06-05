@@ -153,6 +153,7 @@ export async function getProducts() {
 }
 
 export async function addProduct(products: InsertProduct[]) {
+  const addedProducts: InsertProduct[] = [];
   try {
     for (const product of products) {
       // Check if a product with the given SKU exists
@@ -175,15 +176,50 @@ export async function addProduct(products: InsertProduct[]) {
             // Add other fields if necessary
           })
           .execute();
+
+          // Push the inserted product to the addedProducts array
+          addedProducts.push(product);
         console.log(`Product with SKU ${product.sku} added successfully.`);
       } else {
         console.log(`Product with SKU ${product.sku} already exists.`);
       }
     }
+    return addedProducts;
   } catch (error) {
     console.error("Error adding product:", error);
   }
 }
+
+export async function addToProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]) {
+  try {
+    for (const product of products) {
+      if (product.product_id) {
+        // Check if a record with the given product_id already exists
+        const existingLink = await db
+          .select({
+            product_id: schema.product_freight_links.product_id,
+          })
+          .from(schema.product_freight_links)
+          .where(eq(schema.product_freight_links.product_id, product.product_id))
+          .execute();
+
+          if (existingLink.length === 0) {
+            // If the record does not exist, insert the new link
+            await db
+            .insert(schema.product_freight_links)
+            .values({
+              product_id: product.product_id,
+            })
+            .execute();
+            console.log(`Product Freight Link for ${product.name} added successfully for product_id ${product.product_id}.`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error adding Product Freight Links:", error);
+      throw error;
+    }
+  }
 
 export async function getUnlinkedProducts() {
   try { 
@@ -216,7 +252,5 @@ export async function updateProductFreightLink(updates: { link_id: number, class
   }
 }
 
-export async function earchQuery() {
 
-}
    
