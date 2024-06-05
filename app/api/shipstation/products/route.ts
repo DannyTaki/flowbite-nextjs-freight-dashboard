@@ -1,13 +1,20 @@
 import { getMissingSKUs } from "@/app/actions/action";
-import { addProduct } from "@/helpers/getData";
+import { addProduct, addToProductFreightLinks } from "@/helpers/getData";
 import { NextResponse } from "next/server";
+
 
 export async function POST() {
   try {
     const missingProducts = await getMissingSKUs();
     if (missingProducts) {
-      const newProducts = addProduct(missingProducts);
-      addToProductFreightLinks(newProducts);
+      const newProducts = await addProduct(missingProducts);
+      const productsForFreightLinks = newProducts?.map(product => ({
+        product_id: product.product_id,
+        name: product.name,
+      })) || [];
+      
+      
+      addToProductFreightLinks(productsForFreightLinks);
 
     }
 

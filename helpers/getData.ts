@@ -190,7 +190,7 @@ export async function addProduct(products: InsertProduct[]) {
   }
 }
 
-export async function addToProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]) {
+export async function addToProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]): Promise<void> {
   try {
     for (const product of products) {
       if (product.product_id) {
