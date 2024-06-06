@@ -92,9 +92,27 @@ export async function updateChemicalEntry(
         ),
       )
       .execute();
+
+    await triggerAlgoliaSync();
   } catch (error) {
     console.error("Error updating chemical entry:", error);
   }
+}
+async function triggerAlgoliaSync() {
+   // Trigger the Algolia sync
+   const response = await fetch('https://app.getcensus.com/api/v1/syncs/852183/trigger', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer secret-token:hZ3Q2RYkqbBdb4bAJNnUSZWe',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to trigger sync: ${response.statusText}`);
+  }
+
+  console.log('Successfully triggered Algolia sync');
 }
 
 export async function addChemicalEntry(
@@ -114,6 +132,8 @@ export async function addChemicalEntry(
       })
       .onConflictDoNothing()
       .execute();
+
+    triggerAlgoliaSync();
   } catch (error) {
     console.error("Error adding chemical entry:", error);
   }
@@ -130,6 +150,10 @@ export async function deleteChemicalEntries(classification_ids: number[]) {
         ),
       )
       .execute();
+
+    console.log(`Deleted chemical entries with classification IDs: ${classification_ids.join(', ')}`);
+
+    triggerAlgoliaSync();
   } catch (error) {
     console.error("Error deleting chemical entries:", error);
   }
@@ -185,6 +209,8 @@ export async function addProduct(products: InsertProduct[]) {
           })
           .execute();
 
+         
+
           // Push the inserted product to the newProducts array
           if (newProduct.length === 1 ) {
             newProducts.push(newProduct[0]);
@@ -196,6 +222,7 @@ export async function addProduct(products: InsertProduct[]) {
         console.log(`Product with SKU ${product.sku} already exists.`);
       }
     }
+    triggerAlgoliaSync();
     return newProducts;
   } catch (error) {
     console.error("Error adding product:", error);
@@ -229,6 +256,7 @@ export async function addToProductFreightLinks(products: Pick<InsertProduct, "pr
           }
         }
       }
+      triggerAlgoliaSync();
     } catch (error) {
       console.error("Error adding Product Freight Links:", error);
       throw error;
@@ -261,6 +289,7 @@ export async function updateProductFreightLink(updates: { link_id: number, class
     );
 
     await Promise.all(updatePromises);
+    triggerAlgoliaSync();
   } catch (error) {
     console.error("Error updating product freight links:", error);
   }
@@ -305,6 +334,7 @@ export async function deleteProducts(products: Products) {
       }
 
       console.log(`Deleted products with IDs: ${productIds.join(', ')}`);
+      triggerAlgoliaSync();
     } else {
       console.log('No valid product IDs found to delete.');
     }
@@ -329,6 +359,7 @@ export async function deleteProductFreightLinks(products: Products) {
 
         console.log('Deleted product freight links for product ID:', productId)
       }
+      triggerAlgoliaSync();
     } else {
       console.log('No valid product IDs found to delete product freight links.')
     }
