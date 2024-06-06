@@ -7,6 +7,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
 import { Schema } from "inspector";
 import type { SelectProduct, InsertProduct, SelectProductFreightLink, InsertProductFreightLink, SelectFreightClassification, InsertFreightClassification } from "@/types/db/types";
+import { getShipStationProducts } from "@/app/actions/action";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
@@ -153,7 +154,10 @@ export async function getProducts() {
 }
 
 export async function addProduct(products: InsertProduct[]) {
-  const addedProducts: InsertProduct[] = [];
+  const newProducts: {
+    product_id: number;
+    name: string;
+}[] = [];
   try {
     for (const product of products) {
       // Check if a product with the given SKU exists
@@ -168,31 +172,41 @@ export async function addProduct(products: InsertProduct[]) {
 
       if (existingProduct.length === 0) {
         // If the product does not exist, insert the new product
-        await db
+        const newProduct = await db
           .insert(schema.products)
           .values({
             sku: product.sku,
             name: product.name,
             // Add other fields if necessary
           })
+          .returning({
+            product_id: schema.products.product_id,
+            name: schema.products.name,
+          })
           .execute();
 
-          // Push the inserted product to the addedProducts array
-          addedProducts.push(product);
-        console.log(`Product with SKU ${product.sku} added successfully.`);
+          // Push the inserted product to the newProducts array
+          if (newProduct.length === 1 ) {
+            newProducts.push(newProduct[0]);
+            console.log(`Product with SKU ${product.sku} added successfully.`);
+          } else {
+            console.error(`Error adding product with SKU ${product.sku}.`);
+          }
       } else {
         console.log(`Product with SKU ${product.sku} already exists.`);
       }
     }
-    return addedProducts;
+    return newProducts;
   } catch (error) {
     console.error("Error adding product:", error);
   }
 }
 
 export async function addToProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]): Promise<void> {
+  console.log("Adding Product Freight Links")
   try {
     for (const product of products) {
+      console.log("Product:", product)
       if (product.product_id) {
         // Check if a record with the given product_id already exists
         const existingLink = await db
@@ -252,5 +266,50 @@ export async function updateProductFreightLink(updates: { link_id: number, class
   }
 }
 
+export async function findUnsynchronizedProducts() {
+  try {
+    const shipstationProducts = await getShipStationProducts();
+    const databaseProducts = await getProducts();
+    if(!databaseProducts) {
+      throw new Error("No database products found");
+    }
+
+     // Extract SKUs from shipstationProducts
+    const shipstationSKUs = shipstationProducts.map(product => product.sku);
+    // Find products in databaseProducts that are not in shipstationProducts
+    const productsNotInShipstation = databaseProducts.filter(product => !shipstationSKUs.includes(product.sku));
+    
+    // Log or return the products that are missing from shipstationProducts
+    console.log("Products not in ShipStation Products:", productsNotInShipstation);
+
+    return productsNotInShipstation;
+  } catch (error) {
+    console.error("Error finding product freight links:", error);
+  }
+}
+
+export async function deleteProducts(products: InsertProduct[]) {
+  try {
+    const productIds = products
+      .map(product => product.product_id)
+      .filter((id): id is number => id !== undefined);
+
+    if (productIds.length > 0) {
+      for (const productId of productIds) {
+        await db
+          .delete(schema.products)
+          .where(eq(schema.products.product_id, productId));
+
+        console.log(`Deleted product with ID: ${productId}`);
+      }
+
+      console.log(`Deleted products with IDs: ${productIds.join(', ')}`);
+    } else {
+      console.log('No valid product IDs found to delete.');
+    }
+  } catch (error) {
+    console.error("Error deleting products:", error);
+  }
+}
 
    

@@ -29,7 +29,7 @@ const client = createClient<paths>({
   baseUrl: process.env.MYCARRIER_BASE_URL,
 });
 
-export async function getMissingSKUs() {
+export async function getShipStationProducts() {
   let shipstationProducts: Product[] = [];
   let page = 1;
   const pageSize = 500;
@@ -69,7 +69,11 @@ export async function getMissingSKUs() {
       hasMorePages = false;
     }
   }
+  return shipstationProducts;
+}
 
+export async function getMissingSKUs() {
+  const shipstationProducts = await getShipStationProducts();
   console.log(`Number of Products:" ${shipstationProducts.length}`);
   const databaseProducts = await getProducts();
   const shipstationSKUs = shipstationProducts.map((product) => ({
