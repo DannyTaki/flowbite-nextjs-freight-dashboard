@@ -288,10 +288,11 @@ export async function findUnsynchronizedProducts() {
   }
 }
 
-export async function deleteProducts(products: InsertProduct[]) {
+export async function deleteProducts(products: Products) {
   try {
-    const productIds = products
-      .map(product => product.product_id)
+    const filteredProducts = products?.filter(product => product !== undefined) || [];
+    const productIds = filteredProducts
+      .map(product => product.productId)
       .filter((id): id is number => id !== undefined);
 
     if (productIds.length > 0) {
@@ -312,23 +313,28 @@ export async function deleteProducts(products: InsertProduct[]) {
   }
 }
 
-export async function deleteProductFreightLinks(products: InsertProduct[]) {
+export async function deleteProductFreightLinks(products: Products) {
   try {
-    const productIds = products
-      .map(product => product.product_id)
+    const filteredProducts = products?.filter(product => product !== undefined) || [];
+    const productIds = filteredProducts
+      .map(product => product.productId)
       .filter((id): id is number => id !== undefined);
-    for (const productId of productIds) {
-      await db
-      .delete(schema.product_freight_links)
-      .where(eq(schema.product_freight_links.product_id, productId))
+    
+    if (productIds.length > 0 ) {
+      console.log('Deleting product freight links for products:', productIds)
+      for (const productId of productIds) {
+        await db
+        .delete(schema.product_freight_links)
+        .where(eq(schema.product_freight_links.product_id, productId))
 
-      console.log('Deleted product freight links for product ID:', productId)
+        console.log('Deleted product freight links for product ID:', productId)
+      }
+    } else {
+      console.log('No valid product IDs found to delete product freight links.')
     }
-
   } catch (error) {
     console.error("Error deleting product freight links:", error);
   }
-
 }
 
    

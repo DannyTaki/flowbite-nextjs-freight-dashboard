@@ -17,12 +17,12 @@ export async function POST() {
       }
     }
     const unsynchronizedProducts = await findUnsynchronizedProducts();
-    console.log("Unsynchronized Products:", unsynchronizedProducts);  
+    console.log(`Extra products in database but in shipstation.  Delete these products: ${JSON.stringify(unsynchronizedProducts)}`);  
     if (unsynchronizedProducts) {
-      await deleteProducts(unsynchronizedProducts);
       await deleteProductFreightLinks(unsynchronizedProducts);
+      await deleteProducts(unsynchronizedProducts);
     } else {
-      console.log("No")
+      console.log("No valid Product IDs found to delete")
     }
     return NextResponse.json(missingProducts);
   } catch (error) {
