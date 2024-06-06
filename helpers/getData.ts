@@ -312,4 +312,23 @@ export async function deleteProducts(products: InsertProduct[]) {
   }
 }
 
+export async function deleteProductFreightLinks(products: InsertProduct[]) {
+  try {
+    const productIds = products
+      .map(product => product.product_id)
+      .filter((id): id is number => id !== undefined);
+    for (const productId of productIds) {
+      await db
+      .delete(schema.product_freight_links)
+      .where(eq(schema.product_freight_links.product_id, productId))
+
+      console.log('Deleted product freight links for product ID:', productId)
+    }
+
+  } catch (error) {
+    console.error("Error deleting product freight links:", error);
+  }
+
+}
+
    

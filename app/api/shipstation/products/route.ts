@@ -1,5 +1,5 @@
 import { getMissingSKUs } from "@/app/actions/action";
-import { addProduct, addToProductFreightLinks, findUnsynchronizedProducts, deleteProducts } from "@/helpers/getData";
+import { addProduct, addToProductFreightLinks, findUnsynchronizedProducts, deleteProducts, deleteProductFreightLinks } from "@/helpers/getData";
 import { find } from "lodash";
 import { NextResponse } from "next/server";
 
@@ -20,12 +20,10 @@ export async function POST() {
     console.log("Unsynchronized Products:", unsynchronizedProducts);  
     if (unsynchronizedProducts) {
       await deleteProducts(unsynchronizedProducts);
+      await deleteProductFreightLinks(unsynchronizedProducts);
     } else {
-      console.log("No unsynchronized products found");
+      console.log("No")
     }
-    await deleteProductFreightLinks(unsynchronizedProducts);
-
-
     return NextResponse.json(missingProducts);
   } catch (error) {
     console.error(error);
