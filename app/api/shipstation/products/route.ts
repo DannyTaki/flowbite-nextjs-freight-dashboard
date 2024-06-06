@@ -18,7 +18,11 @@ export async function POST() {
     }
     const unsynchronizedProducts = await findUnsynchronizedProducts();
     console.log("Unsynchronized Products:", unsynchronizedProducts);  
-    await deleteProducts(unsynchronizedProducts);
+    if (unsynchronizedProducts) {
+      await deleteProducts(unsynchronizedProducts);
+    } else {
+      console.log("No unsynchronized products found");
+    }
     await deleteProductFreightLinks(unsynchronizedProducts);
 
 
