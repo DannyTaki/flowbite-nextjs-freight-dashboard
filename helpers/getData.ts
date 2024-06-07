@@ -343,7 +343,7 @@ export async function deleteProducts(products: Products) {
   }
 }
 
-export async function deleteProductFreightLinks(products: Products) {
+export async function deleteProductFreightLinks(products?: Products, chemicalEntries?: InsertFreightClassification[]) {
   try {
     const filteredProducts = products?.filter(product => product !== undefined) || [];
     const productIds = filteredProducts
@@ -362,6 +362,29 @@ export async function deleteProductFreightLinks(products: Products) {
       triggerAlgoliaSync();
     } else {
       console.log('No valid product IDs found to delete product freight links.')
+    }
+
+    if (chemicalEntries && deleteChemicalEntries.length > 0) {
+      const classificationIds = chemicalEntries
+        .map(entry => entry.classification_id)
+        .filter((id): id is number => id !== undefined);
+
+        if (classificationIds.length > 0 ) {
+          console.log('Deleting product freight links for classification IDs:', classificationIds);
+          for (const classificationId of classificationIds) {
+            await db
+              .update(schema.product_freight_links)
+              .set({ classification_id: null })
+              .where(eq(schema.product_freight_links.classification_id, classificationId))
+              .execute();
+
+              console.log('Updated product freight links for classification ID:', classificationId);              
+          }
+        } else {
+          console.log('No valid classification IDs provided.');
+        }
+    } else {
+      console.log('No chemical entries provided.');
     }
   } catch (error) {
     console.error("Error deleting product freight links:", error);
