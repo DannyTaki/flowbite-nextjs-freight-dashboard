@@ -99,6 +99,7 @@ export async function updateChemicalEntry(
   }
 }
 async function triggerAlgoliaSync() {
+  try {
    // Trigger the Algolia sync
    const response = await fetch('https://app.getcensus.com/api/v1/syncs/852183/trigger', {
     method: 'POST',
@@ -108,11 +109,17 @@ async function triggerAlgoliaSync() {
     }
   });
 
-  if (!response.ok) {
-    throw new Error(`Failed to trigger sync: ${response.statusText}`);
+  const responseData = await response.json();
+
+  if (!response.ok || responseData.status !== 'success') {
+    const errorMessage = responseData.message || response.statusText;
+    throw new Error(`Failed to trigger sync: ${errorMessage}`);
   }
 
-  console.log('Successfully triggered Algolia sync');
+  console.log('Successfully triggered Algolia sync, sync_run_id:', responseData.data.sync_run_id);
+} catch (error) {
+  console.error('Error triggering Algolia sync:', error);
+}
 }
 
 export async function addChemicalEntry(
@@ -278,22 +285,45 @@ export async function getUnlinkedProducts() {
 
 export async function updateProductFreightLink(updates: { link_id: number, classification_id: number }[]) {
   try {
-    const updatePromises = updates.map(update => 
-      db
-        .update(schema.product_freight_links)
-        .set({
-          classification_id: update.classification_id,
-        })
-        .where(eq(schema.product_freight_links.link_id, update.link_id))
-        .execute()
-    );
+    console.log("Starting update process for product freight links.");
 
-    await Promise.all(updatePromises);
-    triggerAlgoliaSync();
+    if (!updates || updates.length === 0) {
+      console.log("No updates provided.");
+      return;
+    }
+
+    console.log("Updates to process:", updates);
+
+    const updatePromises = updates.map(async update => {
+      try {
+        console.log(`Updating link ID: ${update.link_id} with classification ID: ${update.classification_id}`);
+        
+        const result = await db
+          .update(schema.product_freight_links)
+          .set({
+            classification_id: update.classification_id,
+          })
+          .where(eq(schema.product_freight_links.link_id, update.link_id))
+          .execute();
+        
+        console.log(`Update result for link ID ${update.link_id}:`, result);
+        return result;
+      } catch (innerError) {
+        console.error(`Error updating link ID ${update.link_id}:`, innerError);
+        throw innerError;
+      }
+    });
+
+    const results = await Promise.all(updatePromises);
+    console.log("Update results:", results);
+
+    await triggerAlgoliaSync();
   } catch (error) {
     console.error("Error updating product freight links:", error);
   }
 }
+
+
 
 export async function findUnsynchronizedProducts() {
   try {
@@ -343,7 +373,7 @@ export async function deleteProducts(products: Products) {
   }
 }
 
-export async function deleteProductFreightLinks(products?: Products, chemicalEntries?: InsertFreightClassification[]) {
+export async function deleteProductFreightLinks(products?: Products, classificationIds?: number[]) {
   try {
     const filteredProducts = products?.filter(product => product !== undefined) || [];
     const productIds = filteredProducts
@@ -359,19 +389,16 @@ export async function deleteProductFreightLinks(products?: Products, chemicalEnt
 
         console.log('Deleted product freight links for product ID:', productId)
       }
-      triggerAlgoliaSync();
+    
     } else {
       console.log('No valid product IDs found to delete product freight links.')
     }
 
-    if (chemicalEntries && deleteChemicalEntries.length > 0) {
-      const classificationIds = chemicalEntries
-        .map(entry => entry.classification_id)
-        .filter((id): id is number => id !== undefined);
+    const filteredClassificationIds = classificationIds?.filter(id => id !== undefined) || [];
 
-        if (classificationIds.length > 0 ) {
-          console.log('Deleting product freight links for classification IDs:', classificationIds);
-          for (const classificationId of classificationIds) {
+        if (filteredClassificationIds.length > 0 ) {
+          console.log('Deleting product freight links for classification IDs:', filteredClassificationIds);
+          for (const classificationId of filteredClassificationIds) {
             await db
               .update(schema.product_freight_links)
               .set({ classification_id: null })
@@ -382,10 +409,8 @@ export async function deleteProductFreightLinks(products?: Products, chemicalEnt
           }
         } else {
           console.log('No valid classification IDs provided.');
-        }
-    } else {
-      console.log('No chemical entries provided.');
-    }
+        } 
+        triggerAlgoliaSync();
   } catch (error) {
     console.error("Error deleting product freight links:", error);
   }

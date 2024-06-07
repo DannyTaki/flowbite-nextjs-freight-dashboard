@@ -4,6 +4,7 @@ import type * as schema from "@/app/db/drizzle/schema";
 import {
   addChemicalEntry,
   deleteChemicalEntries,
+  deleteProductFreightLinks,
   getChemicalData,
   updateChemicalEntry,
 } from "@/helpers/getData"; // adjust the import path as necessary
@@ -78,6 +79,7 @@ export default function Chemicals() {
     }
 
     try {
+      await deleteProductFreightLinks(undefined,selectedRows);
       await deleteChemicalEntries(selectedRows);
       setSelectedRows([]);
       queryClient.invalidateQueries({ queryKey: ["chemicals"] });

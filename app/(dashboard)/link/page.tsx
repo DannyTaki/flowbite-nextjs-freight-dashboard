@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Table, TextInput, Button, Checkbox, Pagination } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { useSearch } from "@/hooks/use-search";
+import { current } from "tailwindcss/colors";
 
 
 export default function UnlinkedProducts({
@@ -65,22 +66,40 @@ export default function UnlinkedProducts({
     }
 
     async function handleAdd() {
-      const selectedData = data?.filter(item => selectedRows.includes(item.product_id as number));
-      console.log(selectedData);
-      const updates = selectedData?.map(item => ({
-        link_id: Number(item.link_id),
-        classification_id: Number(classificationIds[item.product_id as number])
-      }));
-
       try {
-        const response = await updateProductFreightLink(updates as {link_id: number, classification_id: number}[]);
-        console.log(response);
-        queryClient.invalidateQueries({ queryKey: ['unlinkedProducts']});
+        // Check the original data and selectedRows
+        console.log("Original data:", data);
+        console.log("Selected rows:", selectedRows);
         
+        const selectedData = currentData?.filter(item => selectedRows.includes(item.product_id as number));
+        
+        // Log the selectedData to see if the filtering is working correctly
+        console.log("Selected data:", selectedData);
+        
+        // Map the selectedData to the updates array
+        const updates = selectedData?.map(item => ({
+          link_id: Number(item.link_id),
+          classification_id: Number(classificationIds[item.product_id as number])
+        }));
+        
+        // Log the updates array to see if the mapping is working correctly
+        console.log("Updates:", updates);
+    
+        // Check if updates is empty
+        if (!updates || updates.length === 0) {
+          console.log("No updates to process.");
+          return;
+        }
+    
+        const response = await updateProductFreightLink(updates as {link_id: number, classification_id: number}[]);
+        console.log("Update response:", response);
+    
+        queryClient.invalidateQueries({ queryKey: ['unlinkedProducts']});
       } catch (error) {
         console.error("Error adding classification:", error); 
       }
     }
+    
 
     const currentData = searchData || data;
     const allSelected = selectedRows.length === data?.length;
