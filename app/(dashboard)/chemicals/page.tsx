@@ -363,9 +363,6 @@ export default function Chemicals() {
           <Table.HeadCell>Hazard Class</Table.HeadCell>
           <Table.HeadCell>Packing Group</Table.HeadCell>
           <Table.HeadCell>
-            <span className="sr-only">Edit</span>
-          </Table.HeadCell>
-          <Table.HeadCell>
             <Button color="success" onClick={openAddModal}>
               Add
             </Button>
@@ -374,6 +371,9 @@ export default function Chemicals() {
             <Button color="failure" size="sm" onClick={handleDelete}>
               Delete
             </Button>
+          </Table.HeadCell>
+          <Table.HeadCell>
+            <span className="sr-only">Edit</span>
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
@@ -399,6 +399,8 @@ export default function Chemicals() {
               <Table.Cell>{item.hazard_id || ""}</Table.Cell>
               <Table.Cell>{item.hazard_class}</Table.Cell>
               <Table.Cell>{item.packing_group || ""}</Table.Cell>
+              <Table.Cell></Table.Cell>
+              <Table.Cell></Table.Cell>
               <Table.Cell>
                 <button onClick={() => openEditModal(item)}>
                   <a
