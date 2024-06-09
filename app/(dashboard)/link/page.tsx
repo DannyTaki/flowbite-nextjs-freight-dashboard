@@ -23,7 +23,7 @@ export default function UnlinkedProducts({
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 9;
     const queryClient = useQueryClient();
-  
+
     const { data: searchData, isLoading: searchIsLoading, error: searchError } = useSearch(query);
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
 
@@ -33,7 +33,7 @@ export default function UnlinkedProducts({
 
 
     function handleRowSelect(product_id: number) {
-      setSelectedRows((prevSelected) => 
+      setSelectedRows((prevSelected) =>
         prevSelected.includes(product_id)
         ? prevSelected.filter((id) => id !== product_id)
         : [...prevSelected, product_id],
@@ -70,36 +70,36 @@ export default function UnlinkedProducts({
         // Check the original data and selectedRows
         console.log("Original data:", data);
         console.log("Selected rows:", selectedRows);
-        
+
         const selectedData = currentData?.filter(item => selectedRows.includes(item.product_id as number));
-        
+
         // Log the selectedData to see if the filtering is working correctly
         console.log("Selected data:", selectedData);
-        
+
         // Map the selectedData to the updates array
         const updates = selectedData?.map(item => ({
           link_id: Number(item.link_id),
           classification_id: Number(classificationIds[item.product_id as number])
         }));
-        
+
         // Log the updates array to see if the mapping is working correctly
         console.log("Updates:", updates);
-    
+
         // Check if updates is empty
         if (!updates || updates.length === 0) {
           console.log("No updates to process.");
           return;
         }
-    
+
         const response = await updateProductFreightLink(updates as {link_id: number, classification_id: number}[]);
         console.log("Update response:", response);
-    
+
         queryClient.invalidateQueries({ queryKey: ['unlinkedProducts']});
       } catch (error) {
-        console.error("Error adding classification:", error); 
+        console.error("Error adding classification:", error);
       }
     }
-    
+
 
     const currentData = searchData || data;
     const allSelected = selectedRows.length === data?.length;
@@ -123,9 +123,6 @@ export default function UnlinkedProducts({
                     <Table.HeadCell>Name</Table.HeadCell>
                     <Table.HeadCell>Classification ID</Table.HeadCell>
                     <Table.HeadCell><Button color="success" onClick={handleAdd}>Add</Button></Table.HeadCell>
-                    <Table.HeadCell>
-                        <span className="sr-only">Edit</span>
-                    </Table.HeadCell>
                 </Table.Head>
                 <Table.Body className="divide-y">
                     {currentPageData.map((item, index) => (
@@ -146,7 +143,8 @@ export default function UnlinkedProducts({
                                     value={classificationIds[item.product_id as number] || ""}
                                     onChange={(e) => handleClassificationIdChange(item.product_id as number, e.target.value)}
                                 />
-                            </Table.Cell>        
+                            </Table.Cell>
+                            <Table.Cell></Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>

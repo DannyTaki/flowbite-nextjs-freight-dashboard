@@ -33,9 +33,6 @@ export default function Products() {
           <Table.HeadCell>Name</Table.HeadCell>
           <Table.HeadCell>Packaging Type</Table.HeadCell>
           <Table.HeadCell>Unit Container Type</Table.HeadCell>
-          <Table.HeadCell>
-            <span className="sr-only">Edit</span>
-          </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
           {data?.map((item, index) => (
