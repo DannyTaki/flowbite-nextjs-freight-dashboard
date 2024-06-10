@@ -41,22 +41,20 @@ export default function Products({
   });
   const { data: productData, error: productError, isLoading: productIsLoading } = useSearch<SelectProduct>(query, "products");
 
-  const openEditModal = useCallback((item: SelectProduct) => {
-    setSelectedChemical(item);
-    setLocalInput(item);
+  const openEditModal = (item: SelectProduct) => {
     setOpenModal(true);
-  }, []);
+    setLocalInput({
+      packaging_type: item.packaging_type ?? undefined,
+      unit_container_type: item.unit_container_type ?? undefined,
+    });
+  };
 
   const debouncedUpdateChemical = useDebouncedCallback((updatedChemical: SelectProduct) => {
     setSelectedChemical(updatedChemical);
   }, 100);
 
-  const handleInputChange = (field: keyof SelectProduct, value: string | number | null) => {
-    const updatedChemical = localInput ? { ...localInput, [field]: value } : null;
-    setLocalInput(updatedChemical);
-    if (updatedChemical) {
-      debouncedUpdateChemical(updatedChemical);
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setLocalInput((prev) => (prev ? { ...prev, [field]: value } : { [field]: value }));
   };
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
