@@ -170,11 +170,11 @@ export async function getProducts() {
   try {
     const products = await db
       .select({
-        productId: schema.products.product_id,
+        product_id: schema.products.product_id,
         sku: schema.products.sku,
         name: schema.products.name,
-        packagingType: schema.products.packaging_type,
-        unitContainerType: schema.products.unit_container_type,
+        packaging_type: schema.products.packaging_type,
+        unit_container_type: schema.products.unit_container_type,
       })
       .from(schema.products)
       .execute();
@@ -233,6 +233,34 @@ export async function addProduct(products: InsertProduct[]) {
     return newProducts;
   } catch (error) {
     console.error("Error adding product:", error);
+  }
+}
+
+export async function updateProduct(products: InsertProduct[]) {
+  console.log('Updating Product(s)');
+  try {
+    for (const product of products) {
+      if (product.product_id !== undefined) {
+        const updatedProduct = await db
+        .update(schema.products)
+        .set({
+          packaging_type: product.packaging_type || null,
+          unit_container_type: product.unit_container_type || null,
+        })
+        .where(eq(schema.products.product_id, product.product_id))
+        .returning({
+          product_id: schema.products.product_id,
+          name: schema.products.name,
+        })
+        .execute();
+        console.log('Updated product:', updatedProduct)
+      } else {
+        console.error(`Product ID is undefined for SKU: ${product.sku}`);
+      }     
+    }
+  } catch (error) {
+    console.error('Error updating product:', error);
+  
   }
 }
 
@@ -351,7 +379,7 @@ export async function deleteProducts(products: Products) {
   try {
     const filteredProducts = products?.filter(product => product !== undefined) || [];
     const productIds = filteredProducts
-      .map(product => product.productId)
+      .map(product => product.product_id)
       .filter((id): id is number => id !== undefined);
 
     if (productIds.length > 0) {
@@ -377,7 +405,7 @@ export async function deleteProductFreightLinks(products?: Products, classificat
   try {
     const filteredProducts = products?.filter(product => product !== undefined) || [];
     const productIds = filteredProducts
-      .map(product => product.productId)
+      .map(product => product.product_id)
       .filter((id): id is number => id !== undefined);
     
     if (productIds.length > 0 ) {

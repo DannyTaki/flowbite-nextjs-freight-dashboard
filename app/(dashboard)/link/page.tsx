@@ -6,6 +6,7 @@ import { Table, TextInput, Button, Checkbox, Pagination } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { useSearch } from "@/hooks/use-search";
 import { current } from "tailwindcss/colors";
+import { SelectProductFreightLinkage } from "@/types/db/types";
 
 
 export default function UnlinkedProducts({
@@ -24,7 +25,7 @@ export default function UnlinkedProducts({
     const itemsPerPage = 9;
     const queryClient = useQueryClient();
 
-    const { data: searchData, isLoading: searchIsLoading, error: searchError } = useSearch(query);
+    const { data: searchData, isLoading: searchIsLoading, error: searchError } = useSearch<SelectProductFreightLinkage>(query, "product_freight_linkages");
     const { data, isLoading, error } = useQuery({queryKey: ['unlinkedProducts'], queryFn: () => getUnlinkedProducts()})
 
     useEffect(() => {

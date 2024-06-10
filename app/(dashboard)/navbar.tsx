@@ -43,7 +43,7 @@ export function DashboardNavbar() {
   const { computedMode } = useThemeMode();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
-  const linkPage = usePathname() === '/link';
+  const linkPage = usePathname() === '/link' || '/products';
 
 
   function handleToggleSidebar() {
