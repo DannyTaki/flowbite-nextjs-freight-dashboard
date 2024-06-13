@@ -8,7 +8,8 @@ import { alias } from "drizzle-orm/pg-core";
 import { Schema } from "inspector";
 import type { SelectProduct, InsertProduct, SelectProductFreightLink, InsertProductFreightLink, SelectFreightClassification, InsertFreightClassification } from "@/types/db/types";
 import { getShipStationProducts } from "@/app/actions/action";
-import algoliasearch, { SearchIndex } from "algoliasearch";
+import algoliasearch from "algoliasearch";
+import { string } from "zod";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
@@ -17,7 +18,7 @@ export type Products = Awaited<ReturnType<typeof getProducts>>;
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
-const client = algoliasearch(process.env.ALGOLIA_APP_ID!, process.env.ALGOLIA_ADMIN_KEY!);
+const client = algoliasearch(process.env.ALGOLIA_APPLICATION_ID!, process.env.ALGOLIA_WRITE_API_KEY!);
 
 export async function getData(sku: string) {
   const freightLinks = alias(schema.product_freight_links, "freightLinks");
@@ -95,7 +96,7 @@ export async function updateChemicalEntry(
       )
       .execute();
 
-    await triggerAlgoliaSync();
+    updateAlgoliaIndex('freight_classifications', undefined, [chemical]);
   } catch (error) {
     console.error("Error updating chemical entry:", error);
   }
@@ -261,23 +262,59 @@ export async function updateProduct(products: InsertProduct[]) {
   }
 }
 
-export async function updateAlgoliaIndex(searchIndex: string, products: InsertProduct[]) {
+export async function updateAlgoliaIndex(searchIndex: string, products?: InsertProduct[], chemicalEntries?: InsertFreightClassification[] ) {
   const index = client.initIndex(searchIndex); 
   try {
-    const repsonse = index.partialUpdateObjects(products, {
-      createIfNotExists: false,
-    })
+    if (products && products.length > 0 ) {
+      const productResponse = await index.partialUpdateObjects(products, {
+        createIfNotExists: false,
+      });
+      console.log("Algolia index updated successfully:", productResponse);
+    } else {
+      console.log("No products to update in Algolia index.");
+    } 
 
-    console.log("Algolia index updated successfully:", repsonse)
-    
+    if (chemicalEntries && chemicalEntries.length > 0 ) {
+      const chemicalResponse = await index.partialUpdateObjects(chemicalEntries, {
+        createIfNotExists: false,
+      });
+      console.log("Algolia index updated successfully:", chemicalResponse);
+    } else {
+      console.log("No chemical entries to update in Algolia index.")
+    }
   } catch (error) {
     console.error("Error updating Algolia index:", error);
+  }
+}
+
+export async function createObjectAlgoliaIndex(searchIndex: string, products?: InsertProduct[], chemicalEntries?: InsertFreightClassification[], product_freight_links?: InsertProductFreightLink[] ) {
+  try {
+    if (products && products.length > 0 ) {
+
+    } else {
+
+    }
+
+    if (chemicalEntries && chemicalEntries.length > 0 ) {
+
+    } else {
+
+    }
+
+    if (product_freight_links && product_freight_links.length > 0 ) {
+
+    } else {
+
+    }
+  } catch (error) {
+    console.error("Error creating object in Algolia index:", error);
   }
 }
 
 export async function addToProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]): Promise<void> {
   console.log("Adding Product Freight Links")
   try {
+    let newLinkRecords: InsertProductFreightLink[] = [];
     for (const product of products) {
       console.log("Product:", product)
       if (product.product_id) {
@@ -292,16 +329,19 @@ export async function addToProductFreightLinks(products: Pick<InsertProduct, "pr
 
           if (existingLink.length === 0) {
             // If the record does not exist, insert the new link
-            await db
+            const newLinkRecord = await db
             .insert(schema.product_freight_links)
             .values({
               product_id: product.product_id,
             })
+            .returning()
             .execute();
+            newLinkRecords.push(newLinkRecord[0]);
             console.log(`Product Freight Link for ${product.name} added successfully for product_id ${product.product_id}.`);
           }
         }
       }
+      createObjectAlgoliaIndex('product_freight_links', undefined, undefined, newLinkRecords);
       triggerAlgoliaSync();
     } catch (error) {
       console.error("Error adding Product Freight Links:", error);

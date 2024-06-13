@@ -107,7 +107,7 @@ export default function Products({
   return (
     <div className="overflow-x-auto">
       <Modal show={openModal} onClose={() => setOpenModal(false)}>
-        <Modal.Header>Edit Product</Modal.Header>
+        <Modal.Header ><span className="text-base">Edit Product - {selectedChemical?.name}</span></Modal.Header>
         <Modal.Body>
           <form className="p-4 md:p-5" onSubmit={handleFormSubmit}>
             <div className="mb-4 flex justify-around">
