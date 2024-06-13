@@ -21,7 +21,7 @@ export const product_freight_links = pgTable("product_freight_links", {
 	link_id: serial("link_id").primaryKey().notNull(),
 	product_id: integer("product_id").references(() => products.product_id),
 	classification_id: integer("classification_id").references(() => freight_classifications.classification_id),
-	object_id: uuid("object_id").defaultRandom(),
+	objectID: uuid("objectID").defaultRandom(),
 });
 
 export const freight_classifications = pgTable("freight_classifications", {
@@ -34,6 +34,7 @@ export const freight_classifications = pgTable("freight_classifications", {
 	packing_group: varchar("packing_group", { length: 255 }),
 	sub: varchar("sub", { length: 255 }),
 	hazard_class: varchar("hazard_class", { length: 255 }),
+	objectID: uuid("objectID"),
 });
 
 export const product_freight_linkages = pgTable("product_freight_linkages", {
@@ -44,5 +45,5 @@ export const product_freight_linkages = pgTable("product_freight_linkages", {
 	unit_container_type: varchar("unit_container_type", { length: 255 }),
 	classification_id: integer("classification_id"),
 	link_id: integer("link_id"),
-	object_id: uuid("object_id"),
+	objectID: uuid("objectID"),
 });

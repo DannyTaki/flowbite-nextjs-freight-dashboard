@@ -6,7 +6,7 @@ import { Table, TextInput, Button, Checkbox, Pagination } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { useSearch } from "@/hooks/use-search";
 import { current } from "tailwindcss/colors";
-import { SelectProductFreightLinkage } from "@/types/db/types";
+import { InsertProductFreightLinkage, SelectProductFreightLinkage } from "@/types/db/types";
 
 
 export default function UnlinkedProducts({
@@ -72,27 +72,35 @@ export default function UnlinkedProducts({
         console.log("Original data:", data);
         console.log("Selected rows:", selectedRows);
 
-        const selectedData = currentData?.filter(item => selectedRows.includes(item.product_id as number));
-
-        // Log the selectedData to see if the filtering is working correctly
-        console.log("Selected data:", selectedData);
-
-        // Map the selectedData to the updates array
-        const updates = selectedData?.map(item => ({
-          link_id: Number(item.link_id),
-          classification_id: Number(classificationIds[item.product_id as number])
+        const updates = currentData?.filter(item => selectedRows.includes(item.product_id as number))
+        .map(item => ({
+          link_id: item.link_id as number, // Ensure link_id is a number
+          classification_id: item.classification_id as number, // Ensure classification_id is a number
         }));
+  ;
 
         // Log the updates array to see if the mapping is working correctly
         console.log("Updates:", updates);
 
-        // Check if updates is empty
-        if (!updates || updates.length === 0) {
-          console.log("No updates to process.");
-          return;
-        }
+          // Check if updates is empty
+      if (!updates || updates.length === 0) {
+        console.log("No updates to process.");
+        return;
+      }
 
-        const response = await updateProductFreightLink(updates as {link_id: number, classification_id: number}[]);
+      // Ensure updates conform to the expected type
+      const validUpdates: { link_id: number; classification_id: number; }[] = updates.filter(
+        (item): item is { link_id: number; classification_id: number; } => 
+          item.link_id !== undefined && item.classification_id !== undefined
+      );
+
+        // Check if validUpdates is empty
+      if (validUpdates.length === 0) {
+        console.log("No valid updates to process.");
+        return;
+      }
+
+        const response = await updateProductFreightLink(validUpdates);
         console.log("Update response:", response);
 
         queryClient.invalidateQueries({ queryKey: ['unlinkedProducts']});
