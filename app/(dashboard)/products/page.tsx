@@ -12,7 +12,7 @@ import MemoizedRow from "@/components/row";
 import ProductModal from "@/components/productmodal";
 
 const productSchema = z.object({
-  product_id: z.number(),
+  product_id: z.union([z.string(), z.number()]).transform((id) => typeof id === 'string' ? Number(id) : id),
   sku: z.string(),
   name: z.string(),
   packaging_type: z.string().nullable(),
@@ -36,6 +36,8 @@ export default function Products({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const [packagingLabel, setPackagingLabel] = useState("Packaging Type");
+  const [unitContainerLabel, setUnitContainerLabel] = useState("Unit Container Type");
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["products"],
@@ -46,6 +48,8 @@ export default function Products({
   const openEditModal = (item: SelectProduct) => {
     setOpenModal(true);
     setSelectedChemical(item);
+    setPackagingLabel("Packaging Type");
+    setUnitContainerLabel("Unit Container Type");
   };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -104,24 +108,32 @@ export default function Products({
         <Modal.Header>Edit Product</Modal.Header>
         <Modal.Body>
           <form className="p-4 md:p-5" onSubmit={handleFormSubmit}>
-            <div className="mb-4 grid grid-cols-2 gap-4">
+            <div className="mb-4 flex justify-around">
               <div>
-                <Dropdown label="Packaging Type" className="mb-2" dismissOnClick={false}>
+                <Dropdown label={packagingLabel} className="mb-2" dismissOnClick={true}>
+                <Dropdown.Header>
+                  <span className="block text-sm">Packaging Type</span>
+                </Dropdown.Header>
                   {packagingTypes.map((option) => (
                     <Dropdown.Item key={option} onClick={() => {
                       if (selectedChemical) {
                         setSelectedChemical({ ...selectedChemical, packaging_type: option})
+                        setPackagingLabel(option);
                       }
                     }}>{option}</Dropdown.Item>
                   ))}
                   </Dropdown>
                 </div>
               <div>
-              <Dropdown label="Unit Container Type" className="mb-2" dismissOnClick={false}>
+              <Dropdown label={unitContainerLabel} className="mb-2" dismissOnClick={true}>
+              <Dropdown.Header>
+                  <span className="block text-sm">Unit Container Type</span>
+                </Dropdown.Header>
                 {unitContainerTypes.map((option) => (
                   <Dropdown.Item key={option} onClick={() => {
                     if (selectedChemical) {
                       setSelectedChemical({ ...selectedChemical, unit_container_type: option});
+                      setUnitContainerLabel(option);
                     }
                   }}>{option}</Dropdown.Item>
                 ))}

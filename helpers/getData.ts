@@ -254,6 +254,7 @@ export async function updateProduct(products: InsertProduct[]) {
         })
         .execute();
         console.log('Updated product:', updatedProduct)
+        triggerAlgoliaSync();
       } else {
         console.error(`Product ID is undefined for SKU: ${product.sku}`);
       }     
