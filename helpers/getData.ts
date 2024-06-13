@@ -137,7 +137,7 @@ export async function addChemicalEntry(
   chemical: InsertFreightClassification,
 ) {
   try {
-    await db
+    const newChemicalEntry = await db
       .insert(schema.freight_classifications)
       .values({
         description: chemical.description,
@@ -149,9 +149,10 @@ export async function addChemicalEntry(
         sub: chemical.sub,
       })
       .onConflictDoNothing()
+      .returning()
       .execute();
 
-    triggerAlgoliaSync();
+    updateAlgoliaIndex(SearchIndex.FreightClassifications, newChemicalEntry);
   } catch (error) {
     console.error("Error adding chemical entry:", error);
   }
