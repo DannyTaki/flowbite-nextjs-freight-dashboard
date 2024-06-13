@@ -1,4 +1,4 @@
-import { pgTable, unique, serial, varchar, text, foreignKey, integer, numeric, boolean } from "drizzle-orm/pg-core"
+import { pgTable, unique, serial, varchar, text, uuid, foreignKey, integer, numeric, boolean } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 
@@ -9,6 +9,7 @@ export const products = pgTable("products", {
 	name: text("name").notNull(),
 	packaging_type: varchar("packaging_type", { length: 255 }),
 	unit_container_type: varchar("unit_container_type", { length: 255 }),
+	object_id: uuid("object_id").defaultRandom(),
 },
 (table) => {
 	return {
@@ -20,16 +21,7 @@ export const product_freight_links = pgTable("product_freight_links", {
 	link_id: serial("link_id").primaryKey().notNull(),
 	product_id: integer("product_id").references(() => products.product_id),
 	classification_id: integer("classification_id").references(() => freight_classifications.classification_id),
-});
-
-export const product_freight_linkages = pgTable("product_freight_linkages", {
-	product_id: integer("product_id"),
-	sku: varchar("sku", { length: 255 }),
-	name: text("name"),
-	packaging_type: varchar("packaging_type", { length: 255 }),
-	unit_container_type: varchar("unit_container_type", { length: 255 }),
-	classification_id: integer("classification_id"),
-	link_id: integer("link_id"),
+	object_id: uuid("object_id").defaultRandom(),
 });
 
 export const freight_classifications = pgTable("freight_classifications", {
@@ -42,4 +34,15 @@ export const freight_classifications = pgTable("freight_classifications", {
 	packing_group: varchar("packing_group", { length: 255 }),
 	sub: varchar("sub", { length: 255 }),
 	hazard_class: varchar("hazard_class", { length: 255 }),
+});
+
+export const product_freight_linkages = pgTable("product_freight_linkages", {
+	product_id: integer("product_id"),
+	sku: varchar("sku", { length: 255 }),
+	name: text("name"),
+	packaging_type: varchar("packaging_type", { length: 255 }),
+	unit_container_type: varchar("unit_container_type", { length: 255 }),
+	classification_id: integer("classification_id"),
+	link_id: integer("link_id"),
+	object_id: uuid("object_id"),
 });

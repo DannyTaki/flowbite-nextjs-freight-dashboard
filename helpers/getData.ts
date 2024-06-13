@@ -8,6 +8,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { Schema } from "inspector";
 import type { SelectProduct, InsertProduct, SelectProductFreightLink, InsertProductFreightLink, SelectFreightClassification, InsertFreightClassification } from "@/types/db/types";
 import { getShipStationProducts } from "@/app/actions/action";
+import algoliasearch, { SearchIndex } from "algoliasearch";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
@@ -16,6 +17,7 @@ export type Products = Awaited<ReturnType<typeof getProducts>>;
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
+const client = algoliasearch(process.env.ALGOLIA_APP_ID!, process.env.ALGOLIA_ADMIN_KEY!);
 
 export async function getData(sku: string) {
   const freightLinks = alias(schema.product_freight_links, "freightLinks");
@@ -263,6 +265,11 @@ export async function updateProduct(products: InsertProduct[]) {
     console.error('Error updating product:', error);
   
   }
+}
+
+export async function updateAlgoliaIndex(searchIndex: string, product: InsertProduct) {
+  const index = client.initIndex(searchIndex); 
+
 }
 
 export async function addToProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]): Promise<void> {
