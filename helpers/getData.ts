@@ -287,27 +287,36 @@ export async function updateAlgoliaIndex(searchIndex: string, products?: InsertP
   }
 }
 
-export async function createObjectAlgoliaIndex(searchIndex: string, products?: InsertProduct[], chemicalEntries?: InsertFreightClassification[], product_freight_links?: InsertProductFreightLink[] ) {
+export async function createObjectAlgoliaIndex(
+  searchIndex: string, 
+  data: InsertProduct[] | InsertFreightClassification[] | InsertProductFreightLink[]
+) {
+  const index = client.initIndex(searchIndex);
+
+  const dataType = (() => {
+    if (data.length > 0) {
+      if ((data[0] as InsertProduct).product_id !== undefined) return "products";
+      if ((data[0] as InsertFreightClassification).classification_id !== undefined) return "chemical entries";
+      if ((data[0] as InsertProductFreightLink).link_id !== undefined) return "product freight links";
+    }
+    return "unknown";
+  })();
+
+  if (dataType === "unknown") {
+    console.log("Unrecognized data type or empty array provided.");
+    return; 
+  }
+
   try {
-    if (products && products.length > 0 ) {
-
+    if (data.length > 0) {
+      await index.saveObjects(data, {
+        autoGenerateObjectIDIfNotExist: false,
+      });
     } else {
-
-    }
-
-    if (chemicalEntries && chemicalEntries.length > 0 ) {
-
-    } else {
-
-    }
-
-    if (product_freight_links && product_freight_links.length > 0 ) {
-
-    } else {
-
+      console.log(`No ${dataType} to add to Algolia index.`);
     }
   } catch (error) {
-    console.error("Error creating object in Algolia index:", error);
+    console.error(`Error adding ${dataType} to Algolia index:`, error);
   }
 }
 
