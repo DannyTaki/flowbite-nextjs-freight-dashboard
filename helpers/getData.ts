@@ -215,8 +215,6 @@ export async function addProduct(products: InsertProduct[]) {
           .returning()
           .execute();
 
-         
-
           // Push the inserted product to the newProducts array
           if (newProduct.length === 1 ) {
             newProducts.push(newProduct[0]);
@@ -253,7 +251,7 @@ export async function updateProduct(products: InsertProduct[]) {
         })
         .execute();
         console.log('Updated product:', updatedProduct)
-        updateAlgoliaIndex('products', products);
+        updateAlgoliaIndex(SearchIndex.Products, products);
       } else {
         console.error(`Product ID is undefined for SKU: ${product.sku}`);
       }     
@@ -264,7 +262,7 @@ export async function updateProduct(products: InsertProduct[]) {
   }
 }
 
-export async function updateAlgoliaIndex<T>(
+export async function updateAlgoliaIndex(
   searchIndex: SearchIndex,
   data: AlgoliaData
 ) {
@@ -364,7 +362,6 @@ export async function updateProductFreightLinks(products: Pick<InsertProduct, "p
         }
       }
       createObjectAlgoliaIndex(SearchIndex.ProductFreightLinkages, newViewRecords);
-      triggerAlgoliaSync();
     } catch (error) {
       console.error("Error adding Product Freight Links:", error);
       throw error;
@@ -384,7 +381,7 @@ export async function getUnlinkedProducts() {
   }
 }
 
-export async function updateProductFreightLink(updates: { link_id: number, classification_id: number }[]) {
+export async function updateProductFreightLink(updates: { link_id: number, classification_id: number }[]): Promise<void> {
   try {
     console.log("Starting update process for product freight links.");
 
@@ -399,28 +396,38 @@ export async function updateProductFreightLink(updates: { link_id: number, class
       try {
         console.log(`Updating link ID: ${update.link_id} with classification ID: ${update.classification_id}`);
         
-        const result = await db
+        // Update the record in the database
+        await db
           .update(schema.product_freight_links)
           .set({
             classification_id: update.classification_id,
           })
           .where(eq(schema.product_freight_links.link_id, update.link_id))
           .execute();
-        
-        console.log(`Update result for link ID ${update.link_id}:`, result);
-        return result;
+
+        // Retrieve the updated record
+        const updatedRecord = await db
+          .select()
+          .from(schema.product_freight_links)
+          .where(eq(schema.product_freight_links.link_id, update.link_id))
+          .execute();
+
+        console.log(`Updated record for link ID ${update.link_id}:`, updatedRecord[0]);
+        return updatedRecord[0];
       } catch (innerError) {
         console.error(`Error updating link ID ${update.link_id}:`, innerError);
         throw innerError;
       }
     });
 
-    const results = await Promise.all(updatePromises);
-    console.log("Update results:", results);
+    const updatedRecords = await Promise.all(updatePromises);
+    console.log("Updated records:", updatedRecords);
 
-    await triggerAlgoliaSync();
+    // Pass the updated records to the updateAlgoliaIndex function
+    await updateAlgoliaIndex(SearchIndex.ProductFreightLinks, updatedRecords);
   } catch (error) {
     console.error("Error updating product freight links:", error);
+    throw error;
   }
 }
 
