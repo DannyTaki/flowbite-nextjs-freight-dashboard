@@ -160,6 +160,18 @@ export async function addChemicalEntry(
 
 export async function deleteChemicalEntries(classification_ids: number[]) {
   try {
+
+    const recordsToDelete = await db
+      .select()
+      .from(schema.freight_classifications)
+      .where(
+        inArray(
+          schema.freight_classifications.classification_id,
+          classification_ids,
+        ),
+      )
+      .execute();
+
     await db
       .delete(schema.freight_classifications)
       .where(
@@ -172,7 +184,7 @@ export async function deleteChemicalEntries(classification_ids: number[]) {
 
     console.log(`Deleted chemical entries with classification IDs: ${classification_ids.join(', ')}`);
 
-    triggerAlgoliaSync();
+    deleteObjectAlgoliaIndex(SearchIndex.FreightClassifications, recordsToDelete);
   } catch (error) {
     console.error("Error deleting chemical entries:", error);
   }
@@ -458,6 +470,7 @@ export async function findUnsynchronizedProducts() {
 
 export async function deleteProducts(products: Products) {
   try {
+    const productRecords: InsertProduct[] = [];
     const filteredProducts = products?.filter(product => product !== undefined) || [];
     const productIds = filteredProducts
       .map(product => product.product_id)
@@ -465,15 +478,23 @@ export async function deleteProducts(products: Products) {
 
     if (productIds.length > 0) {
       for (const productId of productIds) {
+        const productRecord = await db
+          .select()
+          .from(schema.products)
+          .where(eq(schema.products.product_id, productId))
+          .execute();
+
+
         await db
           .delete(schema.products)
           .where(eq(schema.products.product_id, productId));
 
+        productRecords.push(productRecord[0]);
         console.log(`Deleted product with ID: ${productId}`);
       }
 
       console.log(`Deleted products with IDs: ${productIds.join(', ')}`);
-      triggerAlgoliaSync();
+      deleteObjectAlgoliaIndex(SearchIndex.Products, productRecords);
     } else {
       console.log('No valid product IDs found to delete.');
     }
