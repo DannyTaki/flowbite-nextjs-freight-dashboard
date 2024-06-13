@@ -171,13 +171,7 @@ export async function deleteChemicalEntries(classification_ids: number[]) {
 export async function getProducts() {
   try {
     const products = await db
-      .select({
-        product_id: schema.products.product_id,
-        sku: schema.products.sku,
-        name: schema.products.name,
-        packaging_type: schema.products.packaging_type,
-        unit_container_type: schema.products.unit_container_type,
-      })
+      .select()
       .from(schema.products)
       .execute();
     return products;
@@ -256,7 +250,7 @@ export async function updateProduct(products: InsertProduct[]) {
         })
         .execute();
         console.log('Updated product:', updatedProduct)
-        triggerAlgoliaSync();
+        updateAlgoliaIndex('products', products);
       } else {
         console.error(`Product ID is undefined for SKU: ${product.sku}`);
       }     
@@ -267,9 +261,18 @@ export async function updateProduct(products: InsertProduct[]) {
   }
 }
 
-export async function updateAlgoliaIndex(searchIndex: string, product: InsertProduct) {
+export async function updateAlgoliaIndex(searchIndex: string, products: InsertProduct[]) {
   const index = client.initIndex(searchIndex); 
+  try {
+    const repsonse = index.partialUpdateObjects(products, {
+      createIfNotExists: false,
+    })
 
+    console.log("Algolia index updated successfully:", repsonse)
+    
+  } catch (error) {
+    console.error("Error updating Algolia index:", error);
+  }
 }
 
 export async function addToProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]): Promise<void> {

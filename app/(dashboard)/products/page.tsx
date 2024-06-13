@@ -17,6 +17,7 @@ const productSchema = z.object({
   name: z.string(),
   packaging_type: z.string().nullable(),
   unit_container_type: z.string().nullable(),
+  objectID: z.string().uuid(),
 });
 
 const packagingTypes = ["Bag", "Bale", "Box", "Bucket", "Bundle", "Carton", "Case", "Crate", "Cylinder", "Drums", "Pail", "Pallet", "Pieces", "Reel", "Roll", "Skid", "Tote", "Tube"];
@@ -64,6 +65,7 @@ export default function Products({
           name: selectedChemical.name,
           packaging_type: selectedChemical.packaging_type || null,
           unit_container_type: selectedChemical.unit_container_type || null,
+          objectID: selectedChemical.objectID, 
         });
 
         await updateProduct([validatedData] as InsertProduct[]);

@@ -9,7 +9,7 @@ export const products = pgTable("products", {
 	name: text("name").notNull(),
 	packaging_type: varchar("packaging_type", { length: 255 }),
 	unit_container_type: varchar("unit_container_type", { length: 255 }),
-	object_id: uuid("object_id").defaultRandom(),
+	objectID: uuid("objectID").defaultRandom(),
 },
 (table) => {
 	return {
