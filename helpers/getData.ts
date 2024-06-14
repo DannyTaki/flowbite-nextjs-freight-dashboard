@@ -650,10 +650,11 @@ export async function addRecords<T>(
   }
 }
 
-export async function updateRecords<T>(
+export async function updateRecords<T extends { [key: string]: any }>(
   tableSchema: any,
   records: T[],
   uniqueField: keyof T,
+  searchIndex: SearchIndex,
 ) {
   const updatedRecords: T[] = [];
   try {
@@ -675,60 +676,78 @@ export async function updateRecords<T>(
           .execute();
 
         // Push the updated record to the updatedRecords array
-        if (updatedRecord.length === 1) {
+        if (Array.isArray(updatedRecord) && updatedRecord.length === 1) {
           updatedRecords.push(updatedRecord[0]);
           console.log(
-            `Record with ${uniqueField} ${record[uniqueField]} updated successfully.`,
+            `Record with ${String(uniqueField)} ${record[uniqueField]} updated successfully.`,
           );
         } else {
           console.error(
-            `Error updating record with ${uniqueField} ${record[uniqueField]}.`,
+            `Error updating record with ${String(uniqueField)} ${record[uniqueField]}.`,
           );
         }
       } else {
         console.log(
-          `Record with ${uniqueField} ${record[uniqueField]} does not exist.`,
+          `Record with ${String(uniqueField)} ${record[uniqueField]} does not exist.`,
         );
       }
     }
     // Call to Algolia indexing function if necessary
-    updateObjectAlgoliaIndex(SearchIndex[tableSchema._name], updatedRecords);
+    updateAlgoliaIndex(searchIndex, updatedRecords);
     return updatedRecords;
   } catch (error) {
     console.error("Error updating records:", error);
   }
 }
 
+interface TableSchemaMap {
+  products: typeof schema.products;
+  freight_classifications: typeof schema.freight_classifications;
+  product_freight_linkages: typeof schema.product_freight_linkages;
+  product_freight_links: typeof schema.product_freight_links;
+}
+
+const tableSchemas: TableSchemaMap = {
+  products: schema.products,
+  freight_classifications: schema.freight_classifications,
+  product_freight_linkages: schema.product_freight_linkages,
+  product_freight_links: schema.product_freight_links,
+};
+
 export async function deleteRecords<T>(
-  tableSchema: any,
+  schemaKey: keyof TableSchemaMap,
   uniqueField: keyof T,
   values: T[typeof uniqueField][],
 ) {
   try {
+    const selectedTableSchema = tableSchemas[schemaKey];
+
     for (const value of values) {
       // Check if a record with the given unique field exists
       const existingRecord = await db
         .select()
-        .from(tableSchema)
-        .where(eq(tableSchema[uniqueField], value))
+        .from(selectedTableSchema)
+        .where(eq(selectedTableSchema[uniqueField], value))
         .execute();
 
       if (existingRecord.length > 0) {
         // If the record exists, delete it
         await db
-          .delete(tableSchema)
-          .where(eq(tableSchema[uniqueField], value))
+          .delete(selectedTableSchema)
+          .where(eq(selectedTableSchema[uniqueField], value))
           .execute();
 
         console.log(
-          `Record with ${uniqueField} ${value} deleted successfully.`,
+          `Record with ${String(uniqueField)} ${value} deleted successfully.`,
         );
       } else {
-        console.log(`Record with ${uniqueField} ${value} does not exist.`);
+        console.log(
+          `Record with ${String(uniqueField)} ${value} does not exist.`,
+        );
       }
     }
     // Call to Algolia indexing function if necessary
-    deleteObjectAlgoliaIndex(SearchIndex[tableSchema._name], values);
+    deleteObjectAlgoliaIndex(SearchIndex[schemaKey], values);
   } catch (error) {
     console.error("Error deleting records:", error);
   }
