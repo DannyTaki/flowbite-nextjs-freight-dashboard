@@ -1,6 +1,5 @@
 "use client";
 
-import type * as schema from "@/app/db/drizzle/schema";
 import {
   addChemicalEntry,
   deleteChemicalEntries,
@@ -8,23 +7,21 @@ import {
   getChemicalData,
   updateChemicalEntry,
 } from "@/helpers/getData"; // adjust the import path as necessary
+import type {
+  InsertFreightClassification,
+  SelectFreightClassification,
+} from "@/types/db/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Checkbox, Modal, Spinner, Table, Toast } from "flowbite-react";
 import React, { useState } from "react";
 import { HiExclamation } from "react-icons/hi";
 import { z } from "zod";
-import type { InsertFreightClassification, SelectFreightClassification } from "@/types/db/types";
 
 const chemicalSchema = z.object({
   classification_id: z.number().optional(),
-  description: z
-    .string()
-    .min(1, "Description is required")
-    .nullable(),
+  description: z.string().min(1, "Description is required").nullable(),
   nmfc: z.string().nullable(),
-  freight_class: z
-    .string()
-    .nullable(),
+  freight_class: z.string().nullable(),
   hazardous: z.boolean().nullable(),
   hazard_id: z.string().nullable(),
   hazard_class: z.string().nullable(),
@@ -79,7 +76,7 @@ export default function Chemicals() {
     }
 
     try {
-      await deleteProductFreightLinks(undefined,selectedRows);
+      await deleteProductFreightLinks(undefined, selectedRows);
       await deleteChemicalEntries(selectedRows);
       setSelectedRows([]);
       queryClient.invalidateQueries({ queryKey: ["chemicals"] });
@@ -111,9 +108,7 @@ export default function Chemicals() {
             validatedData as InsertFreightClassification,
           );
         } else {
-          await addChemicalEntry(
-            validatedData as InsertFreightClassification,
-          );
+          await addChemicalEntry(validatedData as InsertFreightClassification);
         }
         setOpenModal(false);
         queryClient.invalidateQueries({ queryKey: ["chemicals"] });

@@ -1,32 +1,41 @@
 "use server";
 
+import { getShipStationProducts } from "@/app/actions/action";
 import * as schema from "@/app/db/drizzle/schema";
+import type {
+  InsertFreightClassification,
+  InsertProduct,
+  InsertProductFreightLink,
+  InsertProductFreightLinkage,
+} from "@/types/db/types";
 import { neon } from "@neondatabase/serverless";
+import algoliasearch from "algoliasearch";
 import { eq, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
-import { Schema } from "inspector";
-import type { SelectProduct, InsertProduct, SelectProductFreightLink, InsertProductFreightLink, SelectFreightClassification, InsertFreightClassification, InsertProductFreightLinkage } from "@/types/db/types";
-import { getShipStationProducts } from "@/app/actions/action";
-import algoliasearch from "algoliasearch";
-import { string } from "zod";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
 export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
-type AlgoliaData = InsertProduct[] | InsertFreightClassification[] | InsertProductFreightLink[] | InsertProductFreightLinkage[];
-enum SearchIndex { 
+type AlgoliaData =
+  | InsertProduct[]
+  | InsertFreightClassification[]
+  | InsertProductFreightLink[]
+  | InsertProductFreightLinkage[];
+enum SearchIndex {
   Products = "products",
   FreightClassifications = "freight_classifications",
   ProductFreightLinkages = "product_freight_linkages",
   ProductFreightLinks = "product_freight_links",
 }
 
-
 export type Products = Awaited<ReturnType<typeof getProducts>>;
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
-const client = algoliasearch(process.env.ALGOLIA_APPLICATION_ID!, process.env.ALGOLIA_WRITE_API_KEY!);
+const client = algoliasearch(
+  process.env.ALGOLIA_APPLICATION_ID!,
+  process.env.ALGOLIA_WRITE_API_KEY!,
+);
 
 export async function getData(sku: string) {
   const freightLinks = alias(schema.product_freight_links, "freightLinks");
@@ -73,10 +82,9 @@ export async function getChemicalData() {
   }
 }
 
-
 // Add this to your server action code
 export async function updateChemicalEntry(
-  chemical: InsertFreightClassification
+  chemical: InsertFreightClassification,
 ) {
   try {
     if (chemical.classification_id === undefined) {
@@ -104,38 +112,42 @@ export async function updateChemicalEntry(
       )
       .execute();
 
-    updateAlgoliaIndex('freight_classifications', undefined, [chemical]);
+    updateAlgoliaIndex(SearchIndex.FreightClassifications, [chemical]);
   } catch (error) {
     console.error("Error updating chemical entry:", error);
   }
 }
 async function triggerAlgoliaSync() {
   try {
-   // Trigger the Algolia sync
-   const response = await fetch('https://app.getcensus.com/api/v1/syncs/852183/trigger', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer secret-token:hZ3Q2RYkqbBdb4bAJNnUSZWe',
-      'Content-Type': 'application/json'
+    // Trigger the Algolia sync
+    const response = await fetch(
+      "https://app.getcensus.com/api/v1/syncs/852183/trigger",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer secret-token:hZ3Q2RYkqbBdb4bAJNnUSZWe",
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const responseData = await response.json();
+
+    if (!response.ok || responseData.status !== "success") {
+      const errorMessage = responseData.message || response.statusText;
+      throw new Error(`Failed to trigger sync: ${errorMessage}`);
     }
-  });
 
-  const responseData = await response.json();
-
-  if (!response.ok || responseData.status !== 'success') {
-    const errorMessage = responseData.message || response.statusText;
-    throw new Error(`Failed to trigger sync: ${errorMessage}`);
+    console.log(
+      "Successfully triggered Algolia sync, sync_run_id:",
+      responseData.data.sync_run_id,
+    );
+  } catch (error) {
+    console.error("Error triggering Algolia sync:", error);
   }
-
-  console.log('Successfully triggered Algolia sync, sync_run_id:', responseData.data.sync_run_id);
-} catch (error) {
-  console.error('Error triggering Algolia sync:', error);
-}
 }
 
-export async function addChemicalEntry(
-  chemical: InsertFreightClassification,
-) {
+export async function addChemicalEntry(chemical: InsertFreightClassification) {
   try {
     const newChemicalEntry = await db
       .insert(schema.freight_classifications)
@@ -152,7 +164,10 @@ export async function addChemicalEntry(
       .returning()
       .execute();
 
-    updateAlgoliaIndex(SearchIndex.FreightClassifications, newChemicalEntry);
+    createObjectAlgoliaIndex(
+      SearchIndex.FreightClassifications,
+      newChemicalEntry,
+    );
   } catch (error) {
     console.error("Error adding chemical entry:", error);
   }
@@ -160,7 +175,6 @@ export async function addChemicalEntry(
 
 export async function deleteChemicalEntries(classification_ids: number[]) {
   try {
-
     const recordsToDelete = await db
       .select()
       .from(schema.freight_classifications)
@@ -182,9 +196,14 @@ export async function deleteChemicalEntries(classification_ids: number[]) {
       )
       .execute();
 
-    console.log(`Deleted chemical entries with classification IDs: ${classification_ids.join(', ')}`);
+    console.log(
+      `Deleted chemical entries with classification IDs: ${classification_ids.join(", ")}`,
+    );
 
-    deleteObjectAlgoliaIndex(SearchIndex.FreightClassifications, recordsToDelete);
+    deleteObjectAlgoliaIndex(
+      SearchIndex.FreightClassifications,
+      recordsToDelete,
+    );
   } catch (error) {
     console.error("Error deleting chemical entries:", error);
   }
@@ -192,10 +211,7 @@ export async function deleteChemicalEntries(classification_ids: number[]) {
 
 export async function getProducts() {
   try {
-    const products = await db
-      .select()
-      .from(schema.products)
-      .execute();
+    const products = await db.select().from(schema.products).execute();
     return products;
   } catch (error) {
     console.error("Error returning product data:", error);
@@ -228,13 +244,13 @@ export async function addProduct(products: InsertProduct[]) {
           .returning()
           .execute();
 
-          // Push the inserted product to the newProducts array
-          if (newProduct.length === 1 ) {
-            newProducts.push(newProduct[0]);
-            console.log(`Product with SKU ${product.sku} added successfully.`);
-          } else {
-            console.error(`Error adding product with SKU ${product.sku}.`);
-          }
+        // Push the inserted product to the newProducts array
+        if (newProduct.length === 1) {
+          newProducts.push(newProduct[0]);
+          console.log(`Product with SKU ${product.sku} added successfully.`);
+        } else {
+          console.error(`Error adding product with SKU ${product.sku}.`);
+        }
       } else {
         console.log(`Product with SKU ${product.sku} already exists.`);
       }
@@ -247,37 +263,36 @@ export async function addProduct(products: InsertProduct[]) {
 }
 
 export async function updateProduct(products: InsertProduct[]) {
-  console.log('Updating Product(s)');
+  console.log("Updating Product(s)");
   try {
     for (const product of products) {
       if (product.product_id !== undefined) {
         const updatedProduct = await db
-        .update(schema.products)
-        .set({
-          packaging_type: product.packaging_type || null,
-          unit_container_type: product.unit_container_type || null,
-        })
-        .where(eq(schema.products.product_id, product.product_id))
-        .returning({
-          product_id: schema.products.product_id,
-          name: schema.products.name,
-        })
-        .execute();
-        console.log('Updated product:', updatedProduct)
+          .update(schema.products)
+          .set({
+            packaging_type: product.packaging_type || null,
+            unit_container_type: product.unit_container_type || null,
+          })
+          .where(eq(schema.products.product_id, product.product_id))
+          .returning({
+            product_id: schema.products.product_id,
+            name: schema.products.name,
+          })
+          .execute();
+        console.log("Updated product:", updatedProduct);
         updateAlgoliaIndex(SearchIndex.Products, products);
       } else {
         console.error(`Product ID is undefined for SKU: ${product.sku}`);
-      }     
+      }
     }
   } catch (error) {
-    console.error('Error updating product:', error);
-  
+    console.error("Error updating product:", error);
   }
 }
 
 export async function updateAlgoliaIndex(
   searchIndex: SearchIndex,
-  data: AlgoliaData
+  data: AlgoliaData,
 ) {
   const index = client.initIndex(searchIndex);
   try {
@@ -285,7 +300,10 @@ export async function updateAlgoliaIndex(
       const response = await index.partialUpdateObjects(data, {
         createIfNotExists: false,
       });
-      console.log(`Algolia index updated successfully for ${searchIndex}:`, response);
+      console.log(
+        `Algolia index updated successfully for ${searchIndex}:`,
+        response,
+      );
     } else {
       console.log(`No ${searchIndex} to update in Algolia index.`);
     }
@@ -294,10 +312,9 @@ export async function updateAlgoliaIndex(
   }
 }
 
-
 export async function createObjectAlgoliaIndex(
-  searchIndex: SearchIndex, 
-  data: AlgoliaData
+  searchIndex: SearchIndex,
+  data: AlgoliaData,
 ) {
   const index = client.initIndex(searchIndex);
 
@@ -315,13 +332,14 @@ export async function createObjectAlgoliaIndex(
 }
 
 function extractObjectIDs(data: AlgoliaData): string[] {
-  return data.map(item => item.objectID).filter(id => id !== null && id !== undefined) as string[];
+  return data
+    .map((item) => item.objectID)
+    .filter((id) => id !== null && id !== undefined) as string[];
 }
-
 
 export async function deleteObjectAlgoliaIndex(
   searchIndex: SearchIndex,
-  data: AlgoliaData
+  data: AlgoliaData,
 ) {
   const index = client.initIndex(searchIndex);
 
@@ -337,12 +355,14 @@ export async function deleteObjectAlgoliaIndex(
   }
 }
 
-export async function updateProductFreightLinks(products: Pick<InsertProduct, "product_id" | "name">[]): Promise<void> {
-  console.log("Adding Product Freight Links")
+export async function updateProductFreightLinks(
+  products: Pick<InsertProduct, "product_id" | "name">[],
+): Promise<void> {
+  console.log("Adding Product Freight Links");
   try {
-    let newViewRecords: InsertProductFreightLinkage[] = [];
+    const newViewRecords: InsertProductFreightLinkage[] = [];
     for (const product of products) {
-      console.log("Product:", product)
+      console.log("Product:", product);
       if (product.product_id) {
         // Check if a record with the given product_id already exists
         const existingLink = await db
@@ -350,51 +370,65 @@ export async function updateProductFreightLinks(products: Pick<InsertProduct, "p
             product_id: schema.product_freight_links.product_id,
           })
           .from(schema.product_freight_links)
-          .where(eq(schema.product_freight_links.product_id, product.product_id))
+          .where(
+            eq(schema.product_freight_links.product_id, product.product_id),
+          )
           .execute();
 
-          if (existingLink.length === 0) {
-            // If the record does not exist, insert the new link
-            const newLinkRecord = await db
+        if (existingLink.length === 0) {
+          // If the record does not exist, insert the new link
+          const newLinkRecord = await db
             .insert(schema.product_freight_links)
             .values({
               product_id: product.product_id,
             })
             .execute();
-            console.log(`Product Freight Link for ${product.name} added successfully for product_id ${product.product_id}.`);
+          console.log(
+            `Product Freight Link for ${product.name} added successfully for product_id ${product.product_id}.`,
+          );
 
-            const newViewRecord = await db
-              .select()
-              .from(schema.product_freight_linkages)
-              .where(eq(schema.product_freight_linkages.product_id, product.product_id))
-              .execute();
-          
+          const newViewRecord = await db
+            .select()
+            .from(schema.product_freight_linkages)
+            .where(
+              eq(
+                schema.product_freight_linkages.product_id,
+                product.product_id,
+              ),
+            )
+            .execute();
+
           console.log("Newly created view record:", newViewRecord[0]);
           newViewRecords.push(newViewRecord[0]);
-          }
         }
       }
-      createObjectAlgoliaIndex(SearchIndex.ProductFreightLinkages, newViewRecords);
-    } catch (error) {
-      console.error("Error adding Product Freight Links:", error);
-      throw error;
     }
+    createObjectAlgoliaIndex(
+      SearchIndex.ProductFreightLinkages,
+      newViewRecords,
+    );
+  } catch (error) {
+    console.error("Error adding Product Freight Links:", error);
+    throw error;
   }
+}
 
 export async function getUnlinkedProducts() {
-  try { 
-    const unlinkedProducts = await db 
-    .select()
-    .from(schema.product_freight_linkages)
-    .where(isNull(schema.product_freight_linkages.classification_id))
-    .execute();
-  return unlinkedProducts; 
+  try {
+    const unlinkedProducts = await db
+      .select()
+      .from(schema.product_freight_linkages)
+      .where(isNull(schema.product_freight_linkages.classification_id))
+      .execute();
+    return unlinkedProducts;
   } catch (error) {
     console.error("Error returning unlinked products:", error);
   }
 }
 
-export async function updateProductFreightLink(updates: { link_id: number, classification_id: number }[]): Promise<void> {
+export async function updateProductFreightLink(
+  updates: { link_id: number; classification_id: number }[],
+): Promise<void> {
   try {
     console.log("Starting update process for product freight links.");
 
@@ -405,10 +439,12 @@ export async function updateProductFreightLink(updates: { link_id: number, class
 
     console.log("Updates to process:", updates);
 
-    const updatePromises = updates.map(async update => {
+    const updatePromises = updates.map(async (update) => {
       try {
-        console.log(`Updating link ID: ${update.link_id} with classification ID: ${update.classification_id}`);
-        
+        console.log(
+          `Updating link ID: ${update.link_id} with classification ID: ${update.classification_id}`,
+        );
+
         // Update the record in the database
         await db
           .update(schema.product_freight_links)
@@ -425,7 +461,10 @@ export async function updateProductFreightLink(updates: { link_id: number, class
           .where(eq(schema.product_freight_links.link_id, update.link_id))
           .execute();
 
-        console.log(`Updated record for link ID ${update.link_id}:`, updatedRecord[0]);
+        console.log(
+          `Updated record for link ID ${update.link_id}:`,
+          updatedRecord[0],
+        );
         return updatedRecord[0];
       } catch (innerError) {
         console.error(`Error updating link ID ${update.link_id}:`, innerError);
@@ -444,23 +483,26 @@ export async function updateProductFreightLink(updates: { link_id: number, class
   }
 }
 
-
-
 export async function findUnsynchronizedProducts() {
   try {
     const shipstationProducts = await getShipStationProducts();
     const databaseProducts = await getProducts();
-    if(!databaseProducts) {
+    if (!databaseProducts) {
       throw new Error("No database products found");
     }
 
-     // Extract SKUs from shipstationProducts
-    const shipstationSKUs = shipstationProducts.map(product => product.sku);
+    // Extract SKUs from shipstationProducts
+    const shipstationSKUs = shipstationProducts.map((product) => product.sku);
     // Find products in databaseProducts that are not in shipstationProducts
-    const productsNotInShipstation = databaseProducts.filter(product => !shipstationSKUs.includes(product.sku));
-    
+    const productsNotInShipstation = databaseProducts.filter(
+      (product) => !shipstationSKUs.includes(product.sku),
+    );
+
     // Log or return the products that are missing from shipstationProducts
-    console.log("Products not in ShipStation Products:", productsNotInShipstation);
+    console.log(
+      "Products not in ShipStation Products:",
+      productsNotInShipstation,
+    );
 
     return productsNotInShipstation;
   } catch (error) {
@@ -471,9 +513,10 @@ export async function findUnsynchronizedProducts() {
 export async function deleteProducts(products: Products) {
   try {
     const productRecords: InsertProduct[] = [];
-    const filteredProducts = products?.filter(product => product !== undefined) || [];
+    const filteredProducts =
+      products?.filter((product) => product !== undefined) || [];
     const productIds = filteredProducts
-      .map(product => product.product_id)
+      .map((product) => product.product_id)
       .filter((id): id is number => id !== undefined);
 
     if (productIds.length > 0) {
@@ -484,7 +527,6 @@ export async function deleteProducts(products: Products) {
           .where(eq(schema.products.product_id, productId))
           .execute();
 
-
         await db
           .delete(schema.products)
           .where(eq(schema.products.product_id, productId));
@@ -493,57 +535,201 @@ export async function deleteProducts(products: Products) {
         console.log(`Deleted product with ID: ${productId}`);
       }
 
-      console.log(`Deleted products with IDs: ${productIds.join(', ')}`);
+      console.log(`Deleted products with IDs: ${productIds.join(", ")}`);
       deleteObjectAlgoliaIndex(SearchIndex.Products, productRecords);
     } else {
-      console.log('No valid product IDs found to delete.');
+      console.log("No valid product IDs found to delete.");
     }
   } catch (error) {
     console.error("Error deleting products:", error);
   }
 }
 
-export async function deleteProductFreightLinks(products?: Products, classificationIds?: number[]) {
+export async function deleteProductFreightLinks(
+  products?: Products,
+  classificationIds?: number[],
+) {
   try {
-    const filteredProducts = products?.filter(product => product !== undefined) || [];
+    const filteredProducts =
+      products?.filter((product) => product !== undefined) || [];
     const productIds = filteredProducts
-      .map(product => product.product_id)
+      .map((product) => product.product_id)
       .filter((id): id is number => id !== undefined);
-    
-    if (productIds.length > 0 ) {
-      console.log('Deleting product freight links for products:', productIds)
+
+    if (productIds.length > 0) {
+      console.log("Deleting product freight links for products:", productIds);
       for (const productId of productIds) {
         await db
-        .delete(schema.product_freight_links)
-        .where(eq(schema.product_freight_links.product_id, productId))
+          .delete(schema.product_freight_links)
+          .where(eq(schema.product_freight_links.product_id, productId));
 
-        console.log('Deleted product freight links for product ID:', productId)
+        console.log("Deleted product freight links for product ID:", productId);
       }
-    
     } else {
-      console.log('No valid product IDs found to delete product freight links.')
+      console.log(
+        "No valid product IDs found to delete product freight links.",
+      );
     }
 
-    const filteredClassificationIds = classificationIds?.filter(id => id !== undefined) || [];
+    const filteredClassificationIds =
+      classificationIds?.filter((id) => id !== undefined) || [];
 
-        if (filteredClassificationIds.length > 0 ) {
-          console.log('Deleting product freight links for classification IDs:', filteredClassificationIds);
-          for (const classificationId of filteredClassificationIds) {
-            await db
-              .update(schema.product_freight_links)
-              .set({ classification_id: null })
-              .where(eq(schema.product_freight_links.classification_id, classificationId))
-              .execute();
+    if (filteredClassificationIds.length > 0) {
+      console.log(
+        "Deleting product freight links for classification IDs:",
+        filteredClassificationIds,
+      );
+      for (const classificationId of filteredClassificationIds) {
+        await db
+          .update(schema.product_freight_links)
+          .set({ classification_id: null })
+          .where(
+            eq(
+              schema.product_freight_links.classification_id,
+              classificationId,
+            ),
+          )
+          .execute();
 
-              console.log('Updated product freight links for classification ID:', classificationId);              
-          }
-        } else {
-          console.log('No valid classification IDs provided.');
-        } 
-        triggerAlgoliaSync();
+        console.log(
+          "Updated product freight links for classification ID:",
+          classificationId,
+        );
+      }
+    } else {
+      console.log("No valid classification IDs provided.");
+    }
+    triggerAlgoliaSync();
   } catch (error) {
     console.error("Error deleting product freight links:", error);
   }
 }
 
-   
+export async function addRecords<T>(
+  tableSchema: any,
+  records: T[],
+  uniqueField: keyof T,
+) {
+  const newRecords: T[] = [];
+  try {
+    for (const record of records) {
+      const existingRecord = await db
+        .select()
+        .from(tableSchema)
+        .where(eq(tableSchema[uniqueField], record[uniqueField]))
+        .execute();
+
+      if (existingRecord.length === 0) {
+        const newRecord = await db
+          .insert(tableSchema)
+          .values(record)
+          .returning()
+          .execute();
+
+        if (newRecord.length === 1) {
+          newRecords.push(newRecord[0]);
+          console.log(
+            `Record with ${uniqueField} ${record[uniqueField]} added successfully.`,
+          );
+        } else {
+          console.error(
+            `Error adding record with ${uniqueField} ${record[uniqueField]}.`,
+          );
+        }
+      } else {
+        console.log(
+          `Record with ${uniqueField} ${record[uniqueField]} already exists.`,
+        );
+      }
+    }
+
+    createObjectAlgoliaIndex(SearchIndex[tableSchema._name], newRecords);
+    return newRecords;
+  } catch (error) {
+    console.log("Error adding records:", error);
+  }
+}
+
+export async function updateRecords<T>(
+  tableSchema: any,
+  records: T[],
+  uniqueField: keyof T,
+) {
+  const updatedRecords: T[] = [];
+  try {
+    for (const record of records) {
+      // Check if a record with the given unique field exists
+      const existingRecord = await db
+        .select()
+        .from(tableSchema)
+        .where(eq(tableSchema[uniqueField], record[uniqueField]))
+        .execute();
+
+      if (existingRecord.length > 0) {
+        // If the record exists, update it
+        const updatedRecord = await db
+          .update(tableSchema)
+          .set(record)
+          .where(eq(tableSchema[uniqueField], record[uniqueField]))
+          .returning()
+          .execute();
+
+        // Push the updated record to the updatedRecords array
+        if (updatedRecord.length === 1) {
+          updatedRecords.push(updatedRecord[0]);
+          console.log(
+            `Record with ${uniqueField} ${record[uniqueField]} updated successfully.`,
+          );
+        } else {
+          console.error(
+            `Error updating record with ${uniqueField} ${record[uniqueField]}.`,
+          );
+        }
+      } else {
+        console.log(
+          `Record with ${uniqueField} ${record[uniqueField]} does not exist.`,
+        );
+      }
+    }
+    // Call to Algolia indexing function if necessary
+    updateObjectAlgoliaIndex(SearchIndex[tableSchema._name], updatedRecords);
+    return updatedRecords;
+  } catch (error) {
+    console.error("Error updating records:", error);
+  }
+}
+
+export async function deleteRecords<T>(
+  tableSchema: any,
+  uniqueField: keyof T,
+  values: T[typeof uniqueField][],
+) {
+  try {
+    for (const value of values) {
+      // Check if a record with the given unique field exists
+      const existingRecord = await db
+        .select()
+        .from(tableSchema)
+        .where(eq(tableSchema[uniqueField], value))
+        .execute();
+
+      if (existingRecord.length > 0) {
+        // If the record exists, delete it
+        await db
+          .delete(tableSchema)
+          .where(eq(tableSchema[uniqueField], value))
+          .execute();
+
+        console.log(
+          `Record with ${uniqueField} ${value} deleted successfully.`,
+        );
+      } else {
+        console.log(`Record with ${uniqueField} ${value} does not exist.`);
+      }
+    }
+    // Call to Algolia indexing function if necessary
+    deleteObjectAlgoliaIndex(SearchIndex[tableSchema._name], values);
+  } catch (error) {
+    console.error("Error deleting records:", error);
+  }
+}
