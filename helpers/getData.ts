@@ -549,6 +549,7 @@ export async function findUnsynchronizedProducts() {
 export async function deleteProducts(products: Products) {
   try {
     const productRecords: InsertProduct[] = [];
+    const productFreightLinkagesRecords: InsertProductFreightLinkage[] = [];
     const filteredProducts =
       products?.filter((product) => product !== undefined) || [];
     const productIds = filteredProducts
@@ -563,16 +564,27 @@ export async function deleteProducts(products: Products) {
           .where(eq(schema.products.product_id, productId))
           .execute();
 
+        const productFreightLinkagesRecord = await db
+          .select()
+          .from(schema.product_freight_linkages)
+          .where(eq(schema.product_freight_linkages.product_id, productId))
+          .execute();
+
         await db
           .delete(schema.products)
           .where(eq(schema.products.product_id, productId));
 
         productRecords.push(productRecord[0]);
         console.log(`Deleted product with ID: ${productId}`);
+        productFreightLinkagesRecord.push(productFreightLinkagesRecord[0]);
       }
 
       console.log(`Deleted products with IDs: ${productIds.join(", ")}`);
       deleteObjectAlgoliaIndex(SearchIndex.Products, productRecords);
+      deleteObjectAlgoliaIndex(
+        SearchIndex.ProductFreightLinkages,
+        productFreightLinkagesRecords,
+      );
     } else {
       console.log("No valid product IDs found to delete.");
     }
