@@ -15,7 +15,9 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
 
 export type EnrichedItem = Awaited<ReturnType<typeof getData>>;
-export type ChemicalData = Awaited<ReturnType<typeof getChemicalData>>;
+export type ChemicalData = Awaited<
+  ReturnType<typeof getFreightClassifications>
+>;
 type AlgoliaData =
   | InsertProduct[]
   | InsertFreightClassification[]
@@ -60,7 +62,7 @@ export async function getData(sku: string) {
   return product;
 }
 
-export async function getChemicalData() {
+export async function getFreightClassifications() {
   try {
     const classifications = await db
       .select({
@@ -83,7 +85,7 @@ export async function getChemicalData() {
 }
 
 // Add this to your server action code
-export async function updateChemicalEntry(
+export async function updateFreightClassification(
   chemical: InsertFreightClassification,
 ) {
   try {
@@ -147,7 +149,9 @@ async function triggerAlgoliaSync() {
   }
 }
 
-export async function addChemicalEntry(chemical: InsertFreightClassification) {
+export async function createFreightClassification(
+  chemical: InsertFreightClassification,
+) {
   try {
     const newChemicalEntry = await db
       .insert(schema.freight_classifications)
@@ -173,7 +177,9 @@ export async function addChemicalEntry(chemical: InsertFreightClassification) {
   }
 }
 
-export async function deleteChemicalEntries(classification_ids: number[]) {
+export async function deleteFreightClassifications(
+  classification_ids: number[],
+) {
   try {
     const recordsToDelete = await db
       .select()
@@ -220,6 +226,7 @@ export async function getProducts() {
 
 export async function addProduct(products: InsertProduct[]) {
   const newProducts: InsertProduct[] = [];
+  const newProductFreightLinkages: InsertProductFreightLinkage[] = [];
   try {
     for (const product of products) {
       // Check if a product with the given SKU exists
@@ -243,6 +250,31 @@ export async function addProduct(products: InsertProduct[]) {
           })
           .returning()
           .execute();
+        if (typeof product.product_id === "number") {
+          const newProductFreightLinkage = await db
+            .select()
+            .from(schema.product_freight_linkages)
+            .where(
+              eq(
+                schema.product_freight_linkages.product_id,
+                product.product_id,
+              ),
+            )
+            .execute();
+
+          if (newProductFreightLinkage.length === 1) {
+            newProductFreightLinkages.push(newProductFreightLinkage[0]);
+            console.log(
+              `Product Freight Linkage with SKU ${product.sku} added successfully.`,
+            );
+          } else {
+            console.error(
+              `Error adding product freight linkage with SKU ${product.product_id} and SKU ${product.sku}.`,
+            );
+          }
+        } else {
+          throw new Error("Product ID must be defined as a number");
+        }
 
         // Push the inserted product to the newProducts array
         if (newProduct.length === 1) {
@@ -256,6 +288,10 @@ export async function addProduct(products: InsertProduct[]) {
       }
     }
     createObjectAlgoliaIndex(SearchIndex.Products, newProducts);
+    createObjectAlgoliaIndex(
+      SearchIndex.ProductFreightLinkages,
+      newProductFreightLinkages,
+    );
     return newProducts;
   } catch (error) {
     console.error("Error adding product:", error);
@@ -377,7 +413,7 @@ export async function updateProductFreightLinks(
 
         if (existingLink.length === 0) {
           // If the record does not exist, insert the new link
-          const newLinkRecord = await db
+          await db
             .insert(schema.product_freight_links)
             .values({
               product_id: product.product_id,
@@ -602,153 +638,5 @@ export async function deleteProductFreightLinks(
     triggerAlgoliaSync();
   } catch (error) {
     console.error("Error deleting product freight links:", error);
-  }
-}
-
-export async function addRecords<T>(
-  tableSchema: any,
-  records: T[],
-  uniqueField: keyof T,
-) {
-  const newRecords: T[] = [];
-  try {
-    for (const record of records) {
-      const existingRecord = await db
-        .select()
-        .from(tableSchema)
-        .where(eq(tableSchema[uniqueField], record[uniqueField]))
-        .execute();
-
-      if (existingRecord.length === 0) {
-        const newRecord = await db
-          .insert(tableSchema)
-          .values(record)
-          .returning()
-          .execute();
-
-        if (newRecord.length === 1) {
-          newRecords.push(newRecord[0]);
-          console.log(
-            `Record with ${uniqueField} ${record[uniqueField]} added successfully.`,
-          );
-        } else {
-          console.error(
-            `Error adding record with ${uniqueField} ${record[uniqueField]}.`,
-          );
-        }
-      } else {
-        console.log(
-          `Record with ${uniqueField} ${record[uniqueField]} already exists.`,
-        );
-      }
-    }
-
-    createObjectAlgoliaIndex(SearchIndex[tableSchema._name], newRecords);
-    return newRecords;
-  } catch (error) {
-    console.log("Error adding records:", error);
-  }
-}
-
-export async function updateRecords<T extends { [key: string]: any }>(
-  tableSchema: any,
-  records: T[],
-  uniqueField: keyof T,
-  searchIndex: SearchIndex,
-) {
-  const updatedRecords: T[] = [];
-  try {
-    for (const record of records) {
-      // Check if a record with the given unique field exists
-      const existingRecord = await db
-        .select()
-        .from(tableSchema)
-        .where(eq(tableSchema[uniqueField], record[uniqueField]))
-        .execute();
-
-      if (existingRecord.length > 0) {
-        // If the record exists, update it
-        const updatedRecord = await db
-          .update(tableSchema)
-          .set(record)
-          .where(eq(tableSchema[uniqueField], record[uniqueField]))
-          .returning()
-          .execute();
-
-        // Push the updated record to the updatedRecords array
-        if (Array.isArray(updatedRecord) && updatedRecord.length === 1) {
-          updatedRecords.push(updatedRecord[0]);
-          console.log(
-            `Record with ${String(uniqueField)} ${record[uniqueField]} updated successfully.`,
-          );
-        } else {
-          console.error(
-            `Error updating record with ${String(uniqueField)} ${record[uniqueField]}.`,
-          );
-        }
-      } else {
-        console.log(
-          `Record with ${String(uniqueField)} ${record[uniqueField]} does not exist.`,
-        );
-      }
-    }
-    // Call to Algolia indexing function if necessary
-    updateAlgoliaIndex(searchIndex, updatedRecords);
-    return updatedRecords;
-  } catch (error) {
-    console.error("Error updating records:", error);
-  }
-}
-
-interface TableSchemaMap {
-  products: typeof schema.products;
-  freight_classifications: typeof schema.freight_classifications;
-  product_freight_linkages: typeof schema.product_freight_linkages;
-  product_freight_links: typeof schema.product_freight_links;
-}
-
-const tableSchemas: TableSchemaMap = {
-  products: schema.products,
-  freight_classifications: schema.freight_classifications,
-  product_freight_linkages: schema.product_freight_linkages,
-  product_freight_links: schema.product_freight_links,
-};
-
-export async function deleteRecords<T>(
-  schemaKey: keyof TableSchemaMap,
-  uniqueField: keyof T,
-  values: T[typeof uniqueField][],
-) {
-  try {
-    const selectedTableSchema = tableSchemas[schemaKey];
-
-    for (const value of values) {
-      // Check if a record with the given unique field exists
-      const existingRecord = await db
-        .select()
-        .from(selectedTableSchema)
-        .where(eq(selectedTableSchema[uniqueField], value))
-        .execute();
-
-      if (existingRecord.length > 0) {
-        // If the record exists, delete it
-        await db
-          .delete(selectedTableSchema)
-          .where(eq(selectedTableSchema[uniqueField], value))
-          .execute();
-
-        console.log(
-          `Record with ${String(uniqueField)} ${value} deleted successfully.`,
-        );
-      } else {
-        console.log(
-          `Record with ${String(uniqueField)} ${value} does not exist.`,
-        );
-      }
-    }
-    // Call to Algolia indexing function if necessary
-    deleteObjectAlgoliaIndex(SearchIndex[schemaKey], values);
-  } catch (error) {
-    console.error("Error deleting records:", error);
   }
 }

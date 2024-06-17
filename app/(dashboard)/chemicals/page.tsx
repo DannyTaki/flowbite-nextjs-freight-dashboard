@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  addChemicalEntry,
-  deleteChemicalEntries,
+  createFreightClassification,
+  deleteFreightClassifications,
   deleteProductFreightLinks,
-  getChemicalData,
-  updateChemicalEntry,
+  getFreightClassifications,
+  updateFreightClassification,
 } from "@/helpers/getData"; // adjust the import path as necessary
 import type {
   InsertFreightClassification,
@@ -43,7 +43,7 @@ export default function Chemicals() {
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["chemicals"],
-    queryFn: () => getChemicalData(),
+    queryFn: () => getFreightClassifications(),
   });
 
   if (error) {
@@ -77,7 +77,7 @@ export default function Chemicals() {
 
     try {
       await deleteProductFreightLinks(undefined, selectedRows);
-      await deleteChemicalEntries(selectedRows);
+      await deleteFreightClassifications(selectedRows);
       setSelectedRows([]);
       queryClient.invalidateQueries({ queryKey: ["chemicals"] });
     } catch (error) {
@@ -104,11 +104,13 @@ export default function Chemicals() {
         });
 
         if (isEditMode) {
-          await updateChemicalEntry(
+          await updateFreightClassification(
             validatedData as InsertFreightClassification,
           );
         } else {
-          await addChemicalEntry(validatedData as InsertFreightClassification);
+          await createFreightClassification(
+            validatedData as InsertFreightClassification,
+          );
         }
         setOpenModal(false);
         queryClient.invalidateQueries({ queryKey: ["chemicals"] });

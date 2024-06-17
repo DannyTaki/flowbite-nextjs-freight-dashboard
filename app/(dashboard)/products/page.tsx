@@ -1,18 +1,18 @@
 "use client";
 
-import { getProducts, updateProduct } from "@/helpers/getData";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Spinner, Table, Modal, Button, Dropdown } from "flowbite-react";
-import { useSearch } from "@/hooks/use-search";
-import { InsertProduct, SelectProduct } from "@/types/db/types";
-import { useState, useCallback } from "react";
-import { z } from "zod";
-import { useDebouncedCallback } from "use-debounce";
 import MemoizedRow from "@/components/row";
-import ProductModal from "@/components/productmodal";
+import { getProducts, updateProduct } from "@/helpers/getData";
+import { useSearch } from "@/hooks/use-search";
+import type { InsertProduct, SelectProduct } from "@/types/db/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Dropdown, Modal, Spinner, Table } from "flowbite-react";
+import { useState } from "react";
+import { z } from "zod";
 
 const productSchema = z.object({
-  product_id: z.union([z.string(), z.number()]).transform((id) => typeof id === 'string' ? Number(id) : id),
+  product_id: z
+    .union([z.string(), z.number()])
+    .transform((id) => (typeof id === "string" ? Number(id) : id)),
   sku: z.string(),
   name: z.string(),
   packaging_type: z.string().nullable(),
@@ -20,8 +20,43 @@ const productSchema = z.object({
   objectID: z.string().uuid(),
 });
 
-const packagingTypes = ["Bag", "Bale", "Box", "Bucket", "Bundle", "Carton", "Case", "Crate", "Cylinder", "Drums", "Pail", "Pallet", "Pieces", "Reel", "Roll", "Skid", "Tote", "Tube"];
-const unitContainerTypes = ["Bag", "Bale", "Box", "Bucket", "Bundle", "Carton", "Case", "Crate", "Cylinder", "Drums", "Pail", "Reel", "Roll", "Tote", "Tube"];
+const packagingTypes = [
+  "Bag",
+  "Bale",
+  "Box",
+  "Bucket",
+  "Bundle",
+  "Carton",
+  "Case",
+  "Crate",
+  "Cylinder",
+  "Drums",
+  "Pail",
+  "Pallet",
+  "Pieces",
+  "Reel",
+  "Roll",
+  "Skid",
+  "Tote",
+  "Tube",
+];
+const unitContainerTypes = [
+  "Bag",
+  "Bale",
+  "Box",
+  "Bucket",
+  "Bundle",
+  "Carton",
+  "Case",
+  "Crate",
+  "Cylinder",
+  "Drums",
+  "Pail",
+  "Reel",
+  "Roll",
+  "Tote",
+  "Tube",
+];
 
 export default function Products({
   searchParams,
@@ -29,22 +64,29 @@ export default function Products({
   searchParams?: {
     query?: string;
     page?: string;
-  }
+  };
 }) {
-  const query = searchParams?.query || '';
+  const query = searchParams?.query || "";
   const [openModal, setOpenModal] = useState(false);
-  const [selectedChemical, setSelectedChemical] = useState<SelectProduct | null>(null);
+  const [selectedChemical, setSelectedChemical] =
+    useState<SelectProduct | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const [packagingLabel, setPackagingLabel] = useState("Packaging Type");
-  const [unitContainerLabel, setUnitContainerLabel] = useState("Unit Container Type");
+  const [unitContainerLabel, setUnitContainerLabel] = useState(
+    "Unit Container Type",
+  );
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: () => getProducts(),
   });
-  const { data: productData, error: productError, isLoading: productIsLoading } = useSearch<SelectProduct>(query, "products");
+  const {
+    data: productData,
+    error: productError,
+    isLoading: productIsLoading,
+  } = useSearch<SelectProduct>(query, "products");
 
   const openEditModal = (item: SelectProduct) => {
     setOpenModal(true);
@@ -65,7 +107,7 @@ export default function Products({
           name: selectedChemical.name,
           packaging_type: selectedChemical.packaging_type || null,
           unit_container_type: selectedChemical.unit_container_type || null,
-          objectID: selectedChemical.objectID, 
+          objectID: selectedChemical.objectID,
         });
 
         await updateProduct([validatedData] as InsertProduct[]);
@@ -107,39 +149,67 @@ export default function Products({
   return (
     <div className="overflow-x-auto">
       <Modal show={openModal} onClose={() => setOpenModal(false)}>
-        <Modal.Header ><span className="text-base">Edit Product - {selectedChemical?.name}</span></Modal.Header>
+        <Modal.Header>
+          <span className="text-base">
+            Edit Product - {selectedChemical?.name}
+          </span>
+        </Modal.Header>
         <Modal.Body>
           <form className="p-4 md:p-5" onSubmit={handleFormSubmit}>
             <div className="mb-4 flex justify-around">
               <div>
-                <Dropdown label={packagingLabel} className="mb-2" dismissOnClick={true}>
-                <Dropdown.Header>
-                  <span className="block text-sm">Packaging Type</span>
-                </Dropdown.Header>
+                <Dropdown
+                  label={packagingLabel}
+                  className="mb-2"
+                  dismissOnClick={true}
+                >
+                  <Dropdown.Header>
+                    <span className="block text-sm">Packaging Type</span>
+                  </Dropdown.Header>
                   {packagingTypes.map((option) => (
-                    <Dropdown.Item key={option} onClick={() => {
-                      if (selectedChemical) {
-                        setSelectedChemical({ ...selectedChemical, packaging_type: option})
-                        setPackagingLabel(option);
-                      }
-                    }}>{option}</Dropdown.Item>
+                    <Dropdown.Item
+                      key={option}
+                      onClick={() => {
+                        if (selectedChemical) {
+                          setSelectedChemical({
+                            ...selectedChemical,
+                            packaging_type: option,
+                          });
+                          setPackagingLabel(option);
+                        }
+                      }}
+                    >
+                      {option}
+                    </Dropdown.Item>
                   ))}
-                  </Dropdown>
-                </div>
+                </Dropdown>
+              </div>
               <div>
-              <Dropdown label={unitContainerLabel} className="mb-2" dismissOnClick={true}>
-              <Dropdown.Header>
-                  <span className="block text-sm">Unit Container Type</span>
-                </Dropdown.Header>
-                {unitContainerTypes.map((option) => (
-                  <Dropdown.Item key={option} onClick={() => {
-                    if (selectedChemical) {
-                      setSelectedChemical({ ...selectedChemical, unit_container_type: option});
-                      setUnitContainerLabel(option);
-                    }
-                  }}>{option}</Dropdown.Item>
-                ))}
-              </Dropdown>
+                <Dropdown
+                  label={unitContainerLabel}
+                  className="mb-2"
+                  dismissOnClick={true}
+                >
+                  <Dropdown.Header>
+                    <span className="block text-sm">Unit Container Type</span>
+                  </Dropdown.Header>
+                  {unitContainerTypes.map((option) => (
+                    <Dropdown.Item
+                      key={option}
+                      onClick={() => {
+                        if (selectedChemical) {
+                          setSelectedChemical({
+                            ...selectedChemical,
+                            unit_container_type: option,
+                          });
+                          setUnitContainerLabel(option);
+                        }
+                      }}
+                    >
+                      {option}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown>
               </div>
             </div>
             <Modal.Footer className="flex justify-center">
@@ -161,7 +231,11 @@ export default function Products({
         </Table.Head>
         <Table.Body className="divide-y">
           {currentData?.map((item, index) => (
-            <MemoizedRow key={index} item={item} openEditModal={openEditModal} />
+            <MemoizedRow
+              key={index}
+              item={item}
+              openEditModal={openEditModal}
+            />
           ))}
         </Table.Body>
       </Table>
