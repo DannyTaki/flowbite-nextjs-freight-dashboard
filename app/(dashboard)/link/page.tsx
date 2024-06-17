@@ -8,6 +8,7 @@ import { useSearch } from "@/hooks/use-search";
 import type { SelectProductFreightLinkage } from "@/types/db/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Checkbox, Pagination, Table, TextInput } from "flowbite-react";
+import { useEffect, useState } from "react";
 
 export default function UnlinkedProducts({
   searchParams,

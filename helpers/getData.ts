@@ -643,11 +643,26 @@ export async function deleteProductFreightLinks(
           "Updated product freight links for classification ID:",
           classificationId,
         );
+
+        const productFreightLinkageRecords = await db
+          .select()
+          .from(schema.product_freight_linkages)
+          .where(
+            eq(
+              schema.product_freight_linkages.classification_id,
+              classificationId,
+            ),
+          )
+          .execute();
+
+        updateAlgoliaIndex(
+          SearchIndex.ProductFreightLinkages,
+          productFreightLinkageRecords,
+        );
       }
     } else {
       console.log("No valid classification IDs provided.");
     }
-    triggerAlgoliaSync();
   } catch (error) {
     console.error("Error deleting product freight links:", error);
   }
