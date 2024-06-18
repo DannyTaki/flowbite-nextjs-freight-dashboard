@@ -1,19 +1,23 @@
 "use server";
 
-import { getEnrichedOrder, EnrichedOrder } from "@/helpers/EnrichedOrder";
+import type { EnrichedOrder } from "@/helpers/EnrichedOrder";
+import { getEnrichedOrder } from "@/helpers/EnrichedOrder";
 import { getProducts } from "@/helpers/getData";
-import type { ErrorResult, QuoteUnits, QuoteCommodity } from "@/types/book-freight/action-types";
+import type { Dimensions } from "@/helpers/parse-dims";
+import { parseDimensionsAndQty } from "@/helpers/parse-dims";
+import { parseWeight } from "@/helpers/parse-weight";
+import type {
+  ErrorResult,
+  QuoteCommodity,
+  QuoteUnits,
+} from "@/types/book-freight/action-types";
+import type { paths } from "@/types/book-freight/mycarrierSchema";
 import { optsSchema } from "@/types/optsSchema";
 import type { Product } from "@/types/shiptation/product";
+import date from "date-and-time";
+import createClient from "openapi-fetch";
 import Shipstation from "shipstation-node";
 import type { IOrderPaginationResult } from "shipstation-node/typings/models";
-import createClient from "openapi-fetch";
-import { paths } from "@/types/book-freight/mycarrierSchema";
-import date from "date-and-time";
-import { parseWeight } from "@/helpers/parse-weight";
-import { parseDimensionsAndQty, Dimensions } from "@/helpers/parse-dims";
-
-
 
 const credentials = {
   key: process.env.VERCEL_SHIPSTATION_KEY,
@@ -133,7 +137,7 @@ export async function bookFreight(
   limitedAccess: boolean,
 ) {
   try {
-    console.log("Order Data: " + JSON.stringify(orderData));  
+    console.log("Order Data: " + JSON.stringify(orderData));
     if (!orderData || orderData.orders.length === 0) {
       console.log("No orders found");
       return "No orders available";
@@ -141,13 +145,13 @@ export async function bookFreight(
       console.log("Only one order can be processed at a time");
       return "Only one order can be processed at a time";
     } else {
-    console.log("Booking Freight...");
+      console.log("Booking Freight...");
 
-    const enrichedOrder = await getEnrichedOrder(orderData);
-    console.log(enrichedOrder);
-    // const shipmentResult = await rateLtlShipment(EnrichedOrder, liftgate, limitedAccess)
-    const quotes = await getQuotes(enrichedOrder, liftgate, limitedAccess);
-     return quotes;
+      const enrichedOrder = await getEnrichedOrder(orderData);
+      console.log(enrichedOrder);
+      // const shipmentResult = await rateLtlShipment(EnrichedOrder, liftgate, limitedAccess)
+      const quotes = await getQuotes(enrichedOrder, liftgate, limitedAccess);
+      return quotes;
     }
   } catch (error) {
     console.log(error);
@@ -179,7 +183,7 @@ async function getQuotes(
           carrierService: "Standard",
           emergencyContactPersonName: "Chemtel",
           emergencyContactPhone: "800-255-3924",
-          readyToDispatch: "NO",  // What does this mean?
+          readyToDispatch: "NO", // What does this mean?
           timeCreated: formattedDate,
           isVicsBol: "YES",
           references: {
@@ -209,14 +213,18 @@ async function getQuotes(
             closeTime: "04:00 PM",
           },
           destinationStop: {
-            companyName: order.shipTo.company ? order.shipTo.company : undefined,
+            companyName: order.shipTo.company
+              ? order.shipTo.company
+              : undefined,
             streetLine1: order.shipTo.street1,
-            streetLine2: order.shipTo.street2 ? order.shipTo.street2 : undefined,
+            streetLine2: order.shipTo.street2
+              ? order.shipTo.street2
+              : undefined,
             city: order.shipTo.city,
             state: order.shipTo.state,
             zip: order.shipTo.postalCode,
             country: "USA",
-            locationType: order.shipTo.residential ? "Residential" : "Business",   // Make a dropdown UI element for user selection of location type
+            locationType: order.shipTo.residential ? "Residential" : "Business", // Make a dropdown UI element for user selection of location type
             contactFirstName: order.shipTo.name,
             contactPhone: order.shipTo.phone,
             contactEmail: order.customerEmail,
@@ -224,9 +232,8 @@ async function getQuotes(
             closeTime: "04:00 PM",
           },
           quoteUnits: getQuoteUnits(order, weight, dimensions),
-
-        }
-      ]
+        },
+      ],
     },
   });
 
@@ -235,7 +242,7 @@ async function getQuotes(
     weight: number,
     dimensions: Dimensions,
   ): QuoteUnits[] {
-    let LTLitems: QuoteUnits[] = [];
+    const LTLitems: QuoteUnits[] = [];
 
     for (let i = 0; i < dimensions.qty; i++) {
       LTLitems.push({
@@ -246,40 +253,60 @@ async function getQuotes(
         unitHeight: dimensions.height.toString(),
         unitStackable: "NO",
         quoteCommodities: getQuoteCommodities(items, weight),
-
       });
     }
 
     return LTLitems;
   }
 
-  function getQuoteCommodities(items: EnrichedOrder, weight: number): QuoteCommodity[] {
-
-    let commodities: QuoteCommodity[] = [];
+  function getQuoteCommodities(
+    items: EnrichedOrder,
+    weight: number,
+  ): QuoteCommodity[] {
+    const commodities: QuoteCommodity[] = [];
     for (let i = 0; i < items.enrichedItems.length; i++) {
-      const freightClass = items.enrichedItems[i].additionalData[i].freightClass.freight_class as QuoteCommodity["commodityClass"];
-      const unitContainerType = items.enrichedItems[i].additionalData[i].product.unit_container_type as QuoteCommodity["commodityPackingType"];
-      const packingGroup = convertToRomainNumeral(items.enrichedItems[i].additionalData[i].freightClass.packing_group);
+      const freightClass = items.enrichedItems[i].additionalData[i].freightClass
+        .freight_class as QuoteCommodity["commodityClass"];
+      const unitContainerType = items.enrichedItems[i].additionalData[i].product
+        .unit_container_type as QuoteCommodity["commodityPackingType"];
+      const packingGroup = convertToRomainNumeral(
+        items.enrichedItems[i].additionalData[i].freightClass.packing_group,
+      );
 
       commodities.push({
         commodityDescription: items.enrichedItems[i].name ?? undefined,
-        commodityNMFC: items.enrichedItems[i].additionalData[i].freightClass.nmfc ?? undefined,
-        commoditySub: items.enrichedItems[i].additionalData[i].freightClass.sub ?? undefined,
+        commodityNMFC:
+          items.enrichedItems[i].additionalData[i].freightClass.nmfc ??
+          undefined,
+        commoditySub:
+          items.enrichedItems[i].additionalData[i].freightClass.sub ??
+          undefined,
         commodityClass: freightClass ? freightClass : undefined,
         commodityPieces: items.enrichedItems[i].quantity.toString(),
         commodityWeight: (weight / items.enrichedItems.length).toString(),
         commodityPackingType: unitContainerType ? unitContainerType : undefined,
-        commodityHazMat: items.enrichedItems[i].additionalData[i].freightClass.hazardous ? "YES" : "NO",
-        hazmatIDNumber: items.enrichedItems[i].additionalData[i].freightClass.hazard_id ?? undefined,
-        hazmatProperShippingName: items.enrichedItems[i].additionalData[i].freightClass.description ?? undefined,
-        hazmatHazardClass: items.enrichedItems[i].additionalData[i].freightClass.hazard_class ?? undefined,
+        commodityHazMat: items.enrichedItems[i].additionalData[i].freightClass
+          .hazardous
+          ? "YES"
+          : "NO",
+        hazmatIDNumber:
+          items.enrichedItems[i].additionalData[i].freightClass.hazard_id ??
+          undefined,
+        hazmatProperShippingName:
+          items.enrichedItems[i].additionalData[i].freightClass.description ??
+          undefined,
+        hazmatHazardClass:
+          items.enrichedItems[i].additionalData[i].freightClass.hazard_class ??
+          undefined,
         hazmatPackingGroup: packingGroup ? packingGroup : undefined,
         customerOrderNumber: items.orderNumber,
-      })
+      });
     }
     return commodities;
   }
-  function convertToRomainNumeral(packingGroup: string | number | null): QuoteCommodity["hazmatPackingGroup"] {
+  function convertToRomainNumeral(
+    packingGroup: string | number | null,
+  ): QuoteCommodity["hazmatPackingGroup"] {
     switch (packingGroup) {
       case "1":
       case 1:
@@ -295,7 +322,3 @@ async function getQuotes(
     }
   }
 }
-
-
-
-
