@@ -250,14 +250,14 @@ export async function addProduct(products: InsertProduct[]) {
           })
           .returning()
           .execute();
-        if (typeof product.product_id === "number") {
+        if (typeof newProduct[0].product_id === "number") {
           const newProductFreightLinkage = await db
             .select()
             .from(schema.product_freight_linkages)
             .where(
               eq(
                 schema.product_freight_linkages.product_id,
-                product.product_id,
+                newProduct[0].product_id,
               ),
             )
             .execute();

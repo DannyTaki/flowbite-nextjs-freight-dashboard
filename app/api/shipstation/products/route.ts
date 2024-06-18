@@ -1,8 +1,6 @@
 import { getMissingSKUs } from "@/app/actions/action";
 import {
   addProduct,
-  addToProductFreightLinks,
-  deleteProductFreightLinks,
   deleteProducts,
   findUnsynchronizedProducts,
 } from "@/helpers/getData";
@@ -15,17 +13,13 @@ export async function POST() {
     if (missingProducts) {
       const newProducts = await addProduct(missingProducts);
       console.log("New Products:", newProducts);
-      const productsForFreightLinks = newProducts ?? [];
-      if (productsForFreightLinks.length > 0) {
-        await addToProductFreightLinks(productsForFreightLinks);
-      }
     }
     const unsynchronizedProducts = await findUnsynchronizedProducts();
     console.log(
       `Extra products in database but in shipstation.  Delete these products: ${JSON.stringify(unsynchronizedProducts)}`,
     );
     if (unsynchronizedProducts) {
-      await deleteProductFreightLinks(unsynchronizedProducts);
+      // await deleteProductFreightLinks(unsynchronizedProducts);
       await deleteProducts(unsynchronizedProducts);
     } else {
       console.log("No valid Product IDs found to delete");
