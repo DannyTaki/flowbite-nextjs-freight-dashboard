@@ -7,6 +7,7 @@ import {
   getFreightClassifications,
   updateFreightClassification,
 } from "@/helpers/getData"; // adjust the import path as necessary
+import { useSearch } from "@/hooks/use-search";
 import type {
   InsertFreightClassification,
   SelectFreightClassification,
@@ -30,7 +31,15 @@ const chemicalSchema = z.object({
 });
 type ChemicalInput = z.infer<typeof chemicalSchema>;
 
-export default function Chemicals() {
+export default function Chemicals({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+}) {
+  const query = searchParams?.query || "";
   const [openModal, setOpenModal] = useState(false);
   const [selectedChemical, setSelectedChemical] =
     useState<Partial<ChemicalInput | null>>(null);
@@ -46,17 +55,11 @@ export default function Chemicals() {
     queryFn: () => getFreightClassifications(),
   });
 
-  if (error) {
-    console.log(error);
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Spinner className="h-36 w-36" />
-      </div>
-    );
-  }
+  const {
+    data: chemicalData,
+    error: chemicalError,
+    isLoading: chemicalIsLoading,
+  } = useSearch<SelectFreightClassification>(query, "freight_classifications");
 
   const handleRowSelect = (classificationId: number) => {
     setSelectedRows((prevSelected) =>
@@ -158,6 +161,21 @@ export default function Chemicals() {
     setIsEditMode(true);
     setOpenModal(true);
   };
+
+  if (error || chemicalError) {
+    console.log(error);
+    return <div>Error loading products.</div>;
+  }
+
+  if (isLoading || chemicalIsLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner className="h-36 w-36" />
+      </div>
+    );
+  }
+
+  const currentData = chemicalData?.length ? chemicalData : data;
 
   return (
     <div className="overflow-x-auto">
@@ -374,7 +392,7 @@ export default function Chemicals() {
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          {data?.map((item, index) => (
+          {currentData?.map((item, index) => (
             <Table.Row
               key={index}
               className="bg-white dark:border-gray-700 dark:bg-gray-800"

@@ -192,6 +192,17 @@ export async function deleteFreightClassifications(
       )
       .execute();
 
+    const recordstoUpdate = await db
+      .select()
+      .from(schema.product_freight_linkages)
+      .where(
+        inArray(
+          schema.product_freight_linkages.classification_id,
+          classification_ids,
+        ),
+      )
+      .execute();
+
     await db
       .delete(schema.freight_classifications)
       .where(
@@ -210,6 +221,7 @@ export async function deleteFreightClassifications(
       SearchIndex.FreightClassifications,
       recordsToDelete,
     );
+    updateAlgoliaIndex(SearchIndex.ProductFreightLinkages, recordstoUpdate);
   } catch (error) {
     console.error("Error deleting chemical entries:", error);
   }
