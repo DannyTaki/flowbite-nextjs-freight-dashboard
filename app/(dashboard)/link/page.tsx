@@ -86,7 +86,7 @@ export default function UnlinkedProducts({
         ?.filter((item) => selectedRows.includes(item.product_id as number))
         .map((item) => ({
           link_id: item.link_id as number, // Ensure link_id is a number
-          classification_id: item.classification_id as number, // Ensure classification_id is a number
+          classification_id: classificationIds[item.product_id as number], // Ensure classification_id is a number
         }));
       // Log the updates array to see if the mapping is working correctly
       console.log("Updates:", updates);
