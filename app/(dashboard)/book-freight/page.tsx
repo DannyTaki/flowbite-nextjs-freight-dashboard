@@ -30,8 +30,15 @@ import {
   HiShoppingCart,
   HiX,
 } from "react-icons/hi";
-import { type IOrderPaginationResult } from "shipstation-node/typings/models";
+import type { IOrderPaginationResult } from "shipstation-node/typings/models/Order";
 import titleize from "titleize";
+
+// Ensure IOrderItem has the new property
+declare module "shipstation-node/typings/models/Order" {
+  interface IOrderItem {
+    hasClassification?: boolean;
+  }
+}
 
 export default function BookFreight() {
   const { computedMode } = useThemeMode();
@@ -74,18 +81,30 @@ export default function BookFreight() {
     if (skusWithNoClassification) {
       setOrderData((prevData) => {
         if (!prevData) return prevData;
+        const updatedOrders = prevData.orders.map((order) => ({
+          ...order,
+          items: order.items.map((item) => ({
+            ...item,
+            hasClassification: !skusWithNoClassification.includes(item.sku),
+          })),
+        }));
+        console.log("Updated Orders:", updatedOrders);
         return {
           ...prevData,
-          orders: prevData.orders.map((order) => ({
-            ...order,
-            items: order.items.map((item) => ({
-              ...item,
-              hasClassification: !skusWithNoClassification.includes(item.sku),
-            })),
-          })),
+          orders: updatedOrders,
         };
       });
       setDisableFreightBtn(skusWithNoClassification.length > 0);
+      if (skusWithNoClassification.length > 0) {
+        setShowToast(true);
+        setToastMessage(
+          `Please set a classification ID for the following SKUs: ${skusWithNoClassification.join(", ")}`,
+        );
+        setToastStyle(
+          "bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200",
+        );
+        setIcon(<HiExclamation className="size-5" />);
+      }
     }
   }, [skusWithNoClassification]);
 
@@ -396,6 +415,7 @@ export default function BookFreight() {
                           <Link
                             href={`/link?query=${item.sku}`}
                             className="text-blue-500 underline"
+                            target="_blank"
                           >
                             {item.sku}
                           </Link>

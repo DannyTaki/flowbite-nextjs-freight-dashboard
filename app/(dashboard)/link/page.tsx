@@ -130,6 +130,11 @@ export default function UnlinkedProducts({
   const currentPageData =
     currentData?.slice(startIndex, startIndex + itemsPerPage) || [];
 
+  // Filter the data to only show items where classification_id is null
+  const filteredPageData = currentPageData.filter(
+    (item) => item.classification_id === null,
+  );
+
   const onPageChange = (page: number) => setCurrentPage(page);
 
   return (
@@ -150,7 +155,7 @@ export default function UnlinkedProducts({
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          {currentPageData.map((item, index) => (
+          {filteredPageData.map((item, index) => (
             <Table.Row
               key={index}
               className="bg-white dark:border-gray-700 dark:bg-gray-800"
