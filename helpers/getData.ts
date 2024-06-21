@@ -10,7 +10,7 @@ import type {
 } from "@/types/db/types";
 import { neon } from "@neondatabase/serverless";
 import algoliasearch from "algoliasearch";
-import { eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -678,4 +678,33 @@ export async function deleteProductFreightLinks(
   } catch (error) {
     console.error("Error deleting product freight links:", error);
   }
+}
+
+export async function checkSKUsForClassification(
+  skus: string[],
+): Promise<string[]> {
+  console.log("Inside our function");
+  try {
+    const results = await db
+      .select({
+        sku: schema.product_freight_linkages.sku,
+      })
+      .from(schema.product_freight_linkages)
+      .where(
+        and(
+          inArray(schema.product_freight_linkages.sku, skus),
+          isNull(schema.product_freight_linkages.classification_id),
+        ),
+      )
+      .execute();
+
+    console.log(results);
+
+    return results
+      .map((result) => result.sku)
+      .filter((sku): sku is string => sku !== null);
+  } catch (error) {
+    console.error("Error checking SKUs for classification:", error);
+  }
+  return skus;
 }

@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  bookFreight,
-  checkSKUsForClassification,
-  getOrder,
-} from "@/app/actions/action";
+import { bookFreight, getOrder } from "@/app/actions/action";
+import { checkSKUsForClassification } from "@/helpers/getData";
 import lightLogo from "@/public/images/alliancechemical.svg";
 import darkLogo from "@/public/images/alliancechemical_dark.svg";
 import { optsSchema } from "@/types/optsSchema";
@@ -61,7 +58,7 @@ export default function BookFreight() {
     isLoading: isLoadingSKUs,
     refetch: refetchSKUs,
   } = useQuery({
-    queryKey: ["skus", orderData],
+    queryKey: ["skus"],
     queryFn: async () => {
       if (!orderData) return [];
       const skus = orderData.orders.flatMap((order) =>

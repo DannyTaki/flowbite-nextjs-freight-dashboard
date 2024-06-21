@@ -134,6 +134,7 @@ export async function getOrder(
 export async function checkSKUsForClassification(
   skus: string[],
 ): Promise<string[]> {
+  console.log("Inside our function");
   return skus;
 }
 
