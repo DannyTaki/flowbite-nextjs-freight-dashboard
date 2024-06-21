@@ -1,9 +1,14 @@
 "use client";
 
-import { bookFreight, getOrder } from "@/app/actions/action";
+import {
+  bookFreight,
+  checkSKUsForClassification,
+  getOrder,
+} from "@/app/actions/action";
 import lightLogo from "@/public/images/alliancechemical.svg";
 import darkLogo from "@/public/images/alliancechemical_dark.svg";
 import { optsSchema } from "@/types/optsSchema";
+import { useQuery } from "@tanstack/react-query";
 import {
   Button,
   Card,
@@ -16,7 +21,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactElement } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import {
   HiCheck,
@@ -50,6 +55,42 @@ export default function BookFreight() {
   );
   const [isLiftgateRequired, setIsLiftgateRequired] = useState<boolean>(false);
   const [isLimitedAccess, setIsLimitedAccess] = useState<boolean>(false);
+
+  const {
+    data: skusWithNoClassification,
+    isLoading: isLoadingSKUs,
+    refetch: refetchSKUs,
+  } = useQuery({
+    queryKey: ["skus", orderData],
+    queryFn: async () => {
+      if (!orderData) return [];
+      const skus = orderData.orders.flatMap((order) =>
+        order.items.map((item) => item.sku),
+      );
+      const filteredSKUs = checkSKUsForClassification(skus);
+      return filteredSKUs;
+    },
+    enabled: !!orderData,
+  });
+
+  useEffect(() => {
+    if (skusWithNoClassification) {
+      setOrderData((prevData) => {
+        if (!prevData) return prevData;
+        return {
+          ...prevData,
+          orders: prevData.orders.map((order) => ({
+            ...order,
+            items: order.items.map((item) => ({
+              ...item,
+              hasClassification: !skusWithNoClassification.includes(item.sku),
+            })),
+          })),
+        };
+      });
+      setDisableFreightBtn(skusWithNoClassification.length > 0);
+    }
+  }, [skusWithNoClassification]);
 
   function handleChevronClick(section: string) {
     if (section === "shipment") {
@@ -163,7 +204,7 @@ export default function BookFreight() {
           <Toast.Toggle onClick={() => setShowToast(false)} />
         </Toast>
       )}
-      <div className="flex flex-col flex-grow items-center justify-center px-6 pt-8 pb-10 md:h-full">
+      <div className="flex grow flex-col items-center justify-center px-6 pb-10 pt-8 md:h-full">
         <Link
           href="/"
           className="mb-8 flex items-center justify-center text-2xl font-semibold dark:text-white lg:mb-10"
@@ -338,6 +379,7 @@ export default function BookFreight() {
               <>
                 <ul className="mt-4 grid grid-cols-5 bg-gradient-to-r from-green-400 to-blue-500 text-center ">
                   <li className="font-bold">Item Name</li>
+                  <li className="font-bold">SKU</li>
                   <li className="font-bold">Image</li>
                   <li className="font-bold">Unit Cost</li>
                   <li className="font-bold">Quantity</li>
@@ -350,6 +392,18 @@ export default function BookFreight() {
                       className="grid grid-cols-5 items-center border-b bg-white text-center"
                     >
                       <li className="py-2">{item.name}</li>
+                      <li className="py-2">
+                        {item.hasClassification ? (
+                          item.sku
+                        ) : (
+                          <Link
+                            href={`/link?query=${item.sku}`}
+                            className="text-blue-500 underline"
+                          >
+                            {item.sku}
+                          </Link>
+                        )}
+                      </li>
                       <li>
                         <img
                           src={item.imageUrl || ""}

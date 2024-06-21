@@ -131,6 +131,12 @@ export async function getOrder(
   }
 }
 
+export async function checkSKUsForClassification(
+  skus: string[],
+): Promise<string[]> {
+  return skus;
+}
+
 export async function bookFreight(
   orderData: IOrderPaginationResult,
   liftgate: boolean,
