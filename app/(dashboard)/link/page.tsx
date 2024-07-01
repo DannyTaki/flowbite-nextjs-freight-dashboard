@@ -29,6 +29,15 @@ export default function UnlinkedProducts({
   const queryClient = useQueryClient();
 
   const {
+    data: unlinkedProductsData,
+    isLoading: unlinkedProductsLoading,
+    error: unlinkedProductsError,
+  } = useQuery({
+    queryKey: ["unlinkedProducts"],
+    queryFn: () => getUnlinkedProducts(),
+  });
+
+  const {
     data: searchData,
     isLoading: searchIsLoading,
     error: searchError,
@@ -116,6 +125,7 @@ export default function UnlinkedProducts({
       console.log("Update response:", response);
 
       queryClient.invalidateQueries({ queryKey: ["unlinkedProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["searchResults"] });
 
       // Notify the opener (if it exists) that an update has occured
       if (window.opener && !window.opener.closed) {

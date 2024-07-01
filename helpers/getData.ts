@@ -516,8 +516,8 @@ export async function updateProductFreightLink(
         // Retrieve the updated record
         const updatedRecord = await db
           .select()
-          .from(schema.product_freight_links)
-          .where(eq(schema.product_freight_links.link_id, update.link_id))
+          .from(schema.product_freight_linkages)
+          .where(eq(schema.product_freight_linkages.link_id, update.link_id))
           .execute();
 
         console.log(
@@ -535,7 +535,10 @@ export async function updateProductFreightLink(
     console.log("Updated records:", updatedRecords);
 
     // Pass the updated records to the updateAlgoliaIndex function
-    await updateAlgoliaIndex(SearchIndex.ProductFreightLinks, updatedRecords);
+    await updateAlgoliaIndex(
+      SearchIndex.ProductFreightLinkages,
+      updatedRecords,
+    );
   } catch (error) {
     console.error("Error updating product freight links:", error);
     throw error;
