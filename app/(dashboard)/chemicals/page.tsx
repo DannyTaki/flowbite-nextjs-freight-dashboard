@@ -14,7 +14,7 @@ import type {
 } from "@/types/db/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Checkbox, Modal, Spinner, Table, Toast } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiExclamation } from "react-icons/hi";
 import { z } from "zod";
 
@@ -47,6 +47,9 @@ export default function Chemicals({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [currentData, setCurrentData] = useState<
+    SelectFreightClassification[] | undefined
+  >(undefined);
 
   const queryClient = useQueryClient();
 
@@ -59,7 +62,18 @@ export default function Chemicals({
     data: chemicalData,
     error: chemicalError,
     isLoading: chemicalIsLoading,
+    refetch: refetchChemicalData,
   } = useSearch<SelectFreightClassification>(query, "freight_classifications");
+
+  useEffect(() => {
+    setCurrentData(chemicalData?.length ? chemicalData : data);
+  }, [chemicalData, data]);
+
+  useEffect(() => {
+    if (query) {
+      refetchChemicalData();
+    }
+  }, [query, refetchChemicalData]);
 
   const handleRowSelect = (classificationId: number) => {
     setSelectedRows((prevSelected) =>
@@ -81,10 +95,31 @@ export default function Chemicals({
     try {
       await deleteProductFreightLinks(undefined, selectedRows);
       await deleteFreightClassifications(selectedRows);
+
+      // Update local state
+      const updatedData = currentData?.filter(
+        (item) => !selectedRows.includes(item.classification_id),
+      );
+
+      if (query) {
+        // If using search data, update chemicalData state
+        queryClient.setQueryData(
+          ["search", query, "freight_classifications"],
+          updatedData,
+        );
+      } else {
+        // If not using search data, update the main data
+        queryClient.setQueryData(["chemicals"], updatedData);
+      }
+
       setSelectedRows([]);
       queryClient.invalidateQueries({ queryKey: ["chemicals"] });
+      setToastMessage("Selected items deleted successfully!");
+      setShowToast(true);
     } catch (error) {
       console.error("Error deleting entries:", error);
+      setToastMessage("Error deleting entries");
+      setShowToast(true);
     }
   };
 
@@ -107,14 +142,29 @@ export default function Chemicals({
         });
 
         if (isEditMode) {
-          await updateFreightClassification(
+          const updatedItem = await updateFreightClassification(
             validatedData as InsertFreightClassification,
           );
+          if (updatedItem) {
+            setCurrentData((prevData) =>
+              prevData?.map((item) =>
+                item.classification_id === updatedItem.classification_id
+                  ? updatedItem
+                  : item,
+              ),
+            );
+          }
         } else {
-          await createFreightClassification(
+          const newItem = await createFreightClassification(
             validatedData as InsertFreightClassification,
           );
+          if (newItem) {
+            setCurrentData((prevData) =>
+              prevData ? [...prevData, newItem] : [newItem],
+            );
+          }
         }
+
         setOpenModal(false);
         queryClient.invalidateQueries({ queryKey: ["chemicals"] });
       } catch (e) {
@@ -175,7 +225,7 @@ export default function Chemicals({
     );
   }
 
-  const currentData = chemicalData?.length ? chemicalData : data;
+  // const currentData = chemicalData?.length ? chemicalData : data;
 
   return (
     <div className="overflow-x-auto">

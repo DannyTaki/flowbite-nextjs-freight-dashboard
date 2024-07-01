@@ -7,6 +7,7 @@ import type {
   InsertProduct,
   InsertProductFreightLink,
   InsertProductFreightLinkage,
+  SelectFreightClassification,
 } from "@/types/db/types";
 import { neon } from "@neondatabase/serverless";
 import algoliasearch from "algoliasearch";
@@ -75,6 +76,7 @@ export async function getFreightClassifications() {
         hazard_class: schema.freight_classifications.hazard_class,
         packing_group: schema.freight_classifications.packing_group,
         sub: schema.freight_classifications.sub,
+        objectID: schema.freight_classifications.objectID,
       })
       .from(schema.freight_classifications)
       .execute();
@@ -94,7 +96,7 @@ export async function updateFreightClassification(
         "classification_id is required to update a chemical entry.",
       );
     }
-    await db
+    const updatedRecord = await db
       .update(schema.freight_classifications)
       .set({
         description: chemical.description,
@@ -112,9 +114,13 @@ export async function updateFreightClassification(
           chemical.classification_id,
         ),
       )
+      .returning()
       .execute();
 
+    const updatedChemcial = updatedRecord[0] as SelectFreightClassification;
+
     updateAlgoliaIndex(SearchIndex.FreightClassifications, [chemical]);
+    return updatedChemcial;
   } catch (error) {
     console.error("Error updating chemical entry:", error);
   }
@@ -153,7 +159,7 @@ export async function createFreightClassification(
   chemical: InsertFreightClassification,
 ) {
   try {
-    const newChemicalEntry = await db
+    const newChemicalRecords = await db
       .insert(schema.freight_classifications)
       .values({
         description: chemical.description,
@@ -168,10 +174,15 @@ export async function createFreightClassification(
       .returning()
       .execute();
 
+    const newChemicalRecord =
+      newChemicalRecords[0] as SelectFreightClassification;
+
     createObjectAlgoliaIndex(
       SearchIndex.FreightClassifications,
-      newChemicalEntry,
+      newChemicalRecords,
     );
+
+    return newChemicalRecord;
   } catch (error) {
     console.error("Error adding chemical entry:", error);
   }
