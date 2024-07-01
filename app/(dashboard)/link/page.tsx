@@ -8,7 +8,7 @@ import { useSearch } from "@/hooks/use-search";
 import type { SelectProductFreightLinkage } from "@/types/db/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Checkbox, Pagination, Table, TextInput } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function UnlinkedProducts({
   searchParams,
@@ -19,14 +19,17 @@ export default function UnlinkedProducts({
   };
 }) {
   const query = searchParams?.query || "";
-  const currentSearchPage = Number(searchParams?.page) || 1;
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [classificationIds, setClassifications] = useState<{
     [key: number]: string;
   }>({});
+  const [updateCounter, setUpdateCounter] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
   const queryClient = useQueryClient();
+  const [currentData, setCurrentData] = useState<
+    SelectProductFreightLinkage[] | undefined
+  >(undefined);
 
   const {
     data: unlinkedProductsData,
@@ -42,10 +45,27 @@ export default function UnlinkedProducts({
     isLoading: searchIsLoading,
     error: searchError,
   } = useSearch<SelectProductFreightLinkage>(query, "product_freight_linkages");
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["unlinkedProducts"],
-    queryFn: () => getUnlinkedProducts(),
-  });
+
+  useEffect(() => {
+    setCurrentData(query ? searchData : unlinkedProductsData);
+  }, [query, searchData, unlinkedProductsData, updateCounter]);
+
+  const allSelected = selectedRows.length === currentData?.length;
+
+  const totalItems = useMemo(() => {
+    if (!currentData) return 0;
+    return currentData.filter((item) => item.classification_id === null).length;
+  }, [currentData]);
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const filteredPageData = useMemo(() => {
+    if (!currentData) return [];
+    return currentData
+      .filter((item) => item.classification_id === null)
+      .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [currentData, currentPage, itemsPerPage]);
+
+  const onPageChange = (page: number) => setCurrentPage(page);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -60,11 +80,12 @@ export default function UnlinkedProducts({
   }
 
   function handleSelectAll() {
-    if (selectedRows.length === data?.length) {
+    if (selectedRows.length === filteredPageData.length) {
       setSelectedRows([]);
     } else {
-      const allProductsIds =
-        data?.map((item) => item.product_id as number) || [];
+      const allProductsIds = filteredPageData.map(
+        (item) => item.product_id as number,
+      );
       setSelectedRows(allProductsIds);
     }
   }
@@ -88,10 +109,10 @@ export default function UnlinkedProducts({
   async function handleAdd() {
     try {
       // Check the original data and selectedRows
-      console.log("Original data:", data);
+      console.log("Original data:", filteredPageData);
       console.log("Selected rows:", selectedRows);
 
-      const updates = currentData
+      const updates = filteredPageData
         ?.filter((item) => selectedRows.includes(item.product_id as number))
         .map((item) => ({
           link_id: item.link_id as number, // Ensure link_id is a number
@@ -124,8 +145,20 @@ export default function UnlinkedProducts({
       const response = await updateProductFreightLink(validUpdates);
       console.log("Update response:", response);
 
+      // Manually remove updated items from local state
+      const updatedProductIds = validUpdates.map((update) => update.link_id);
+      setCurrentData((prevData) =>
+        prevData?.filter(
+          (item) => !updatedProductIds.includes(item.link_id as number),
+        ),
+      );
+
       queryClient.invalidateQueries({ queryKey: ["unlinkedProducts"] });
-      queryClient.invalidateQueries({ queryKey: ["searchResults"] });
+      queryClient.invalidateQueries({ queryKey: ["searchResults", query] });
+
+      setSelectedRows([]);
+      setClassifications({});
+      setUpdateCounter((prev) => prev + 1);
 
       // Notify the opener (if it exists) that an update has occured
       if (window.opener && !window.opener.closed) {
@@ -136,25 +169,16 @@ export default function UnlinkedProducts({
     }
   }
 
-  const currentData = searchData || data;
-  const allSelected = selectedRows.length === data?.length;
-
-  const totalItems = currentData?.length || 0;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentPageData =
-    currentData?.slice(startIndex, startIndex + itemsPerPage) || [];
+  // const currentData = searchData || data;
 
   // Filter the data to only show items where classification_id is null
-  const filteredPageData = currentPageData.filter(
-    (item) => item.classification_id === null,
-  );
-
-  const onPageChange = (page: number) => setCurrentPage(page);
+  // const filteredPageData = currentPageData.filter(
+  //   (item) => item.classification_id === null,
+  // );
 
   return (
     <div className="overflow-x-auto">
-      <Table>
+      <Table key={updateCounter}>
         <Table.Head>
           <Table.HeadCell className="p-4">
             <Checkbox checked={allSelected} onChange={handleSelectAll} />
