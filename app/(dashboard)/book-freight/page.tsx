@@ -59,6 +59,8 @@ export default function BookFreight() {
   );
   const [isLiftgateRequired, setIsLiftgateRequired] = useState<boolean>(false);
   const [isLimitedAccess, setIsLimitedAccess] = useState<boolean>(false);
+  const [classificationJustUpdated, setClassificationJustUpdated] =
+    useState<boolean>(false);
 
   const {
     data: skusWithNoClassification,
@@ -71,14 +73,19 @@ export default function BookFreight() {
       const skus = orderData.orders.flatMap((order) =>
         order.items.map((item) => item.sku),
       );
-      const filteredSKUs = checkSKUsForClassification(skus);
+      const filteredSKUs = await checkSKUsForClassification(skus);
       return filteredSKUs;
     },
     enabled: !!orderData,
   });
 
+  const handlePostClassificationUpdate = async () => {
+    setClassificationJustUpdated(true);
+    await refetchSKUs();
+  };
+
   useEffect(() => {
-    if (skusWithNoClassification) {
+    if (skusWithNoClassification !== undefined) {
       setOrderData((prevData) => {
         if (!prevData) return prevData;
         const updatedOrders = prevData.orders.map((order) => ({
@@ -94,9 +101,28 @@ export default function BookFreight() {
           orders: updatedOrders,
         };
       });
+
       setDisableFreightBtn(skusWithNoClassification.length > 0);
-      if (skusWithNoClassification.length > 0) {
-        setShowToast(true);
+
+      setShowToast(true);
+      if (classificationJustUpdated) {
+        if (skusWithNoClassification.length === 0) {
+          setToastMessage("All SKUs now have valid classifications!");
+          setToastStyle(
+            "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200",
+          );
+          setIcon(<HiCheck className="size-5" />);
+        } else {
+          setToastMessage(
+            `Classification updated. Remaining SKUs without classification: ${skusWithNoClassification.join(", ")}`,
+          );
+          setToastStyle(
+            "bg-orange-100 text-orange-500 dark:bg-orange-700 dark:text-orange-200",
+          );
+          setIcon(<HiExclamation className="size-5" />);
+        }
+        setClassificationJustUpdated(false);
+      } else if (skusWithNoClassification.length > 0) {
         setToastMessage(
           `Please set a classification ID for the following SKUs: ${skusWithNoClassification.join(", ")}`,
         );
@@ -106,7 +132,21 @@ export default function BookFreight() {
         setIcon(<HiExclamation className="size-5" />);
       }
     }
-  }, [skusWithNoClassification]);
+  }, [skusWithNoClassification, classificationJustUpdated]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === "classificationUpdated") {
+        handlePostClassificationUpdate();
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  });
 
   function handleChevronClick(section: string) {
     if (section === "shipment") {
@@ -416,6 +456,17 @@ export default function BookFreight() {
                             href={`/link?query=${item.sku}`}
                             className="text-blue-500 underline"
                             target="_blank"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const newWindow = window.open(
+                                `/link?query=${item.sku}`,
+                                "_blank",
+                              );
+                              if (newWindow) {
+                                newWindow.onbeforeunload =
+                                  handlePostClassificationUpdate;
+                              }
+                            }}
                           >
                             {item.sku}
                           </Link>

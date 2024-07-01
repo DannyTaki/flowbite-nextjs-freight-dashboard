@@ -116,6 +116,11 @@ export default function UnlinkedProducts({
       console.log("Update response:", response);
 
       queryClient.invalidateQueries({ queryKey: ["unlinkedProducts"] });
+
+      // Notify the opener (if it exists) that an update has occured
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage("classificationUpdated", "*");
+      }
     } catch (error) {
       console.error("Error adding classification:", error);
     }
